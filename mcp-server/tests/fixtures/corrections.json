@@ -1,0 +1,96 @@
+{
+  "cases": [
+    {
+      "input": "cervical margins uninvolved",
+      "organ_system": "colon",
+      "expected": "surgical margins uninvolved",
+      "description": "Colon: cervical → surgical margins"
+    },
+    {
+      "input": "perineal invasion not identified",
+      "organ_system": null,
+      "expected": "perineural invasion not identified",
+      "description": "General: perineal → perineural"
+    },
+    {
+      "input": "acid nor carcinoma",
+      "organ_system": "prostate",
+      "expected": "acinar adenocarcinoma",
+      "description": "Prostate: acid nor carcinoma → acinar adenocarcinoma"
+    },
+    {
+      "input": "ductal karma grade 2",
+      "organ_system": "breast",
+      "expected": "ductal carcinoma grade 2",
+      "description": "Breast: ductal karma → ductal carcinoma"
+    },
+    {
+      "input": "reason score 3 plus 4",
+      "organ_system": "prostate",
+      "expected": "Gleason score 3 plus 4",
+      "description": "Prostate: reason score → Gleason score"
+    },
+    {
+      "input": "popular carcinoma",
+      "organ_system": "thyroid",
+      "expected": "papillary carcinoma",
+      "description": "Thyroid: popular → papillary carcinoma"
+    },
+    {
+      "input": "hurtle cell neoplasm",
+      "organ_system": "thyroid",
+      "expected": "Hurthle cell neoplasm",
+      "description": "Thyroid: hurtle → Hurthle cell"
+    },
+    {
+      "input": "isop grade group 2",
+      "organ_system": "prostate",
+      "expected": "ISUP grade group 2",
+      "description": "Prostate: isop → ISUP"
+    },
+    {
+      "input": "centennial node negative",
+      "organ_system": "breast",
+      "expected": "sentinel node negative",
+      "description": "Breast: centennial → sentinel node"
+    },
+    {
+      "input": "The margins are negative",
+      "organ_system": null,
+      "expected": "The margins are negative",
+      "description": "No correction needed — verbatim pass-through"
+    },
+    {
+      "input": "add no carcinoma with meta static disease",
+      "organ_system": null,
+      "expected": "adenocarcinoma with metastatic disease",
+      "description": "General: multiple corrections in one pass"
+    },
+    {
+      "input": "mod diff adenocarcinoma with LVI identified",
+      "organ_system": null,
+      "expand_abbreviations": true,
+      "expected": "moderately differentiated adenocarcinoma with lymphovascular invasion identified",
+      "description": "Abbreviation expansion: mod diff + LVI"
+    },
+    {
+      "input": "mod diff adenocarcinoma with LVI identified",
+      "organ_system": null,
+      "expand_abbreviations": false,
+      "expected": "mod diff adenocarcinoma with LVI identified",
+      "description": "Abbreviation expansion disabled — no changes"
+    },
+    {
+      "input": "in city changes noted",
+      "organ_system": null,
+      "expected": "in situ changes noted",
+      "description": "General: in city → in situ"
+    },
+    {
+      "input": "mess oh thelia with plural invasion",
+      "organ_system": "lung",
+      "expected": "mesothelioma with pleural invasion",
+      "description": "Lung: mess oh thelia → mesothelioma, plural invasion → pleural invasion"
+    }
+  ]
+}

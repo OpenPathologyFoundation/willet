@@ -1,0 +1,127 @@
+{
+  "version": "1.0",
+  "description": "Pathology vocabulary data for WILLET linguistic services. Confusion pairs, abbreviations, and Whisper prompt hints.",
+
+  "confusionPairs": {
+    "_default": {
+      "add no carcinoma": "adenocarcinoma",
+      "adder no carcinoma": "adenocarcinoma",
+      "car cinema": "carcinoma",
+      "new plasm": "neoplasm",
+      "meta static": "metastatic",
+      "meta stasis": "metastasis",
+      "immune oh his to chemistry": "immunohistochemistry",
+      "immuno histo chemistry": "immunohistochemistry",
+      "perineal": "perineural",
+      "dis plasia": "dysplasia",
+      "diss plasia": "dysplasia",
+      "high grade die splasher": "high-grade dysplasia",
+      "low grade die splasher": "low-grade dysplasia",
+      "un involved": "uninvolved",
+      "in city": "in situ",
+      "in sigh to": "in situ",
+      "in filtering": "infiltrating",
+      "isop": "ISUP",
+      "isop grade": "ISUP grade",
+      "gleeson": "Gleason",
+      "reason score": "Gleason score",
+      "add end um": "addendum",
+      "a men meant": "amendment"
+    },
+    "colon": {
+      "cervical margins": "surgical margins",
+      "color cancer": "colon cancer",
+      "color carcinoma": "colon carcinoma",
+      "ascending column": "ascending colon",
+      "descending column": "descending colon",
+      "sigmoid column": "sigmoid colon",
+      "transverse column": "transverse colon",
+      "secular": "cecal",
+      "see call": "cecal",
+      "secular polyp": "cecal polyp",
+      "signal ring": "signet ring",
+      "muscle layers propria": "muscularis propria",
+      "music layers propria": "muscularis propria",
+      "perineal invasion": "perineural invasion",
+      "perry neural": "perineural",
+      "tubular adder noma": "tubular adenoma"
+    },
+    "breast": {
+      "ductal karma": "ductal carcinoma",
+      "ductal car cinema": "ductal carcinoma",
+      "centennial node": "sentinel node",
+      "sentinel lymph note": "sentinel lymph node",
+      "lobular in city": "lobular in situ",
+      "her to positive": "HER2 positive",
+      "her to negative": "HER2 negative",
+      "paget disease": "Paget disease",
+      "micro calcifications": "microcalcifications"
+    },
+    "prostate": {
+      "reason score": "Gleason score",
+      "gleeson score": "Gleason score",
+      "gleeson": "Gleason",
+      "perineal invasion": "perineural invasion",
+      "perry neural invasion": "perineural invasion",
+      "extra prostate extension": "extraprostatic extension",
+      "extra prostate at": "extraprostatic",
+      "seminal vessel": "seminal vesicle",
+      "acid nor": "acinar",
+      "acid nor carcinoma": "acinar adenocarcinoma",
+      "i snap": "ISUP",
+      "isop": "ISUP",
+      "isop grade": "ISUP grade",
+      "high grade pin": "HGPIN",
+      "pi rads": "PI-RADS"
+    },
+    "thyroid": {
+      "bethesda": "Bethesda",
+      "popular carcinoma": "papillary carcinoma",
+      "papillary car cinema": "papillary carcinoma",
+      "colloid nodule": "colloid nodule",
+      "hurdle cell": "Hurthle cell",
+      "hurtle cell": "Hurthle cell"
+    },
+    "lung": {
+      "add no carcinoma": "adenocarcinoma",
+      "squamous sell": "squamous cell",
+      "non-small sell": "non-small cell",
+      "perineal invasion": "perineural invasion",
+      "plural invasion": "pleural invasion",
+      "mess oh thelia": "mesothelioma",
+      "left attic": "lepidic",
+      "micro popular": "micropapillary",
+      "naps in a": "Napsin A"
+    }
+  },
+
+  "abbreviations": {
+    "mod diff": "moderately differentiated",
+    "well diff": "well differentiated",
+    "poorly diff": "poorly differentiated",
+    "LVI": "lymphovascular invasion",
+    "PNI": "perineural invasion",
+    "IHC": "immunohistochemistry",
+    "H&E": "hematoxylin and eosin",
+    "FNA": "fine needle aspiration",
+    "DCIS": "ductal carcinoma in situ",
+    "LCIS": "lobular carcinoma in situ",
+    "SLN": "sentinel lymph node",
+    "HGPIN": "high-grade prostatic intraepithelial neoplasia",
+    "ASAP": "atypical small acinar proliferation"
+  },
+
+  "whisperHints": [
+    "adenocarcinoma", "carcinoma", "dysplasia", "neoplasm",
+    "hyperplastic", "tubular adenoma", "villous", "tubulovillous",
+    "muscularis propria", "submucosa", "serosa", "mesentery",
+    "perineural invasion", "lymphovascular invasion",
+    "surgical margins", "uninvolved", "involved",
+    "sentinel node", "metastatic", "immunohistochemistry",
+    "Gleason", "ISUP", "acinar", "Nottingham",
+    "ductal", "lobular", "HER2", "estrogen receptor",
+    "papillary", "follicular", "Bethesda", "Hurthle cell",
+    "squamous cell", "mesothelioma", "lepidic",
+    "hematoxylin", "eosin", "Napsin A", "synaptophysin"
+  ]
+}

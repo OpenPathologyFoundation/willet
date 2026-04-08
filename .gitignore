@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.vite/
+public/mockServiceWorker.js
+
+# Local / OS
+*.local
+.DS_Store
+
+# Test + coverage
+coverage/
+artifacts/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+!.env.example.mcp
+
+# Editor / tooling
+.claude/
+.idea/
+.vscode/
+
+# Local dev notes (per-iteration PR drafts, scratch)
+.dev-notes/
+
+# Python (mcp-server)
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
