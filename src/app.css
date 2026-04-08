@@ -1,0 +1,127 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   Clinical Design System — matches Okapi
+   ============================================ */
+
+:root {
+  /* Light Mode (default) */
+  --clinical-bg: #F9FAFB;          /* Gray-50 */
+  --clinical-surface: #FFFFFF;      /* White */
+  --clinical-surface-raised: #FFFFFF;
+  --clinical-primary: #2563EB;      /* Blue-600 */
+  --clinical-success: #0D9488;      /* Teal-600 */
+  --clinical-text: #111827;         /* Gray-900 */
+  --clinical-text-secondary: #374151; /* Gray-700 */
+  --clinical-muted: #6B7280;        /* Gray-500 */
+  --clinical-border: #E5E7EB;       /* Gray-200 */
+  --clinical-border-subtle: #F3F4F6; /* Gray-100 */
+  --clinical-hover: rgba(0, 0, 0, 0.05);
+  --clinical-input-bg: #FFFFFF;
+  --clinical-input-border: #D1D5DB; /* Gray-300 */
+
+  /* Badge backgrounds (light) */
+  --badge-rose-bg: rgba(244, 63, 94, 0.1);
+  --badge-rose-text: #E11D48;
+  --badge-amber-bg: rgba(245, 158, 11, 0.1);
+  --badge-amber-text: #D97706;
+  --badge-sky-bg: rgba(14, 165, 233, 0.1);
+  --badge-sky-text: #0284C7;
+  --badge-purple-bg: rgba(168, 85, 247, 0.1);
+  --badge-purple-text: #7C3AED;
+  --badge-muted-bg: rgba(107, 114, 128, 0.1);
+  --badge-muted-text: #6B7280;
+  --badge-green-bg: rgba(16, 185, 129, 0.08);
+  --badge-green-text: #059669;
+  --badge-yellow-bg: rgba(234, 179, 8, 0.08);
+  --badge-yellow-text: #CA8A04;
+  --badge-blue-bg: rgba(59, 130, 246, 0.08);
+  --badge-blue-text: #2563EB;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root.dark {
+  /* Dark Mode */
+  --clinical-bg: #1E2124;          /* Gunmetal */
+  --clinical-surface: #282C34;      /* Dark Surface */
+  --clinical-surface-raised: #2D3139;
+  --clinical-primary: #3B82F6;      /* Blue-500 */
+  --clinical-success: #14B8A6;      /* Teal-500 */
+  --clinical-text: #F3F4F6;         /* Gray-100 */
+  --clinical-text-secondary: #D1D5DB; /* Gray-300 */
+  --clinical-muted: #9CA3AF;        /* Gray-400 */
+  --clinical-border: #374151;       /* Gray-700 */
+  --clinical-border-subtle: #1F2937; /* Gray-800 */
+  --clinical-hover: rgba(255, 255, 255, 0.05);
+  --clinical-input-bg: #1F2937;
+  --clinical-input-border: #4B5563; /* Gray-600 */
+
+  /* Badge backgrounds (dark — brighter text for contrast) */
+  --badge-rose-bg: rgba(244, 63, 94, 0.15);
+  --badge-rose-text: #FB7185;
+  --badge-amber-bg: rgba(245, 158, 11, 0.15);
+  --badge-amber-text: #FBBF24;
+  --badge-sky-bg: rgba(14, 165, 233, 0.15);
+  --badge-sky-text: #38BDF8;
+  --badge-purple-bg: rgba(168, 85, 247, 0.15);
+  --badge-purple-text: #C084FC;
+  --badge-muted-bg: rgba(107, 114, 128, 0.15);
+  --badge-muted-text: #9CA3AF;
+  --badge-green-bg: rgba(16, 185, 129, 0.1);
+  --badge-green-text: #34D399;
+  --badge-yellow-bg: rgba(234, 179, 8, 0.1);
+  --badge-yellow-text: #FBBF24;
+  --badge-blue-bg: rgba(59, 130, 246, 0.1);
+  --badge-blue-text: #60A5FA;
+}
+
+@theme {
+  --color-clinical-bg: var(--clinical-bg);
+  --color-clinical-surface: var(--clinical-surface);
+  --color-clinical-surface-raised: var(--clinical-surface-raised);
+  --color-clinical-primary: var(--clinical-primary);
+  --color-clinical-success: var(--clinical-success);
+  --color-clinical-text: var(--clinical-text);
+  --color-clinical-text-secondary: var(--clinical-text-secondary);
+  --color-clinical-muted: var(--clinical-muted);
+  --color-clinical-border: var(--clinical-border);
+  --color-clinical-border-subtle: var(--clinical-border-subtle);
+  --color-clinical-hover: var(--clinical-hover);
+  --color-clinical-input-bg: var(--clinical-input-bg);
+  --color-clinical-input-border: var(--clinical-input-border);
+
+  --color-badge-rose-bg: var(--badge-rose-bg);
+  --color-badge-rose-text: var(--badge-rose-text);
+  --color-badge-amber-bg: var(--badge-amber-bg);
+  --color-badge-amber-text: var(--badge-amber-text);
+  --color-badge-sky-bg: var(--badge-sky-bg);
+  --color-badge-sky-text: var(--badge-sky-text);
+  --color-badge-purple-bg: var(--badge-purple-bg);
+  --color-badge-purple-text: var(--badge-purple-text);
+  --color-badge-muted-bg: var(--badge-muted-bg);
+  --color-badge-muted-text: var(--badge-muted-text);
+  --color-badge-green-bg: var(--badge-green-bg);
+  --color-badge-green-text: var(--badge-green-text);
+  --color-badge-yellow-bg: var(--badge-yellow-bg);
+  --color-badge-yellow-text: var(--badge-yellow-text);
+  --color-badge-blue-bg: var(--badge-blue-bg);
+  --color-badge-blue-text: var(--badge-blue-text);
+
+  --font-sans: var(--font-sans);
+}
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--clinical-bg);
+  color: var(--clinical-text);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
