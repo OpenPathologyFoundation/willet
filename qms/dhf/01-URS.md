@@ -1269,6 +1269,25 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 ---
 
+### 5.26 Case-Level Comments
+
+#### UN-089 · Phase 1
+
+**Requirement:** The user shall be able to add a free-text comment that applies to the entire case report, distinct from part-level COMMENT clauses. The case-level comment shall be visible and editable in the authoring workspace, and shall be included in the finalized report after all specimen parts.
+
+**Rationale:** Pathologists routinely need to add case-wide notes that do not belong to any specific specimen part — for example, clinical correlation recommendations, case-wide qualifications, or references to ancillary reports spanning multiple parts. The existing part-level COMMENT clause (one per part, UN-006) does not fulfill this need. A dedicated case-level comment field provides an unambiguous location for whole-report annotations.
+
+**Source:** Clinical authoring workflow; distinct from part-level COMMENT clause (UN-006) and from educational commenting workflows (UN-061).
+
+**Acceptance:**
+- A case-level comment input area is displayed in the authoring workspace below all specimen part sections.
+- The field is free-text multi-line, editable by any user with authoring access.
+- Changes to the case-level comment are included in the standard autosave cycle.
+- The case-level comment is rendered in the finalized RTF report as a distinct section following all specimen parts.
+- Changes to the case-level comment are recorded in the audit trail (author identity and timestamp).
+
+---
+
 ## 6. Open Questions Affecting Requirements
 
 The following questions remain unresolved and may result in additional or modified requirements. Each question is tracked with its current status and the requirement areas it affects.
@@ -1310,6 +1329,7 @@ The following traceability matrix will be completed as Design Inputs are derived
 | 2.0 | 2026-03-13 | DRAFT | Major expansion from UI Critical Review and Design Dialogue. Added 23 new requirements (UN-063 through UN-085) in 8 new sections: §5.18 Direct Dictation and Voice Input Routing (UN-063–066), §5.19 User Preferences (UN-067–068), §5.20 Context Dock (UN-069–071), §5.21 Synoptic Reporting (UN-072–075), §5.22 Report Templates (UN-076–079), §5.23 Clause Editor Enhancements (UN-080–082), §5.24 Layout and Workspace (UN-083–084), §5.25 Accessibility (UN-085). Updated UN-058 to cross-reference detailed synoptic requirements. Resolved Open Question #7. Added Open Questions #9–12. Total requirements: 85 (76 Phase 1, 9 Phase 2). |
 | 2.1 | 2026-03-13 | DRAFT | Added UN-086 (context-aware transcription correction) and UN-087 (clause-type-driven normalization) to §5.18 Direct Dictation section. These address speech recognition accuracy with accented speech and the clinical-to-clerical text transformation during dictation. Total requirements: 87 (78 Phase 1, 9 Phase 2). |
 | 2.2 | 2026-03-14 | DRAFT | Added UN-088 (contextual prompt seeding for STT model). Pre-transcription vocabulary biasing reduces domain-specific speech recognition errors at source. Total requirements: 88 (79 Phase 1, 9 Phase 2). |
+| 2.3 | 2026-04-09 | DRAFT | Added UN-089 (case-level comment field) in new §5.26 Case-Level Comments. Addresses the need for a whole-report free-text annotation distinct from part-level COMMENT clauses. Total requirements: 89 (80 Phase 1, 9 Phase 2). |
 
 ---
 
