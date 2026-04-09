@@ -1411,6 +1411,56 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
+### 3.27 Case-Level Comments
+
+#### SRS-260 · Phase 1
+
+**The system shall provide a case-level comment input area positioned below all specimen part sections in the authoring workspace. The field shall be a free-text multi-line input, up to 2,000 characters, editable by any user with authoring access to the case.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-089 |
+| SDS trace | 04-01 §X (to be added) |
+| Verification | Functional test: case-level comment field renders below all parts; accepts multi-line input; enforces 2,000 character limit |
+
+---
+
+#### SRS-261 · Phase 1
+
+**The case-level comment shall be persisted in `cases.metadata.case_comment` (JSONB text field) and included in the standard autosave cycle. An empty or null `case_comment` shall be a valid state; the field is not required for finalization.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-089 |
+| SDS trace | 04-06 §X (to be added), 04-01 §X |
+| Verification | Integration test: `case_comment` persisted and retrieved on scaffold reload; unit test: autosave fires on comment change |
+
+---
+
+#### SRS-262 · Phase 1
+
+**The finalization template shall render the case-level comment as a distinct section after all specimen parts. If `cases.metadata.case_comment` is non-null and non-empty, the RTF shall include `<h3>Comment</h3><p>{text}</p>` after the last specimen part block. If empty or null, no Comment section shall be emitted.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-089 |
+| SDS trace | 04-05 §4.2 |
+| Verification | Unit test: finalization template with non-empty `case_comment` produces Comment section; unit test: empty `case_comment` produces no Comment section; golden fixture comparison |
+
+---
+
+#### SRS-263 · Phase 1
+
+**Changes to the case-level comment shall be recorded in the audit trail. Each autosave event that includes a changed `case_comment` value shall create an audit record containing: author identity (user ID), timestamp (ISO 8601 UTC), and SHA-256 hash of the new value.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-089 |
+| SDS trace | 04-06 §X (audit events) |
+| Verification | Integration test: editing `case_comment` and triggering autosave creates an audit record with author identity, timestamp, and value hash |
+
+---
+
 ---
 
 ## 4. Requirements Summary
@@ -1443,7 +1493,8 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 | Clause Enhancements | SRS-230 – SRS-233 | 4 | 1 |
 | Layout/Workspace | SRS-240 – SRS-242 | 3 | 1 |
 | Accessibility | SRS-250 – SRS-252 | 3 | 1 |
-| **Total** | | **107** | **Phase 1: 101, Phase 2: 6** |
+| Case-Level Comments | SRS-260 – SRS-263 | 4 | 1 |
+| **Total** | | **114** | **Phase 1: 108, Phase 2: 6** |
 
 ---
 
@@ -1541,6 +1592,7 @@ Every URS user need traces to at least one SRS requirement:
 | UN-086 | SRS-185, SRS-186, SRS-188, SRS-189, SRS-196 |
 | UN-087 | SRS-187, SRS-188, SRS-189 |
 | UN-088 | SRS-194, SRS-195 |
+| UN-089 | SRS-260, SRS-261, SRS-262, SRS-263 |
 
 ---
 
@@ -1553,6 +1605,7 @@ Every URS user need traces to at least one SRS requirement:
 | 2.1 | 2026-03-13 | DRAFT | Added 5 new requirements (SRS-185–189) to §3.19 Direct Dictation for context-aware transcription correction and clause-type-driven normalization. SRS-185: domain-specific speech correction using confusion-pair table + LLM fallback. SRS-186: visual highlight for corrected words. SRS-187: clause-type-driven normalization (DIAGNOSIS=full, COMMENT=minimal). SRS-188: two-level undo stack for dictation. SRS-189: graceful degradation. Added UN-086, UN-087 to traceability index. Total: 107 requirements (101 Phase 1, 6 Phase 2). |
 | 2.2 | 2026-03-14 | DRAFT | Added SRS-194 (contextual prompt seeding for STT vocabulary biasing) and SRS-195 (STT model selection: gpt-4o-transcribe default, whisper-1 fallback). Added UN-088 to traceability index. Updated Direct Dictation count to 12 (SRS-180–195). Total: 109 requirements (103 Phase 1, 6 Phase 2). |
 | 2.3 | 2026-03-14 | DRAFT | Added SRS-196 (keyboard shortcut Ctrl+Alt+Space for hands-free dictation toggle, foot pedal compatible). Updated Direct Dictation count to 13 (SRS-180–196). Updated UN-086 traceability. Total: 110 requirements (104 Phase 1, 6 Phase 2). |
+| 2.4 | 2026-04-09 | DRAFT | Added §3.27 Case-Level Comments (SRS-260–263). SRS-260: case-level comment UI input. SRS-261: persistence in cases.metadata.case_comment + autosave. SRS-262: finalization rendering as Comment section in RTF. SRS-263: audit trail for comment changes. Traceable to UN-089. Updated requirements summary table and traceability index. Total: 114 requirements (108 Phase 1, 6 Phase 2). |
 
 ---
 
