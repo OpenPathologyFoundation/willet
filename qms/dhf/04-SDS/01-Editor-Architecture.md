@@ -582,7 +582,7 @@ The `ReportModule` root element uses CSS Grid or Flexbox with three horizontal z
 ```css
 .willet-module {
   display: flex;
-  height: 100%;  /* fills Okapi content area */
+  height: 100%;  /* fills Starling content area */
 }
 .authoring-zone {
   flex: 1;
@@ -600,11 +600,11 @@ The `ReportModule` root element uses CSS Grid or Flexbox with three horizontal z
 
 The prompt area anchors to the bottom of the authoring zone (below clause editors and Finalize button). When the instruction history has entries, it expands upward. When empty, only the input field is visible.
 
-This replaces the v1.0 design where the prompt area was above the part list. The change was driven by the Okapi cockpit context: with Okapi's navigation strip on the far left, a separate left-side prompt panel would create four horizontal zones — too much fragmentation.
+This replaces the v1.0 design where the prompt area was above the part list. The change was driven by the Starling cockpit context: with Starling's navigation strip on the far left, a separate left-side prompt panel would create four horizontal zones — too much fragmentation.
 
 ### 15.3 Performance Budget
 
-Per SRS-242, WILLET must meet these targets within the Okapi shell:
+Per SRS-242, WILLET must meet these targets within the Starling shell:
 
 | Metric | Target | Measurement |
 |---|---|---|

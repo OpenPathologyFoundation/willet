@@ -28,7 +28,7 @@ All design decisions trace back to User Requirements in URS (01-URS.md) and comp
 | Test framework | Vitest | 3.x | Native Vite integration; co-located tests |
 | E2E test | Playwright | Latest | Browser-based scenarios including lock contention |
 | API mocking | MSW (Mock Service Worker) | 2.x | Browser-level request interception for standalone mode |
-| Styling | Tailwind CSS | 4.x | Matches Okapi web-client design language |
+| Styling | Tailwind CSS | 4.x | Matches Starling web-client design language |
 | RTF editor | svelte-rtf-editor | 1.x | RTF viewer, rich-text editor, and RTF↔HTML conversion for finalization (§4.2, SDS 04-05) |
 
 **Not SvelteKit.** WILLET is a plain Vite + Svelte 5 application, following the same pattern as the Pelican digital viewer. SvelteKit's routing and SSR add complexity that a single-page embedded module does not need.
@@ -60,13 +60,13 @@ WILLET operates in two modes with identical application logic and different infr
 - JWT: static dev token from environment fixture
 - No database, no Keycloak, no running services
 
-### 3.2 Integrated Mode (Behind Okapi)
+### 3.2 Integrated Mode (Behind Starling)
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Browser                                            │
 │  ┌──────────────────┐    ┌───────────────────────┐  │
-│  │ Okapi web-client  │    │  WILLET (embedded)    │  │
+│  │ Starling web-client  │    │  WILLET (embedded)    │  │
 │  │ (:5173)           │───→│  mounted via props    │  │
 │  └──────────────────┘    └───────────────────────┘  │
 │         ↑ postMessage            ↓ fetch             │
@@ -85,7 +85,7 @@ WILLET operates in two modes with identical application logic and different infr
 - Receives mount props per URS §2.5.1: `caseId`, `jwt`, `role`, `apiBase`, `onEvent`
 - API calls go to auth-system REST endpoints (through nginx or Vite proxy)
 - Lock service: FDP WebSocket hub at `:8765`
-- JWT: provisioned by Okapi, refreshed via postMessage
+- JWT: provisioned by Starling, refreshed via postMessage
 
 ### 3.3 Mode Resolution
 
@@ -167,7 +167,7 @@ ReportModule (role="application")
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│ Okapi nav │  ReportHeader (full width)                              │
+│ Starling nav │  ReportHeader (full width)                              │
 │ strip     ├──────────────────────────────────┬──────────────────────┤
 │ (~48px)   │  AuthoringZone (flex-1)          │  ContextDock (0-500) │
 │           │  ┌─PartList─────────────────┐    │  ▌Clinical           │
@@ -201,7 +201,7 @@ ReportModule (role="application")
 
 ## 5. API Surface
 
-WILLET consumes the following REST endpoints on `apiBase`. These are implemented by Okapi's auth-system (or mocked by MSW in standalone mode).
+WILLET consumes the following REST endpoints on `apiBase`. These are implemented by Starling's auth-system (or mocked by MSW in standalone mode).
 
 | Method | Path | Purpose | URS Trace |
 |---|---|---|---|
@@ -242,7 +242,7 @@ URS trace: UN-013, UN-016, UN-021, UN-053.
 
 ## 7. Integration Surfaces
 
-### 7.1 Okapi Integration (URS §2.5)
+### 7.1 Starling Integration (URS §2.5)
 
 Fully defined in URS §2.5.1–2.5.4. This SDS implements that contract:
 
@@ -255,7 +255,7 @@ Fully defined in URS §2.5.1–2.5.4. This SDS implements that contract:
 WILLET can signal the viewer to navigate to a slide when the user selects a part:
 
 ```typescript
-// Emitted via Okapi's existing postMessage bridge
+// Emitted via Starling's existing postMessage bridge
 window.parent.postMessage({
   type: 'willet:navigate-slide',
   partLabel: 'A',
@@ -300,7 +300,7 @@ build: {
   rollupOptions: {
     input: {
       main: resolve(__dirname, 'index.html'),           // standalone
-      orchestrated: resolve(__dirname, 'orchestrated.html'), // Okapi integration
+      orchestrated: resolve(__dirname, 'orchestrated.html'), // Starling integration
     },
   },
 },
@@ -308,7 +308,7 @@ build: {
 
 ### 8.2 Path Prefix
 
-When running behind nginx as part of the full Okapi stack, WILLET is served at `/report/`:
+When running behind nginx as part of the full Starling stack, WILLET is served at `/report/`:
 
 ```bash
 VITE_BASE=/report/ npm run dev -- --port 5175 --host
@@ -347,7 +347,7 @@ willet/
 │   ├── demo/                     # Standalone harness
 │   │   ├── main.ts
 │   │   └── App.svelte
-│   ├── integrated/               # Okapi-mounted entry
+│   ├── integrated/               # Starling-mounted entry
 │   │   ├── main.ts
 │   │   └── App.svelte
 │   ├── lib/
@@ -394,4 +394,4 @@ willet/
 | 1.0 | 2026-03-11 | Initial SDS overview: technology stack, runtime modes, component architecture, API surface, feature flags, build configuration, directory structure. |
 | 1.1 | 2026-03-11 | Added svelte-rtf-editor to technology stack. Updated FinalizeDialog component description to reference two-layer authoring model (SDS 04-05). |
 | 1.2 | 2026-03-11 | Added PromptArea component to component tree (SDS 04-03). Replaced VoicePanel with PromptArea (conversational authoring subsumes voice-only panel). Added promptStore to store table. |
-| 2.0 | 2026-03-13 | Major revision from Design Dialogue v2.0 and URS v2.0. Revised component tree: three-zone layout (authoring zone + context dock + Okapi nav), prompt area at bottom, context dock with vertical tabs (Clinical/Images/Synoptic), template bar, drag handles, insert handles, type suggestions, dictation indicator, preferences panel. Added 4 new stores (preferencesStore, contextDockStore, templateStore, suggestionMetricsStore). Added 5 new API endpoints (preferences, clinical, images, templates). Added SDS 04-07 (Synoptic) and 04-08 (Template) to cross-reference table. ARIA landmarks documented in component tree. |
+| 2.0 | 2026-03-13 | Major revision from Design Dialogue v2.0 and URS v2.0. Revised component tree: three-zone layout (authoring zone + context dock + Starling nav), prompt area at bottom, context dock with vertical tabs (Clinical/Images/Synoptic), template bar, drag handles, insert handles, type suggestions, dictation indicator, preferences panel. Added 4 new stores (preferencesStore, contextDockStore, templateStore, suggestionMetricsStore). Added 5 new API endpoints (preferences, clinical, images, templates). Added SDS 04-07 (Synoptic) and 04-08 (Template) to cross-reference table. ARIA landmarks documented in component tree. |

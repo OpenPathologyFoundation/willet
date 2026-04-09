@@ -11,7 +11,7 @@ January 2026
 
 **Upstream Dependencies:**
 
-Okapi orchestration kernel, Authorization/Identity service,  
+Starling orchestration kernel, Authorization/Identity service,  
 HL7/FHIR Gateway, Document Repository APIs
 
 # **0\. Executive Summary**

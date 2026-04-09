@@ -484,19 +484,19 @@ Zone widths (1366px viewport — common hospital monitor):
 
 ---
 
-## Part VII: The Okapi Context — WILLET as a Cockpit Module
+## Part VII: The Starling Context — WILLET as a Cockpit Module
 
-*Added after reviewing the running Okapi platform: worklist, case view, and integrated viewer.*
+*Added after reviewing the running Starling platform: worklist, case view, and integrated viewer.*
 
 ### The Physical Setup
 
-WILLET does not exist in isolation. It operates within the Okapi orchestration platform, which is designed as a **pathologist cockpit**:
+WILLET does not exist in isolation. It operates within the Starling orchestration platform, which is designed as a **pathologist cockpit**:
 
-- **Monitor 1 (primary):** Okapi web app — worklist, case view, and WILLET (full-screen report authoring when active)
-- **Monitor 2 (dedicated):** Okapi Viewer — digital slide viewer, integrated via WebSocket, showing the slides for the current case. Slide navigation, annotations, and AI analysis happen here.
+- **Monitor 1 (primary):** Starling web app — worklist, case view, and WILLET (full-screen report authoring when active)
+- **Monitor 2 (dedicated):** Starling Viewer — digital slide viewer, integrated via WebSocket, showing the slides for the current case. Slide navigation, annotations, and AI analysis happen here.
 - **Monitor 3 (optional):** Additional reference material — gross photos at full resolution, operative notes from the EMR, or a second slide view for comparison.
 
-When the pathologist clicks "Edit Report" on the Okapi case view, WILLET takes the full content area. Okapi's left navigation sidebar (the icon strip visible in the case view screenshot) may collapse or remain as a narrow strip. When WILLET is dismissed, Okapi's other views (Patient Info, Specimens, etc.) return.
+When the pathologist clicks "Edit Report" on the Starling case view, WILLET takes the full content area. Starling's left navigation sidebar (the icon strip visible in the case view screenshot) may collapse or remain as a narrow strip. When WILLET is dismissed, Starling's other views (Patient Info, Specimens, etc.) return.
 
 This architectural reality resolves several design questions and changes others.
 
@@ -522,17 +522,17 @@ Prior cases are part of the Clinical tab. Hovering over a prior case link shows 
 
 **3. Multi-monitor is already solved.**
 
-The cockpit design means WILLET doesn't need to detach panels into separate windows. Monitor 1 is the authoring surface (WILLET full-screen). Monitor 2 is the slide viewing surface (Okapi Viewer). They communicate via WebSocket: case selection, slide highlighting, annotation events. If a pathologist wants a gross photo at full resolution on a third monitor, they open it from the Images tab — it launches in a new browser window that they can drag to whatever monitor they want. This is standard browser behavior, not something WILLET needs to architect.
+The cockpit design means WILLET doesn't need to detach panels into separate windows. Monitor 1 is the authoring surface (WILLET full-screen). Monitor 2 is the slide viewing surface (Starling Viewer). They communicate via WebSocket: case selection, slide highlighting, annotation events. If a pathologist wants a gross photo at full resolution on a third monitor, they open it from the Images tab — it launches in a new browser window that they can drag to whatever monitor they want. This is standard browser behavior, not something WILLET needs to architect.
 
-**4. Performance budget is shared with Okapi.**
+**4. Performance budget is shared with Starling.**
 
-WILLET runs inside Okapi's browser tab. Memory and CPU are shared. The Okapi worklist, case view, and left navigation are still in the DOM even when WILLET is full-screen (unless Okapi unmounts them). The viewer runs in a separate tab/window, so its memory doesn't count against WILLET's budget.
+WILLET runs inside Starling's browser tab. Memory and CPU are shared. The Starling worklist, case view, and left navigation are still in the DOM even when WILLET is full-screen (unless Starling unmounts them). The viewer runs in a separate tab/window, so its memory doesn't count against WILLET's budget.
 
 Revised performance targets for WILLET specifically:
 - WILLET module load (from "Edit Report" click to interactive): under 1.5 seconds
 - Context dock tab switch: under 200ms
 - Synoptic panel open (with provenance data): under 500ms
-- Total WILLET memory footprint: under 80MB (leaving room for Okapi shell + browser overhead)
+- Total WILLET memory footprint: under 80MB (leaving room for Starling shell + browser overhead)
 
 ---
 
@@ -577,9 +577,9 @@ The synoptic confirmation model is a hybrid:
 
 **The pathologist can still finalize with unreviewed fields** — the system doesn't block. But the count is visible, and the audit trail records which fields were reviewed and which were not. This is the "conscious choice" principle: the system makes it easy to do the right thing but doesn't force it.
 
-### D-6: Multi-Monitor → **Resolved by Okapi architecture**
+### D-6: Multi-Monitor → **Resolved by Starling architecture**
 
-WILLET operates full-screen on Monitor 1 within Okapi. The slide viewer is on Monitor 2 via WebSocket integration. No panel detachment needed. Images can open in new browser windows for multi-monitor viewing via standard browser behavior.
+WILLET operates full-screen on Monitor 1 within Starling. The slide viewer is on Monitor 2 via WebSocket integration. No panel detachment needed. Images can open in new browser windows for multi-monitor viewing via standard browser behavior.
 
 ### D-7: Foot Pedal Mapping → **Delegated to OS/driver level**
 
@@ -591,17 +591,17 @@ This approach requires zero device-specific code in WILLET and works with any fo
 
 ---
 
-## Part IX: Revised Layout — WILLET Full-Screen in Okapi
+## Part IX: Revised Layout — WILLET Full-Screen in Starling
 
 Given the cockpit context, the layout is refined:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ ◀ Okapi │ S26-0004  Colon, right hemicolectomy  Draft ●  Saved 14:22  │
+│ ◀ Starling │ S26-0004  Colon, right hemicolectomy  Draft ●  Saved 14:22  │
 │         │ Gilmezir Gusa  MRN: XN-000018  DOB: 1980-01-22  Sex: M     │
 │         │ Hx: Screening colonoscopy, polyps found ascending & sigmoid │
 │         ├────────────────────────────────┬─────────────────────────────┤
-│ (Okapi  │  AUTHORING                     │ ▌Clinical  Images  Synoptic│
+│ (Starling  │  AUTHORING                     │ ▌Clinical  Images  Synoptic│
 │  nav    │                                │─────────────────────────────│
 │  strip  │  Part A: Right colon, hemi...  │ Operative Note              │
 │  icons) │  ┌────┬──────────────────────┐ │ Rt hemicolectomy for       │
@@ -637,13 +637,13 @@ Given the cockpit context, the layout is refined:
 
 **1. The prompt area moves from a left panel to the bottom of the authoring zone.**
 
-With Okapi's navigation strip on the far left, a separate prompt panel on the left would create a four-zone layout — too much horizontal fragmentation. Instead, the prompt input anchors to the bottom of the authoring zone, like a terminal or console at the bottom of an IDE. The instruction log scrolls above the input field when there's history, and collapses to just the input field when empty.
+With Starling's navigation strip on the far left, a separate prompt panel on the left would create a four-zone layout — too much horizontal fragmentation. Instead, the prompt input anchors to the bottom of the authoring zone, like a terminal or console at the bottom of an IDE. The instruction log scrolls above the input field when there's history, and collapses to just the input field when empty.
 
-This gives the authoring zone the full width between Okapi's nav strip and the context dock. The clause editors get maximum horizontal space.
+This gives the authoring zone the full width between Starling's nav strip and the context dock. The clause editors get maximum horizontal space.
 
-**2. The Okapi nav strip stays visible.**
+**2. The Starling nav strip stays visible.**
 
-The narrow icon strip on the far left (visible in the case view screenshot) remains when WILLET is full-screen. This gives the pathologist a way to navigate back to the worklist, access other Okapi modules, or collapse WILLET without losing context. The strip is approximately 48–56px wide — minimal impact on available width.
+The narrow icon strip on the far left (visible in the case view screenshot) remains when WILLET is full-screen. This gives the pathologist a way to navigate back to the worklist, access other Starling modules, or collapse WILLET without losing context. The strip is approximately 48–56px wide — minimal impact on available width.
 
 **3. The context dock tabs are vertical, along the right edge.**
 
@@ -651,19 +651,19 @@ With only three tabs (Clinical, Images, Synoptic), vertical tabs along the right
 
 When the dock is collapsed, only the vertical tab strip is visible (~40px). When expanded, the dock takes 280–500px depending on drag position.
 
-**4. The mic button can live in the Okapi nav strip.**
+**4. The mic button can live in the Starling nav strip.**
 
 Since the nav strip is always visible, a mic button in the strip provides a persistent, always-accessible voice trigger. This works naturally with the focus-based routing: if a clause has focus, the mic routes there; if nothing has focus, it routes to the prompt input. The mic is always in the same physical location on screen — the pathologist develops muscle memory for it.
 
 ### Zone Widths (revised)
 
 **1920px viewport:**
-- Okapi nav strip: 48px (fixed)
+- Starling nav strip: 48px (fixed)
 - Authoring zone: flex-1 (~1392px with dock collapsed, ~1012px with dock at 380px)
 - Context dock: 0px (collapsed, tabs only) to 500px (expanded, draggable)
 
 **1366px viewport (common hospital monitor):**
-- Okapi nav strip: 48px (fixed)
+- Starling nav strip: 48px (fixed)
 - Authoring zone: flex-1 (~1038px collapsed, ~738px with dock at 280px)
 - Context dock: 0px to 280px
 
@@ -789,4 +789,4 @@ interface SuggestionMetrics {
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-03-13 | Initial roundtable: five primary perspectives plus accessibility, deployment, and QA/regulatory voices. Ten design principles. Three-zone layout proposal. Seven open design questions. |
-| 2.0 | 2026-03-13 | Added Okapi platform context (Parts VII–XI). Resolved all seven design questions. Revised layout: prompt area moves to bottom of authoring zone; context dock with vertical tabs on right edge; Slides tab removed (viewer on Monitor 2). Detailed synoptic confirmation model with provenance-gated review. Clause type suggestion with adaptive disablement. |
+| 2.0 | 2026-03-13 | Added Starling platform context (Parts VII–XI). Resolved all seven design questions. Revised layout: prompt area moves to bottom of authoring zone; context dock with vertical tabs on right edge; Slides tab removed (viewer on Monitor 2). Detailed synoptic confirmation model with provenance-gated review. Clause type suggestion with adaptive disablement. |

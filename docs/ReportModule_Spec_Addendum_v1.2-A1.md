@@ -306,7 +306,7 @@ The module writes the following record to `wsi.report_transmissions` at finaliza
   "idempotency_key": "{uuid v4, generated at finalize-click, stored in report metadata}",
   "case_id": "{wsi.cases.id}",
   "accession_number": "{LIS accession number from case metadata}",
-  "finalized_by": "{Okapi user id}",
+  "finalized_by": "{Starling user id}",
   "finalized_at": "{ISO 8601 UTC timestamp}",
   "report_format": "RTF",
   "report_payload": "{Base64-encoded RTF string}",
@@ -323,7 +323,7 @@ The HL7/FHIR interface wraps the RTF payload into an ORU_R01 message. The mappin
 
 | HL7 segment / field | Value | Source |
 |---|---|---|
-| MSH-3 (Sending Application) | Okapi | Static |
+| MSH-3 (Sending Application) | Starling | Static |
 | MSH-5 (Receiving Application) | LIS identifier | Interface configuration |
 | MSH-9 (Message Type) | ORU^R01 | Static |
 | MSH-10 (Message Control ID) | idempotency_key (UUID) | Transmission record |
@@ -333,7 +333,7 @@ The HL7/FHIR interface wraps the RTF payload into an ORU_R01 message. The mappin
 | OBX-2 (Value Type) | ED (Encapsulated Data) | Static |
 | OBX-5 (Observation Value) | Base64-decoded RTF as ED type: ^AP^RTF^Base64^{payload} | Transmission record: report_payload |
 | OBX-11 (Observation Result Status) | F (Final) | Static |
-| ZDS-1 (custom — Okapi finalized_by) | finalized_by Okapi user id | Transmission record |
+| ZDS-1 (custom — Starling finalized_by) | finalized_by Starling user id | Transmission record |
 
 **OBX-5 ED encoding:** The Encapsulated Data (ED) type in OBX-5 uses the subcomponent structure: `{source application}^{type of data}^{data subtype}^{encoding}^{data}`. For RTF: `^AP^RTF^Base64^{payload}`. The payload field contains the Base64-encoded RTF. This is the standard encoding accepted by CoPath, Soft, and Beaker for formatted reports.
 

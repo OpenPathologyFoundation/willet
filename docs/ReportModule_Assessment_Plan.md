@@ -2,7 +2,7 @@
 
 ## Technical Assessment & Staged Development Plan
 
-**Okapi Orchestration Platform — Pathology Portal Integration**
+**Starling Orchestration Platform — Pathology Portal Integration**
 
 | Field | Value |
 |---|---|
@@ -44,7 +44,7 @@ Section 8 describes authoring behavior but never defines the actual data model f
 
 Section 9 specifies finalization behavior but defers entirely to the HL7/FHIR Gateway. Before Phase 1 implementation you need:
 
-- Gateway endpoint (URL, auth method — presumably JWT from Okapi auth-system).
+- Gateway endpoint (URL, auth method — presumably JWT from Starling auth-system).
 - Inbound format: How does the module receive the initial report scaffold from LIS? Push (gateway delivers to module on case open) or pull (module queries gateway)?
 - Outbound format: RTF is mentioned but not defined. Is this a wrapped HL7 v2 ORU message? A FHIR DiagnosticReport? A raw RTF attachment?
 - Transmission acknowledgment: What constitutes "acked"? HL7 ACK? HTTP 200 from gateway? LIS callback?
@@ -101,15 +101,15 @@ Section 8.4 mentions "conflicts route to arbitration" without specifying:
 
 ## 2. Architecture Strategy: Standalone-First Integration
 
-The correct approach given the complexity and the Okapi context is to build the module as a completely self-contained Svelte 5 application with a thin, well-defined integration surface. The module should be runnable in total isolation — against mocked services — and integrate into Okapi via a small, explicit contract.
+The correct approach given the complexity and the Starling context is to build the module as a completely self-contained Svelte 5 application with a thin, well-defined integration surface. The module should be runnable in total isolation — against mocked services — and integrate into Starling via a small, explicit contract.
 
 ### 2.1 Standalone Application Shell
 
-Create a dedicated repository (or monorepo package): report-authoring-module. It runs on its own Vite dev server (:5175 to avoid conflict with existing Okapi services). It has its own package.json, its own test suite, and its own mock server. It requires zero running Okapi infrastructure to develop and test.
+Create a dedicated repository (or monorepo package): report-authoring-module. It runs on its own Vite dev server (:5175 to avoid conflict with existing Starling services). It has its own package.json, its own test suite, and its own mock server. It requires zero running Starling infrastructure to develop and test.
 
 | Concern | Standalone Mode | Integrated Mode |
 |---|---|---|
-| Auth / JWT | Mock JWT injected via env var or dev fixture | JWT provisioned by Okapi orchestrator via postMessage (same bridge already used for viewer) |
+| Auth / JWT | Mock JWT injected via env var or dev fixture | JWT provisioned by Starling orchestrator via postMessage (same bridge already used for viewer) |
 | Case data / report scaffold | Static JSON fixtures per case | Fetched from HL7/FHIR Gateway via auth-system proxy |
 | Save endpoint | Local mock service (Hono or MSW) | auth-system /api/ endpoints |
 | Transmission | Mock ACK after 1s delay | Real gateway queue |
@@ -122,11 +122,11 @@ The module exposes exactly three integration points. Everything else is internal
 
 **Point 1 — Mount Props (Svelte Component API)**
 
-When embedded in Okapi web-client, the module is mounted as a Svelte component receiving:
+When embedded in Starling web-client, the module is mounted as a Svelte component receiving:
 
 | Prop | Type | Description |
 |---|---|---|
-| caseId | string | Okapi case identifier. Triggers report scaffold fetch on change. |
+| caseId | string | Starling case identifier. Triggers report scaffold fetch on change. |
 | jwt | string | Current JWT from orchestrator. Module handles refresh via postMessage. |
 | role | UserRole | Enum from auth-system claims: RESIDENT \| FELLOW \| ATTENDING \| DIRECTOR |
 | apiBase | string | Base URL for auth-system /api/ — allows env-specific routing |
@@ -147,7 +147,7 @@ The module emits typed events upward to the orchestrator:
 
 **Point 3 — postMessage Extension (if viewer is open)**
 
-If the pathologist has the digital viewer open for the same case, the module participates in the existing Okapi postMessage bridge. Specifically: when the module switches to a different case part, it can optionally signal the viewer to navigate to the corresponding slide region. This is additive and non-breaking — the viewer ignores unknown message types.
+If the pathologist has the digital viewer open for the same case, the module participates in the existing Starling postMessage bridge. Specifically: when the module switches to a different case part, it can optionally signal the viewer to navigate to the corresponding slide region. This is additive and non-breaking — the viewer ignores unknown message types.
 
 > **Note** The FDP session awareness service already tracks open viewer windows. The module does not need to implement its own window tracking — it registers with the existing WebSocket hub using the same protocol.
 
@@ -199,7 +199,7 @@ Five stages, each producing a usable, testable artifact. Stages 1–3 are entire
 
 **Key Design Decision — Lock Service:**
 
-> **Recommendation** Implement the lock service as a thin extension of the FDP WebSocket hub already in Okapi (session-awareness service). The hub already tracks case+user presence. Add a LOCK_CLAIM / LOCK_RELEASE / LOCK_TAKEOVER message type. This avoids a second WebSocket connection per module instance and reuses tested infrastructure.
+> **Recommendation** Implement the lock service as a thin extension of the FDP WebSocket hub already in Starling (session-awareness service). The hub already tracks case+user presence. Add a LOCK_CLAIM / LOCK_RELEASE / LOCK_TAKEOVER message type. This avoids a second WebSocket connection per module instance and reuses tested infrastructure.
 
 | Scenario | Expected behavior | How to test |
 |---|---|---|
@@ -239,9 +239,9 @@ Five stages, each producing a usable, testable artifact. Stages 1–3 are entire
 
 > **⚠ Testing note** All three AI features must degrade gracefully. Test with the mock returning HTTP 503 — the editor must remain fully functional with a visible but non-blocking error indicator.
 
-### Stage 4: Okapi Integration Sprint
+### Stage 4: Starling Integration Sprint
 
-**Goal:** Module runs inside the Okapi web-client with real auth, real gateway, real lock service. This sprint wires the integration surface defined in §2.2 — it should be mostly configuration, not new features.
+**Goal:** Module runs inside the Starling web-client with real auth, real gateway, real lock service. This sprint wires the integration surface defined in §2.2 — it should be mostly configuration, not new features.
 
 **Integration Steps (in order):**
 
@@ -295,7 +295,7 @@ Five stages, each producing a usable, testable artifact. Stages 1–3 are entire
 | 3A — Voice | Transcription, voice command interpreter, undo | 2 weeks | All §8.3 command table cases pass with mock LLM |
 | 3B — Nomenclature | Personal/institutional dict, suggestions, arbitration | 2 weeks | Conflict detection and arbitration queue functional |
 | 3C — LLM assist | On-demand structuring commands | 1 week | Feature-flagged; degrades cleanly on 503 |
-| 4 — Integration | Wire all 8 integration steps; E2E with real Okapi stack | 2–3 weeks | All §16 acceptance criteria pass on real infrastructure |
+| 4 — Integration | Wire all 8 integration steps; E2E with real Starling stack | 2–3 weeks | All §16 acceptance criteria pass on real infrastructure |
 | 5 — Hardening | Adversarial tests, QMS artifacts | 2–3 weeks | Risk analysis signed off; DHF entries created |
 
 Total estimate: 13–17 weeks to a clinically hardened Phase 1. The critical path is Stage 1 (data model) → Stage 2 (lock service) → Stage 4 (integration). Stages 3A/3B/3C can proceed in parallel with Stage 2 once the data model is stable.
