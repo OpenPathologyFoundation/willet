@@ -1,20 +1,20 @@
-# Linguistic Services Architecture — Okapi Orchestration Platform
+# Linguistic Services Architecture — Starling Orchestration Platform
 
 | Field | Value |
 |---|---|
-| **Document ID** | OKAPI-LIS-002 |
+| **Document ID** | STARLING-LIS-002 |
 | **Version** | 1.0 DRAFT |
 | **Date** | April 4, 2026 |
 | **IEC 62304 Reference** | §5.3 — Software Architectural Design |
 | **Status** | DRAFT — Pending review and approval |
 | **Scope** | Workspace-level: governs shared and module-specific linguistic services |
-| **Related** | OKAPI-MIS-001 (Module Integration Specification) |
+| **Related** | STARLING-MIS-001 (Module Integration Specification) |
 
 ---
 
 ## 1. Purpose
 
-Pathology clinical work is fundamentally linguistic. Pathologists search by describing what they're looking for. They dictate reports by describing what they see. They navigate by naming cases, specimens, and findings. Every module in the Okapi platform deals with natural language input — but each module does something different with that input.
+Pathology clinical work is fundamentally linguistic. Pathologists search by describing what they're looking for. They dictate reports by describing what they see. They navigate by naming cases, specimens, and findings. Every module in the Starling platform deals with natural language input — but each module does something different with that input.
 
 This document defines a **layered architecture for linguistic services** that separates the shared capabilities (transcription, vocabulary correction) from the module-specific capabilities (intent interpretation, action generation). The goal is to avoid duplicating infrastructure while keeping each module's domain logic independent and testable.
 
@@ -95,7 +95,7 @@ Linguistic services are organized into three layers. Each layer has different sh
 **Vocabulary hint management:** The pathology term list used in the Whisper prompt hint should be a shared data file (JSON or YAML) in the workspace root, not embedded in Python code. Both modules reference the same file at build time or load it at startup.
 
 ```
-Okapi-workspace/
+Starling-workspace/
   shared/
     pathology-vocabulary.json    ← Whisper hint terms, confusion pairs, abbreviations
 ```
@@ -396,7 +396,7 @@ These validation suites run in each module's CI pipeline independently. A shared
 | §3.3 Intent Interpretation | Ibis `nlsearch-mcp/prompt.py` (NL→Lucene), WILLET SDS 04-03 §4 (LLM Interpreter) |
 | §4 Transcription Modes | WILLET SDS 04-03 §14.1 (focus-based routing), §2.2 (three input paths) |
 | §5 Mnemonics | WILLET SDS 04-08 (Template Architecture, planned) |
-| §6 Decision Matrix | OKAPI-MIS-001 §10 (Design Principles: share contracts, not code) |
+| §6 Decision Matrix | STARLING-MIS-001 §10 (Design Principles: share contracts, not code) |
 
 ---
 

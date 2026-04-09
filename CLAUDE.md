@@ -2,7 +2,7 @@
 
 ## Project Identity
 
-WILLET is a **regulated Svelte 5 / TypeScript report authoring module** for the Okapi anatomic pathology platform. It runs as an independent application in standalone mode and as an orchestrated module behind the Okapi nginx proxy in integrated mode.
+WILLET is a **regulated Svelte 5 / TypeScript report authoring module** for the Starling anatomic pathology platform. It runs as an independent application in standalone mode and as an orchestrated module behind the Starling nginx proxy in integrated mode.
 
 - **IEC 62304 Class B** — changes require Design History File traceability
 - **Separate Git repo** — commits happen in this directory, not the parent workspace
@@ -107,10 +107,10 @@ Summary of priority order:
 
 ## Integration Context (Reference — Read When Touching the Bridge)
 
-WILLET participates in the Okapi orchestration platform. These reference docs define the contract:
+WILLET participates in the Starling orchestration platform. These reference docs define the contract:
 
-- `docs/integration/OKAPI-MIS-001-Module-Integration-Spec.md` — **The module contract.** PostMessage protocol, init payload, lifecycle events, audit pipeline, nginx routing. Read this when working on `src/integrated/`, bridge messages, or audit events.
-- `docs/integration/OKAPI-LIS-002-Linguistic-Services-Architecture.md` — Three-layer linguistic architecture. Shared transcription (Layer 1), shared vocabulary correction data (Layer 2), module-specific intent interpretation (Layer 3). Read this when working on voice/transcription services.
+- `docs/integration/STARLING-MIS-001-Module-Integration-Spec.md` — **The module contract.** PostMessage protocol, init payload, lifecycle events, audit pipeline, nginx routing. Read this when working on `src/integrated/`, bridge messages, or audit events.
+- `docs/integration/STARLING-LIS-002-Linguistic-Services-Architecture.md` — Three-layer linguistic architecture. Shared transcription (Layer 1), shared vocabulary correction data (Layer 2), module-specific intent interpretation (Layer 3). Read this when working on voice/transcription services.
 - `docs/integration/MODULE-INTEGRATION-TEMPLATE.md` — Checklist for module contract compliance.
 
 **Key integration facts (so you don't need to read the full spec for routine work):**

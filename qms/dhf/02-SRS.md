@@ -1339,13 +1339,13 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 #### SRS-240 · Phase 1
 
-**The WILLET module shall render as a full-screen component within the Okapi case page content area. The Okapi navigation strip (~48px left edge) shall remain visible and accessible. The module layout shall be: Okapi nav strip (fixed left) + authoring zone (flex-1 center) + context dock (resizable right, 0–500px).**
+**The WILLET module shall render as a full-screen component within the Starling case page content area. The Starling navigation strip (~48px left edge) shall remain visible and accessible. The module layout shall be: Starling nav strip (fixed left) + authoring zone (flex-1 center) + context dock (resizable right, 0–500px).**
 
 | Field | Value |
 |---|---|
 | URS trace | UN-083 |
 | SDS trace | 04-01 §10 (to be updated) |
-| Verification | Visual test: WILLET fills Okapi content area; nav strip accessible; three-zone layout renders correctly at 1920px and 1366px viewports |
+| Verification | Visual test: WILLET fills Starling content area; nav strip accessible; three-zone layout renders correctly at 1920px and 1366px viewports |
 
 ---
 
@@ -1363,7 +1363,7 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 #### SRS-242 · Phase 1
 
-**The system shall meet the following performance targets when operating within the Okapi shell: (a) module load from "Edit Report" click to interactive: < 1.5 seconds (p95), (b) context dock tab switch: < 200ms (p95), (c) total WILLET memory footprint: < 80MB as measured by Chrome DevTools Performance Monitor.**
+**The system shall meet the following performance targets when operating within the Starling shell: (a) module load from "Edit Report" click to interactive: < 1.5 seconds (p95), (b) context dock tab switch: < 200ms (p95), (c) total WILLET memory footprint: < 80MB as measured by Chrome DevTools Performance Monitor.**
 
 | Field | Value |
 |---|---|

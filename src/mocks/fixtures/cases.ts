@@ -1,5 +1,5 @@
-// MSW Fixture Data — derived from Okapi/seed/wsi/wsi-test-cases.v1.json
-// and Okapi/seed/patients/xenonym-azure-vale-9728.json
+// MSW Fixture Data — derived from Starling/seed/wsi/wsi-test-cases.v1.json
+// and Starling/seed/patients/xenonym-azure-vale-9728.json
 
 import type { ReportScaffold } from '$lib/types';
 

@@ -2,7 +2,7 @@
 
 > **Template instructions:** Copy this file into your module's `docs/` directory and replace all `{PLACEHOLDERS}` with your module's values. Delete this instruction block when done.
 >
-> **Parent specification:** OKAPI-MIS-001 (Module Integration Specification) at the workspace root defines the full contract. This guide is a checklist and implementation reference for applying that contract to your specific module.
+> **Parent specification:** STARLING-MIS-001 (Module Integration Specification) at the workspace root defines the full contract. This guide is a checklist and implementation reference for applying that contract to your specific module.
 
 | Field | Value |
 |---|---|
@@ -34,7 +34,7 @@ npm run build        # production build
 
 Entry file: `orchestrated.html` → `src/integrated/main.ts`
 
-This mode runs behind the Okapi nginx proxy. The orchestrator opens this URL and bootstraps the module via postMessage.
+This mode runs behind the Starling nginx proxy. The orchestrator opens this URL and bootstraps the module via postMessage.
 
 ```bash
 VITE_BASE=/{prefix}/ npm run dev -- --port {port} --host
@@ -272,7 +272,7 @@ export default defineConfig({
 
 ## 6. nginx Configuration
 
-Add to `Okapi/proxy/nginx.dev.conf`:
+Add to `Starling/proxy/nginx.dev.conf`:
 
 ```nginx
 upstream {module_name}_app {
@@ -300,7 +300,7 @@ location /{prefix}/ {
 
 ### 7.1 Activity Registry Entry
 
-Add to `Okapi/web-client/src/lib/registry/activities.ts`:
+Add to `Starling/web-client/src/lib/registry/activities.ts`:
 
 ```typescript
 '{module-id}': {
@@ -321,7 +321,7 @@ Add to `Okapi/web-client/src/lib/registry/activities.ts`:
 
 ### 7.2 Module Bridge (if module has custom messages)
 
-Create `Okapi/web-client/src/lib/bridges/{module}-bridge.ts`:
+Create `Starling/web-client/src/lib/bridges/{module}-bridge.ts`:
 
 ```typescript
 import { ModuleBridge } from './module-bridge';
@@ -341,7 +341,7 @@ export class {ModuleName}Bridge extends ModuleBridge {
 
 ### 7.3 Module Store (optional convenience layer)
 
-Create `Okapi/web-client/src/lib/stores/{module}.svelte.ts` if you need reactive derived state beyond what `activityStore` provides.
+Create `Starling/web-client/src/lib/stores/{module}.svelte.ts` if you need reactive derived state beyond what `activityStore` provides.
 
 ---
 
@@ -370,8 +370,8 @@ Verify with Playwright against the full stack:
 - [ ] URS traceability: each message type traces to a user requirement
 - [ ] Hazard analysis updated for new integration points (e.g., "What if the bridge disconnects during report finalization?")
 - [ ] This document updated in module's `docs/` with all placeholders filled
-- [ ] OKAPI-MIS-001 §2.3 Module Registry updated
-- [ ] Okapi DHF-04-07 cross-reference table updated
+- [ ] STARLING-MIS-001 §2.3 Module Registry updated
+- [ ] Starling DHF-04-07 cross-reference table updated
 
 ---
 
@@ -379,9 +379,9 @@ Verify with Playwright against the full stack:
 
 | What | Where |
 |---|---|
-| Shared contract spec | `/OKAPI-MIS-001-Module-Integration-Spec.md` |
-| Orchestrator architecture | `/Okapi/qms/dhf/04-SDS/07-Module-Orchestration-Architecture.md` |
-| Base protocol types | `/Okapi/web-client/src/lib/types/bridge-protocol.ts` |
-| Activity Registry | `/Okapi/web-client/src/lib/registry/activities.ts` |
-| nginx config | `/Okapi/proxy/nginx.dev.conf` |
+| Shared contract spec | `/STARLING-MIS-001-Module-Integration-Spec.md` |
+| Orchestrator architecture | `/Starling/qms/dhf/04-SDS/07-Module-Orchestration-Architecture.md` |
+| Base protocol types | `/Starling/web-client/src/lib/types/bridge-protocol.ts` |
+| Activity Registry | `/Starling/web-client/src/lib/registry/activities.ts` |
+| nginx config | `/Starling/proxy/nginx.dev.conf` |
 | This module's SDS | `{module}/qms/dhf/04-SDS/00-SDS-Overview.md` |

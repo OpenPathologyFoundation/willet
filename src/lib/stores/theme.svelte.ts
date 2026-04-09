@@ -1,4 +1,4 @@
-// Theme store — mirrors Okapi's theme system
+// Theme store — mirrors Starling's theme system
 // Light/dark mode with system preference detection and localStorage persistence
 
 type Theme = 'system' | 'dark' | 'light';

@@ -27,7 +27,7 @@ User Requirements describe what the system must do from the perspective of its i
 
 ### 2.1 System Description
 
-WILLET is a case-scoped diagnostic report authoring workspace within the Okapi orchestration platform for anatomic pathology. It enables a pathologist to draft and review a diagnostic report, apply controlled AI-assisted conveniences (transcription, structuring, nomenclature harmonization), and produce a finalized report for transmission to the Laboratory Information System (LIS) via a standards-based HL7/FHIR interface.
+WILLET is a case-scoped diagnostic report authoring workspace within the Starling orchestration platform for anatomic pathology. It enables a pathologist to draft and review a diagnostic report, apply controlled AI-assisted conveniences (transcription, structuring, nomenclature harmonization), and produce a finalized report for transmission to the Laboratory Information System (LIS) via a standards-based HL7/FHIR interface.
 
 ### 2.2 Boundary Conditions
 
@@ -48,25 +48,25 @@ Each requirement is tagged with a target phase. Phase 1 requirements define the 
 
 ### 2.5 Module Boundary and Interface Contract
 
-WILLET is developed and tested as an **independent module**. It has no knowledge of the Okapi worklist, case search, navigation routing, or user login flow. From WILLET's perspective, the world begins at the moment it is mounted with a set of well-defined input parameters and ends when it emits a lifecycle event or the host unmounts it.
+WILLET is developed and tested as an **independent module**. It has no knowledge of the Starling worklist, case search, navigation routing, or user login flow. From WILLET's perspective, the world begins at the moment it is mounted with a set of well-defined input parameters and ends when it emits a lifecycle event or the host unmounts it.
 
 This separation is deliberate and non-negotiable:
 
 - **WILLET's complexity** (voice input, LLM structuring, nomenclature harmonization, concurrency locking, RTF serialization, HL7 transmission handoff) is too great to develop and verify within the orchestrator's codebase. Independent development enables isolated testing of the full feature surface without platform dependencies.
-- **WILLET relies on a database** (the `wsi` schema in Postgres) that is managed by the Okapi auth-system. WILLET reads and writes specific tables (`wsi.parts`, `wsi.report_transmissions`) but does not own the schema lifecycle. In standalone mode, these are mocked; in integration, they are the real tables.
-- **Integration is anticipated from the start.** The module is designed to mount inside Okapi's case page (`/app/case/[accession]`) where the "Edit Report" action activates it. But the activation mechanism is Okapi's responsibility — WILLET only defines what it needs to receive.
+- **WILLET relies on a database** (the `wsi` schema in Postgres) that is managed by the Starling auth-system. WILLET reads and writes specific tables (`wsi.parts`, `wsi.report_transmissions`) but does not own the schema lifecycle. In standalone mode, these are mocked; in integration, they are the real tables.
+- **Integration is anticipated from the start.** The module is designed to mount inside Starling's case page (`/app/case/[accession]`) where the "Edit Report" action activates it. But the activation mechanism is Starling's responsibility — WILLET only defines what it needs to receive.
 
 #### 2.5.1 Activation Contract (What WILLET Expects)
 
-When WILLET is activated, the host environment (Okapi, or the standalone dev harness) must provide:
+When WILLET is activated, the host environment (Starling, or the standalone dev harness) must provide:
 
 | Input | Type | Description | Provider |
 |---|---|---|---|
-| `caseId` | `string` | The accession number or case identifier for the case to author. Must correspond to an existing record in `wsi.cases`. | Okapi (from worklist selection, case search, or direct URL) |
-| `jwt` | `string` | A valid JWT with the user's identity, roles, and permissions. WILLET uses this for API authentication and permission enforcement. | Okapi auth system (minted at login or refreshed via postMessage) |
-| `role` | `UserRole` | The user's clinical role (`RESIDENT`, `FELLOW`, `ATTENDING`, `DIRECTOR`). Determines permission defaults (e.g., FINALIZE access). | Derived from JWT claims by Okapi |
-| `apiBase` | `string` | Base URL for the auth-system REST API (e.g., `/api` or `http://localhost:8080/api`). | Okapi configuration |
-| `onEvent` | `(ModuleEvent) => void` | Callback for lifecycle events emitted by WILLET back to the host. | Okapi (or dev harness no-op) |
+| `caseId` | `string` | The accession number or case identifier for the case to author. Must correspond to an existing record in `wsi.cases`. | Starling (from worklist selection, case search, or direct URL) |
+| `jwt` | `string` | A valid JWT with the user's identity, roles, and permissions. WILLET uses this for API authentication and permission enforcement. | Starling auth system (minted at login or refreshed via postMessage) |
+| `role` | `UserRole` | The user's clinical role (`RESIDENT`, `FELLOW`, `ATTENDING`, `DIRECTOR`). Determines permission defaults (e.g., FINALIZE access). | Derived from JWT claims by Starling |
+| `apiBase` | `string` | Base URL for the auth-system REST API (e.g., `/api` or `http://localhost:8080/api`). | Starling configuration |
+| `onEvent` | `(ModuleEvent) => void` | Callback for lifecycle events emitted by WILLET back to the host. | Starling (or dev harness no-op) |
 
 WILLET does **not** receive or depend on: patient demographics (fetched internally from `wsi.cases` → `core.patients`), worklist state, navigation history, viewer window state, or any other orchestrator-internal concern.
 
@@ -74,7 +74,7 @@ WILLET does **not** receive or depend on: patient demographics (fetched internal
 
 WILLET emits typed lifecycle events to the host via the `onEvent` callback:
 
-| Event | When | Host (Okapi) Expected Action |
+| Event | When | Host (Starling) Expected Action |
 |---|---|---|
 | `REPORT_FINALIZED` | RTF written to `wsi.report_transmissions` | Refresh worklist status; optionally advance case workflow |
 | `LOCK_ACQUIRED` | Editor lock obtained via lock service | Update case tile to show "editing" status |
@@ -86,7 +86,7 @@ These events are the **only** mechanism by which WILLET communicates state chang
 
 #### 2.5.3 Database Contract (Shared Schema)
 
-WILLET reads and writes to tables in the `wsi` schema owned by the Okapi auth-system's Flyway migrations:
+WILLET reads and writes to tables in the `wsi` schema owned by the Starling auth-system's Flyway migrations:
 
 | Table | WILLET Access | Notes |
 |---|---|---|
@@ -98,23 +98,23 @@ WILLET reads and writes to tables in the `wsi` schema owned by the Okapi auth-sy
 | `wsi.report_transmissions` | Insert + Read | WILLET inserts PENDING records; reads status updates written by HL7/FHIR interface |
 | `core.patients` | Read | Patient demographics for report header (via `wsi.cases.patient_id` join) |
 
-WILLET does **not** create, alter, or drop tables. Schema evolution is Okapi's responsibility. If WILLET needs a new column or table, the migration is added to Okapi's Flyway chain and the contract is updated here.
+WILLET does **not** create, alter, or drop tables. Schema evolution is Starling's responsibility. If WILLET needs a new column or table, the migration is added to Starling's Flyway chain and the contract is updated here.
 
 #### 2.5.4 Boundary Summary
 
 | Concern | Owner | WILLET's Role |
 |---|---|---|
-| User login, OIDC/SAML, session management | Okapi | Receives JWT |
-| Worklist display, case search, case navigation | Okapi | Not involved |
-| Case page UI, "Edit Report" button, viewer launch | Okapi | Mounted when user clicks "Edit Report" |
-| Report scaffold (wsi.parts) creation from LIS ingest | Okapi / LIS interface | Reads the scaffold |
+| User login, OIDC/SAML, session management | Starling | Receives JWT |
+| Worklist display, case search, case navigation | Starling | Not involved |
+| Case page UI, "Edit Report" button, viewer launch | Starling | Mounted when user clicks "Edit Report" |
+| Report scaffold (wsi.parts) creation from LIS ingest | Starling / LIS interface | Reads the scaffold |
 | Report authoring, voice, LLM, nomenclature | **WILLET** | Full ownership |
 | Concurrency locking (single-editor rule) | **WILLET** | Full ownership (via FDP WebSocket hub) |
 | RTF generation and finalization | **WILLET** | Full ownership |
 | Transmission record creation (PENDING) | **WILLET** | Writes the handoff record |
 | HL7/FHIR transmission to LIS | HL7/FHIR interface engine | WILLET polls for result only |
-| Audit logging of report events | **WILLET** | Writes audit events; Okapi provides the audit infrastructure |
-| Database schema evolution | Okapi (Flyway) | WILLET declares needs; Okapi implements migrations |
+| Audit logging of report events | **WILLET** | Writes audit events; Starling provides the audit infrastructure |
+| Database schema evolution | Starling (Flyway) | WILLET declares needs; Starling implements migrations |
 
 ---
 
@@ -127,7 +127,7 @@ WILLET does **not** create, alter, or drop tables. Schema evolution is Okapi's r
 | Technical Assessment & Staged Development Plan | — | March 2026 |
 | WILLET Project Brief | — | March 2026 |
 | UI Critical Review | — | March 13, 2026 — Pathologist-perspective analysis of Stage 1 UI |
-| Design Dialogue — Multi-Perspective Review | v2.0 | March 13, 2026 — Roundtable design analysis: clinical architect, UX, cognitive ergonomics, data integrity, workflow efficiency perspectives. Okapi integration context, resolved design questions, layout proposal. |
+| Design Dialogue — Multi-Perspective Review | v2.0 | March 13, 2026 — Roundtable design analysis: clinical architect, UX, cognitive ergonomics, data integrity, workflow efficiency perspectives. Starling integration context, resolved design questions, layout proposal. |
 | IEC 62304:2006+AMD1:2015 | — | Medical device software — Software life cycle processes |
 | ISO 14971:2019 | — | Medical devices — Application of risk management |
 
@@ -140,7 +140,7 @@ WILLET does **not** create, alter, or drop tables. Schema evolution is Okapi's r
 | CAP | College of American Pathologists |
 | DHF | Design History File |
 | ED | Encapsulated Data (HL7 v2 data type) |
-| FDP | Federated Display Platform (Okapi session awareness) |
+| FDP | Federated Display Platform (Starling session awareness) |
 | HL7 | Health Level Seven International (interoperability standards) |
 | FHIR | Fast Healthcare Interoperability Resources |
 | LIS | Laboratory Information System |
@@ -169,7 +169,7 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 **Requirement:** When activated with a valid case identifier and authentication token, the module shall load the report scaffold for that case and present the authoring workspace ready for editing.
 
-**Rationale:** WILLET's entry point is activation by the host environment (Okapi case page or standalone dev harness). How the user navigated to the case (worklist click, search, direct URL) is outside WILLET's scope — see §2.5.1 for the activation contract. WILLET's responsibility begins at "I have a caseId and a JWT; now load the scaffold."
+**Rationale:** WILLET's entry point is activation by the host environment (Starling case page or standalone dev harness). How the user navigated to the case (worklist click, search, direct URL) is outside WILLET's scope — see §2.5.1 for the activation contract. WILLET's responsibility begins at "I have a caseId and a JWT; now load the scaffold."
 
 **Source:** Spec v1.2 §1.1; Brief §2.1 Step 1; §2.5.1 Activation Contract
 
@@ -555,7 +555,7 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 **Requirement:** The module shall not silently discard unfinalized drafts. A case with an unfinalized report shall retain its draft state in the database until explicitly finalized or resolved by an authorized user. The module shall emit state information that allows the host environment to surface unfinalized cases in its worklist or dashboard.
 
-**Rationale:** Unfinalized reports represent incomplete clinical work that must not be forgotten. WILLET owns the draft state; the host environment (Okapi worklist) owns the display of unfinalized cases. WILLET enables this by persisting state and emitting lifecycle events.
+**Rationale:** Unfinalized reports represent incomplete clinical work that must not be forgotten. WILLET owns the draft state; the host environment (Starling worklist) owns the display of unfinalized cases. WILLET enables this by persisting state and emitting lifecycle events.
 
 **Source:** Spec v1.2 §6.4; Brief §2.1
 
@@ -1059,9 +1059,9 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 **Requirement:** The system shall provide a context dock (right-side panel) with tabs for Clinical, Images, and Synoptic content. Tabs shall be static (always present) but visually grayed when no content is available for a given tab.
 
-**Rationale:** The context dock provides clinical reference material in a predictable location alongside the authoring surface. Static tabs provide spatial consistency — the pathologist always knows where to find each view. The three-tab model reflects the Okapi cockpit architecture where slides are on a dedicated second monitor (viewer), so a Slides tab within WILLET is unnecessary.
+**Rationale:** The context dock provides clinical reference material in a predictable location alongside the authoring surface. Static tabs provide spatial consistency — the pathologist always knows where to find each view. The three-tab model reflects the Starling cockpit architecture where slides are on a dedicated second monitor (viewer), so a Slides tab within WILLET is unnecessary.
 
-**Source:** Design Dialogue §VII (Okapi context), §IX (revised layout); UI Review §2.1
+**Source:** Design Dialogue §VII (Starling context), §IX (revised layout); UI Review §2.1
 
 **Acceptance:** Three tabs are always visible along the right edge: Clinical, Images, Synoptic. Clicking a tab expands the dock; clicking the active tab collapses it. Grayed tabs are still clickable. The dock is resizable via drag handle (280–500px).
 
@@ -1233,21 +1233,21 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 #### UN-083 · Phase 1
 
-**Requirement:** The authoring workspace shall operate as a full-screen module within the Okapi case page, with the prompt input area anchored at the bottom of the authoring zone and the context dock on the right side with vertical tabs along the right edge.
+**Requirement:** The authoring workspace shall operate as a full-screen module within the Starling case page, with the prompt input area anchored at the bottom of the authoring zone and the context dock on the right side with vertical tabs along the right edge.
 
-**Rationale:** The full-screen layout maximizes authoring space within the Okapi cockpit. The prompt area at the bottom (rather than a left panel) avoids four-zone horizontal fragmentation when combined with Okapi's navigation strip. Vertical context dock tabs along the right edge follow the pattern: click to expand, click again to collapse.
+**Rationale:** The full-screen layout maximizes authoring space within the Starling cockpit. The prompt area at the bottom (rather than a left panel) avoids four-zone horizontal fragmentation when combined with Starling's navigation strip. Vertical context dock tabs along the right edge follow the pattern: click to expand, click again to collapse.
 
 **Source:** Design Dialogue §IX (revised layout)
 
-**Acceptance:** WILLET takes the full content area of the Okapi case page. Okapi's navigation strip remains visible. The prompt input is at the bottom of the authoring zone. The context dock tabs are on the right edge. The dock expands/collapses on tab click. Drag handles allow resizing the dock.
+**Acceptance:** WILLET takes the full content area of the Starling case page. Starling's navigation strip remains visible. The prompt input is at the bottom of the authoring zone. The context dock tabs are on the right edge. The dock expands/collapses on tab click. Drag handles allow resizing the dock.
 
 ---
 
 #### UN-084 · Phase 1
 
-**Requirement:** The system shall meet the following performance targets when operating within the Okapi shell: module load < 1.5 seconds from "Edit Report" click to interactive; context dock tab switch < 200ms; total WILLET memory footprint < 80MB.
+**Requirement:** The system shall meet the following performance targets when operating within the Starling shell: module load < 1.5 seconds from "Edit Report" click to interactive; context dock tab switch < 200ms; total WILLET memory footprint < 80MB.
 
-**Rationale:** WILLET shares memory and CPU with the Okapi shell. The performance budget accounts for the shared browser tab environment and institutional hardware constraints. Follows Design Principle P8: Performance Is a Feature.
+**Rationale:** WILLET shares memory and CPU with the Starling shell. The performance budget accounts for the shared browser tab environment and institutional hardware constraints. Follows Design Principle P8: Performance Is a Feature.
 
 **Source:** Design Dialogue §VII (performance budget); §VIII (P8)
 

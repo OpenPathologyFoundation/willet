@@ -4,7 +4,7 @@
   import { themeStore } from '$lib/stores/theme.svelte';
   import type { ModuleEvent, UserRole } from '$lib/types';
 
-  // In integrated mode, props come from the Okapi orchestrator via postMessage.
+  // In integrated mode, props come from the Starling orchestrator via postMessage.
   // This is a placeholder — full bridge integration is Stage 4.
   // For now, read from URL params for manual testing.
 
@@ -17,7 +17,7 @@
   });
 
   function handleEvent(event: ModuleEvent) {
-    // In Stage 4, this will postMessage to the Okapi orchestrator
+    // In Stage 4, this will postMessage to the Starling orchestrator
     console.log('[WILLET Integrated] ModuleEvent:', event);
     window.parent?.postMessage(
       { ...event, type: `willet:${event.type.toLowerCase()}` },

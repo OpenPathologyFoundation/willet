@@ -2,7 +2,7 @@
 
 *Workspace for Integrated Linguistic Laboratory Evaluation and Transmission*
 
-A module of the **Okapi** orchestration platform · Pathology Report Authoring · Yale Pathology Informatics
+A module of the **Starling** orchestration platform · Pathology Report Authoring · Yale Pathology Informatics
 
 | Field | Value |
 |---|---|
@@ -16,24 +16,24 @@ A module of the **Okapi** orchestration platform · Pathology Report Authoring �
 
 WILLET is the third named module in Yale Pathology Informatics's bird-themed platform ecosystem. Each module is independently developed and deployed, connecting to the others through explicit, versioned integration contracts.
 
-| Okapi | Pelican | WILLET |
+| Starling | Pelican | WILLET |
 |---|---|---|
-| *Orchestration Kernel for Anatomic Pathology Intelligence* | *Pathology Enhanced Large-Image Clinical Analysis Network* | *Workspace for Integrated Linguistic Laboratory Evaluation and Transmission* |
+| *Open Pathology Platform for Anatomic Pathology Intelligence* | *Pathology Enhanced Large-Image Clinical Analysis Network* | *Workspace for Integrated Linguistic Laboratory Evaluation and Transmission* |
 | Worklist, case navigation, auth, viewer window management, FDP session awareness. The orchestration hub that all modules connect to. | Digital pathology imaging module. Whole slide image viewing, tile server, OpenSeadragon viewer, slide management. | Diagnostic report authoring. Voice input, LLM-assisted structuring, nomenclature harmonization, RTF generation, HL7/FHIR interface transmission to LIS. |
 
-**Integration principle:** Modules are loosely coupled. WILLET mounts inside Okapi's web-client via a three-point contract (props, event bus, postMessage) and is otherwise fully self-contained. WILLET has no direct dependency on Pelican, but can optionally signal the viewer via the existing Okapi postMessage bridge.
+**Integration principle:** Modules are loosely coupled. WILLET mounts inside Starling's web-client via a three-point contract (props, event bus, postMessage) and is otherwise fully self-contained. WILLET has no direct dependency on Pelican, but can optionally signal the viewer via the existing Starling postMessage bridge.
 
 ---
 
 ## 2. What WILLET Is
 
-WILLET is a case-scoped diagnostic report authoring workspace. A pathologist opens a case from the Okapi worklist, authors the diagnostic report using keyboard, voice, and LLM-assisted tools, and finalizes it for transmission to the Laboratory Information System (LIS) via the HL7/FHIR interface engine.
+WILLET is a case-scoped diagnostic report authoring workspace. A pathologist opens a case from the Starling worklist, authors the diagnostic report using keyboard, voice, and LLM-assisted tools, and finalizes it for transmission to the Laboratory Information System (LIS) via the HL7/FHIR interface engine.
 
 ### 2.1 Core Workflow
 
 | Step | Actor | What happens |
 |---|---|---|
-| 1. Open case | Pathologist / Okapi | Okapi mounts WILLET, passes caseId + JWT. WILLET fetches report scaffold from wsi.parts. |
+| 1. Open case | Pathologist / Starling | Starling mounts WILLET, passes caseId + JWT. WILLET fetches report scaffold from wsi.parts. |
 | 2. Acquire lock | WILLET | Single-editor lock acquired via FDP WebSocket hub. Other users see read-only. |
 | 3. Author report | Pathologist | Types, dictates, or issues voice editing commands. Edits autosave immediately. LLM structures diagnostic clauses. |
 | 4. Nomenclature check | WILLET / LLM | Terms checked against personal dictionary → institutional dictionary → LLM inference. Conflicts routed to arbitration. |
@@ -47,11 +47,11 @@ WILLET is a case-scoped diagnostic report authoring workspace. A pathologist ope
 
 ### 3.1 Standalone-First Development
 
-WILLET is developed as a completely independent Svelte 5 application before integration with Okapi. It runs on its own Vite dev server (:5175) against MSW mock services. Zero running Okapi infrastructure is required for standalone development and testing.
+WILLET is developed as a completely independent Svelte 5 application before integration with Starling. It runs on its own Vite dev server (:5175) against MSW mock services. Zero running Starling infrastructure is required for standalone development and testing.
 
 | Concern | Standalone (dev) | Integrated (production) |
 |---|---|---|
-| Auth / JWT | Mock JWT from env fixture | Provisioned by Okapi orchestrator via postMessage |
+| Auth / JWT | Mock JWT from env fixture | Provisioned by Starling orchestrator via postMessage |
 | Case data | Static JSON fixtures in /fixtures/ | Fetched via auth-system /api/ from wsi.parts |
 | Autosave endpoint | MSW mock (in-browser) | auth-system /api/report/save with CSRF token |
 | Lock service | Mock WS in dev harness | FDP WebSocket hub (:8765) — extended with LOCK_CLAIM messages |
@@ -65,7 +65,7 @@ WILLET is developed as a completely independent Svelte 5 application before inte
 
 ```svelte
 <ReportModule
-  caseId={string}               // Okapi case ID → triggers scaffold fetch
+  caseId={string}               // Starling case ID → triggers scaffold fetch
   jwt={string}                  // Current JWT; module handles refresh via postMessage
   role={UserRole}               // RESIDENT | FELLOW | ATTENDING | DIRECTOR
   apiBase={string}              // auth-system base URL
@@ -75,7 +75,7 @@ WILLET is developed as a completely independent Svelte 5 application before inte
 
 **Point 2 — ModuleEvent Outbound Bus**
 
-| Event | When emitted | Okapi action |
+| Event | When emitted | Starling action |
 |---|---|---|
 | REPORT_FINALIZED | RTF written to wsi.report_transmissions | Refresh worklist; optionally advance case |
 | LOCK_ACQUIRED | Editor lock obtained | Update case tile status in worklist |
@@ -85,7 +85,7 @@ WILLET is developed as a completely independent Svelte 5 application before inte
 
 **Point 3 — postMessage Bridge (optional)**
 
-If a Pelican viewer window is open for the same case, WILLET participates in the existing Okapi postMessage bridge. Selecting a part in WILLET can signal the viewer to navigate to the corresponding slide. This is additive — the viewer ignores unknown message types, so WILLET's absence never breaks Pelican.
+If a Pelican viewer window is open for the same case, WILLET participates in the existing Starling postMessage bridge. Selecting a part in WILLET can signal the viewer to navigate to the corresponding slide. This is additive — the viewer ignores unknown message types, so WILLET's absence never breaks Pelican.
 
 ---
 
@@ -139,7 +139,7 @@ create table wsi.report_transmissions (
   id              uuid default gen_random_uuid() primary key,
   case_id         uuid not null references wsi.cases,
   idempotency_key uuid not null unique,
-  finalized_by    uuid not null,               -- Okapi user id
+  finalized_by    uuid not null,               -- Starling user id
   finalized_at    timestamptz not null,
   rtf_payload     text not null,               -- Base64-encoded RTF
   version_hash    varchar(64) not null,        -- SHA-256 of raw RTF
@@ -234,7 +234,7 @@ The HL7/FHIR interface is an autonomous engine. It polls wsi.report_transmission
 | RTF ownership | WILLET owns all formatting. LIS renders without modification. No bullet/indent markup in OBX-5 payload. |
 | HL7 encoding | ORU_R01 · OBX-5 ED type · ^AP^RTF^Base64^{payload} · idempotency_key in MSH-10 |
 | Lock service | Extension of existing FDP WebSocket hub. LOCK_CLAIM / LOCK_RELEASE / LOCK_TAKEOVER message types added. |
-| Development strategy | Standalone-first on :5175 with MSW mocks. Three-point integration contract into Okapi web-client. |
+| Development strategy | Standalone-first on :5175 with MSW mocks. Three-point integration contract into Starling web-client. |
 | Module name | WILLET — Workspace for Integrated Linguistic Laboratory Evaluation and Transmission |
 
 ### 7.3 Open Questions
@@ -258,7 +258,7 @@ The HL7/FHIR interface is an autonomous engine. It polls wsi.report_transmission
 | 3A | Voice Input | Whisper integration, voice command interpreter, undo stack | All §8.3 command table cases pass with mock LLM |
 | 3B | Nomenclature | Personal/institutional dictionary, suggestions, arbitration queue | Conflict detection and routing functional |
 | 3C | LLM Assist | On-demand structuring commands, feature-flagged | Degrades cleanly on 503; no editor corruption |
-| 4 | Okapi Integration | Eight-step wiring into real Okapi stack | All §16 acceptance criteria pass on real infrastructure |
+| 4 | Starling Integration | Eight-step wiring into real Starling stack | All §16 acceptance criteria pass on real infrastructure |
 | 5 | Hardening | Adversarial tests, QMS artifacts, DHF entries | Risk analysis signed off; verification protocol executed |
 
 Stages 3A, 3B, 3C are parallelizable with Stage 2 once the Stage 1 data model is stable. Critical path: Stage 1 → Stage 2 → Stage 4.
@@ -283,6 +283,6 @@ When starting a new conversation in this project:
 - Tag architectural decisions clearly so this brief can be updated
 - Note which Stage of the development plan a task belongs to
 
-**Scope reminder:** WILLET is a standalone Svelte 5 application. Okapi implementation details belong in the Okapi project. Integration surface discussions (the three contract points) belong in both projects.
+**Scope reminder:** WILLET is a standalone Svelte 5 application. Starling implementation details belong in the Starling project. Integration surface discussions (the three contract points) belong in both projects.
 
 *WILLET — built at the intersection of language, laboratory, and the Connecticut shoreline.*

@@ -1,19 +1,19 @@
-# Module Integration Specification — Okapi Orchestration Platform
+# Module Integration Specification — Starling Orchestration Platform
 
 | Field | Value |
 |---|---|
-| **Document ID** | OKAPI-MIS-001 |
+| **Document ID** | STARLING-MIS-001 |
 | **Version** | 1.0 DRAFT |
 | **Date** | April 4, 2026 |
 | **IEC 62304 Reference** | §5.3 — Software Architectural Design |
 | **Status** | DRAFT — Pending review and approval |
-| **Scope** | Workspace-level: governs all modules in the Okapi platform |
+| **Scope** | Workspace-level: governs all modules in the Starling platform |
 
 ---
 
 ## 1. Purpose
 
-This document defines the shared contract that every module in the Okapi anatomic pathology platform must implement to participate in the orchestrated clinical workflow. It is the authoritative reference for:
+This document defines the shared contract that every module in the Starling anatomic pathology platform must implement to participate in the orchestrated clinical workflow. It is the authoritative reference for:
 
 - How modules are mounted by the orchestrator
 - The typed postMessage protocol all modules speak
@@ -22,9 +22,9 @@ This document defines the shared contract that every module in the Okapi anatomi
 - How modules are routed through nginx to share a single browser origin
 - How modules communicate with each other (always mediated by the orchestrator)
 
-This specification is **prescriptive**. Any module that conforms to this contract can be developed, tested, and deployed independently while appearing to the end user as a seamless part of the Okapi clinical cockpit.
+This specification is **prescriptive**. Any module that conforms to this contract can be developed, tested, and deployed independently while appearing to the end user as a seamless part of the Starling clinical cockpit.
 
-**Audience:** Developers working on any Okapi module (Pelican viewer, WILLET report authoring, future modules), the Okapi orchestrator web-client, or the session/infrastructure layer.
+**Audience:** Developers working on any Starling module (Pelican viewer, WILLET report authoring, future modules), the Starling orchestrator web-client, or the session/infrastructure layer.
 
 **Regulatory note:** This document is part of the workspace-level Design History File. Changes to the module contract require traceability review against the DHFs of all affected modules.
 
@@ -34,7 +34,7 @@ This specification is **prescriptive**. Any module that conforms to this contrac
 
 ### 2.1 The State Machine Model
 
-Okapi is a **workflow orchestration platform** for anatomic pathology. The user's clinical session is modeled as a state machine where each state is an **activity** — a focused task context with its own UI, data, and lifecycle:
+Starling is a **workflow orchestration platform** for anatomic pathology. The user's clinical session is modeled as a state machine where each state is an **activity** — a focused task context with its own UI, data, and lifecycle:
 
 ```
                     ┌──────────┐
@@ -59,7 +59,7 @@ Okapi is a **workflow orchestration platform** for anatomic pathology. The user'
                          └─────────┘
 ```
 
-The orchestrator (Okapi web-client) owns transitions between states. Modules own the behavior within a state. No module knows about any other module — the orchestrator mediates all cross-module communication.
+The orchestrator (Starling web-client) owns transitions between states. Modules own the behavior within a state. No module knows about any other module — the orchestrator mediates all cross-module communication.
 
 ### 2.2 Module Taxonomy
 
@@ -76,11 +76,11 @@ External modules are the primary subject of this specification. Internal activit
 
 | Module | Type | Path Prefix | Port (Dev) | Repository | Status |
 |---|---|---|---|---|---|
-| Web-client (orchestrator) | Internal | `/` | 5173 | `Okapi/web-client` | Active |
+| Web-client (orchestrator) | Internal | `/` | 5173 | `Starling/web-client` | Active |
 | Pelican Digital Viewer | External | `/viewer/` | 5174 | `large_image/digital-viewer` | Active |
 | WILLET Report Authoring | External | `/report/` | 5175 | `willet/` | Stage 2 |
 | Ibis Case Search | External | `/search/` | 8081 | `ibis/` | Prototype |
-| Activity Portal | Internal | `/app/portal` | — | `Okapi/web-client` | Planned |
+| Activity Portal | Internal | `/app/portal` | — | `Starling/web-client` | Planned |
 
 **Note on Ibis:** Ibis uses a different technology stack (Spring Boot + vanilla JavaScript) than the Svelte-based modules. This is intentional and validates the framework-agnostic design of the module contract. The postMessage bridge protocol works identically regardless of the module's internal framework choice. Ibis also brings its own backend (Elasticsearch, MCP server for NL search) which is routed through nginx alongside the auth-system.
 
@@ -88,7 +88,7 @@ External modules are the primary subject of this specification. Internal activit
 
 ## 3. The Module Contract
 
-Every external module must implement the following three-point contract to participate in the Okapi orchestration.
+Every external module must implement the following three-point contract to participate in the Starling orchestration.
 
 ### 3.1 Mount Entry Point
 
@@ -296,7 +296,7 @@ Module-specific events (e.g., `REPORT_FINALIZED`, `SLIDE_VIEWED`, `ANNOTATION_CR
 
 ## 4. Orchestrator Responsibilities
 
-The orchestrator (Okapi web-client) is the only component in the system that knows about all modules. It has four responsibilities that no module should duplicate.
+The orchestrator (Starling web-client) is the only component in the system that knows about all modules. It has four responsibilities that no module should duplicate.
 
 ### 4.1 Activity Registry
 
@@ -444,7 +444,7 @@ interface AuditEvent {
 
 All modules receive a JWT from the orchestrator and use it for API authentication:
 
-- **Token format:** JWT with `sub` (user ID), `exp` (expiry), `roles` (array), `okapiAuthzVersion` (permission schema version)
+- **Token format:** JWT with `sub` (user ID), `exp` (expiry), `roles` (array), `starlingAuthzVersion` (permission schema version)
 - **Token lifetime:** Configured in auth-system (currently 15 minutes)
 - **Refresh:** The orchestrator schedules a refresh 60 seconds before expiry and sends `orchestrator:token-refresh` to all connected modules
 - **Module responsibility:** Replace the token in its API client; do not store tokens in localStorage, sessionStorage, or cookies (tokens live only in memory)
@@ -633,7 +633,7 @@ The current system has the Pelican Viewer integrated via `ViewerBridge` with vie
 
 ## 10. Design Principles
 
-These principles govern architectural decisions for the Okapi platform:
+These principles govern architectural decisions for the Starling platform:
 
 1. **Star topology.** The orchestrator is at the center. Modules connect to the orchestrator, never to each other. This keeps the dependency graph flat and auditable.
 
@@ -657,16 +657,16 @@ These principles govern architectural decisions for the Okapi platform:
 
 | Section | Traces To |
 |---|---|
-| §3 Module Contract | Okapi DHF-04 (SDS Overview), WILLET-DHF-SDS-004-00 §7 |
+| §3 Module Contract | Starling DHF-04 (SDS Overview), WILLET-DHF-SDS-004-00 §7 |
 | §3.1 Mount Entry Point | WILLET-DHF-URS §2.5.1 (Mount Props) |
-| §3.4 Message Protocol | Okapi `src/lib/types/viewer-bridge.ts` (existing), WILLET-DHF-SDS-004-00 §7.2 |
+| §3.4 Message Protocol | Starling `src/lib/types/viewer-bridge.ts` (existing), WILLET-DHF-SDS-004-00 §7.2 |
 | §3.5 Event Emission | WILLET-DHF-URS §2.5.2 (ModuleEvent callback) |
-| §4.4 Audit Pipeline | Okapi DHF SYS-AUDIT requirements, WILLET UN-050 |
-| §5.2 Auth Token | Okapi DHF-04-01 (AuthN Architecture) |
-| §6.1 nginx Proxy | Okapi `proxy/nginx.dev.conf` |
+| §4.4 Audit Pipeline | Starling DHF SYS-AUDIT requirements, WILLET UN-050 |
+| §5.2 Auth Token | Starling DHF-04-01 (AuthN Architecture) |
+| §6.1 nginx Proxy | Starling `proxy/nginx.dev.conf` |
 | §6.2 Session Service | `large_image/digital-viewer/packages/session-service/`, WILLET-DHF-SDS-004-02 |
-| §6.3 Database Schemas | Okapi DHF-04-03 (IAM Schema), WILLET-DHF-SDS-004-06 (Data Model) |
-| §9 Migration Path | Okapi `src/lib/viewer-bridge.ts` (existing), DHF-04-07 §11 (Migration Plan) |
+| §6.3 Database Schemas | Starling DHF-04-03 (IAM Schema), WILLET-DHF-SDS-004-06 (Data Model) |
+| §9 Migration Path | Starling `src/lib/viewer-bridge.ts` (existing), DHF-04-07 §11 (Migration Plan) |
 
 ---
 

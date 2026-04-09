@@ -6,7 +6,7 @@
 | **Version** | 1.0 DRAFT |
 | **Date** | April 4, 2026 |
 | **Status** | DRAFT |
-| **Parent** | OKAPI-LIS-002 (Linguistic Services Architecture) |
+| **Parent** | STARLING-LIS-002 (Linguistic Services Architecture) |
 | **Purpose** | Development-focused guide for building and validating WILLET's linguistic MCP server |
 
 ---
@@ -15,7 +15,7 @@
 
 **Build everything inside WILLET. Extract later when a second consumer exists.**
 
-The workspace-level spec (OKAPI-LIS-002) describes the ideal architecture: shared transcription service, shared vocabulary data, module-specific interpretation. That's the deployment target. But WILLET can't wait for shared infrastructure that doesn't exist yet. Every linguistic capability WILLET needs should be built, tested, and validated within the WILLET repository first. Extraction into shared services is a future refactoring step that costs almost nothing when the time comes — the interfaces are clean and the data is in JSON files.
+The workspace-level spec (STARLING-LIS-002) describes the ideal architecture: shared transcription service, shared vocabulary data, module-specific interpretation. That's the deployment target. But WILLET can't wait for shared infrastructure that doesn't exist yet. Every linguistic capability WILLET needs should be built, tested, and validated within the WILLET repository first. Extraction into shared services is a future refactoring step that costs almost nothing when the time comes — the interfaces are clean and the data is in JSON files.
 
 This document describes what to build today.
 

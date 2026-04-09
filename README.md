@@ -2,7 +2,7 @@
 
 **Workspace for Integrated Linguistic Laboratory Evaluation and Transmission**
 
-A module of the [Okapi](https://github.com/YalePathologyInformatics) orchestration platform for anatomic pathology.
+A module of the [Starling](https://github.com/YalePathologyInformatics) orchestration platform for anatomic pathology.
 
 ---
 
@@ -10,7 +10,7 @@ A module of the [Okapi](https://github.com/YalePathologyInformatics) orchestrati
 
 WILLET is a case-scoped diagnostic report authoring workspace for anatomic pathology. It enables pathologists to draft diagnostic reports using keyboard, voice dictation, and LLM-assisted tools, then finalize and transmit those reports to the Laboratory Information System (LIS) via a standards-based HL7/FHIR interface.
 
-WILLET is designed as a standalone Svelte 5 module that integrates into the Okapi orchestration platform through a defined three-point contract (mount props, event bus, postMessage bridge). It can be developed and tested in complete isolation using mock services.
+WILLET is designed as a standalone Svelte 5 module that integrates into the Starling orchestration platform through a defined three-point contract (mount props, event bus, postMessage bridge). It can be developed and tested in complete isolation using mock services.
 
 ## Design Approach
 
@@ -80,7 +80,7 @@ willet/
 | 3A | Voice Input | 2 weeks | Not started |
 | 3B | Nomenclature Harmonization | 2 weeks | Not started |
 | 3C | LLM Structuring Assistance | 1 week | Not started |
-| 4 | Okapi Integration | 2–3 weeks | Not started |
+| 4 | Starling Integration | 2–3 weeks | Not started |
 | 5 | Clinical Hardening & QMS | 2–3 weeks | Not started |
 
 Estimated total: 13–17 weeks to a clinically hardened Phase 1.
@@ -120,6 +120,6 @@ The DHF index at [`qms/dhf/00-Index.md`](qms/dhf/00-Index.md) is the entry point
 
 | Module | Purpose |
 |---|---|
-| **Okapi** | Orchestration kernel — worklist, case navigation, auth, viewer management |
+| **Starling** | Orchestration kernel — worklist, case navigation, auth, viewer management |
 | **Pelican** | Digital pathology imaging — WSI viewing, tile server, OpenSeadragon |
 | **WILLET** | Diagnostic report authoring — voice, LLM structuring, RTF generation, HL7 transmission |

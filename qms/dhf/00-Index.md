@@ -23,12 +23,12 @@ This DHF covers the design and evolution of the WILLET module, including:
 - RTF report generation and serialization
 - HL7 v2 outbound transmission via the HL7/FHIR interface
 - Concurrency control (single-editor locking, takeover, session management)
-- Integration contract with the Okapi orchestration platform (props, event bus, postMessage)
+- Integration contract with the Starling orchestration platform (props, event bus, postMessage)
 - Audit logging and compliance
 
 Out of scope (unless explicitly pulled into scope by change control):
 
-- Okapi orchestration kernel internals (covered by Okapi DHF)
+- Starling orchestration kernel internals (covered by Starling DHF)
 - Pelican digital pathology imaging module (covered by Pelican DHF)
 - HL7/FHIR interface engine internals (separate component; WILLET defines only the handoff contract)
 - LIS internal configuration (owned by hospital teams)
@@ -215,7 +215,7 @@ Each RELREC-{release}.md SHALL reference:
 - SDS 04-07 (Synoptic) and 04-08 (Template) are planned new documents
 - SDS 04-05 (Finalization Architecture) drafted with two-layer authoring model and svelte-rtf-editor integration
 - Risk analysis (05a/b), VVP (06), and Trace Matrix (07) are planned
-- Flyway migration V14 (report_transmissions table) not yet created in Okapi — needed for Stage 4 integration
+- Flyway migration V14 (report_transmissions table) not yet created in Starling — needed for Stage 4 integration
 - Stage 1 scaffold complete: all exit criteria met (see SDS 04-01 §11)
 
 ## 10. Source Specification Documents

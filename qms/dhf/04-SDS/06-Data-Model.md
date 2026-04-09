@@ -14,7 +14,7 @@
 
 This document specifies the database schema that WILLET reads and writes, the JSONB metadata conventions, the audit event schema, and the database role permissions. It is the single source of truth for WILLET's data layer.
 
-**Ownership rule:** WILLET does not own the schema. All tables are created and evolved by Okapi's Flyway migrations. This document defines what WILLET *needs*; the corresponding Flyway DDL is the implementation. See URS §2.5.3 for the formal database contract.
+**Ownership rule:** WILLET does not own the schema. All tables are created and evolved by Starling's Flyway migrations. This document defines what WILLET *needs*; the corresponding Flyway DDL is the implementation. See URS §2.5.3 for the formal database contract.
 
 ---
 
@@ -66,7 +66,7 @@ These tables already exist via Flyway V6–V8. WILLET reads them but does not mo
 | `metadata` | jsonb | Read | LIS-sourced extensions |
 | `patient_id` | uuid FK → core.patients | Read | Join to patient demographics |
 
-**WILLET never writes to `wsi.cases`.** Case-level state changes (e.g., archival on LIS sign-out) are performed by the LIS interface or Okapi.
+**WILLET never writes to `wsi.cases`.** Case-level state changes (e.g., archival on LIS sign-out) are performed by the LIS interface or Starling.
 
 ### 3.2 wsi.parts
 
@@ -170,7 +170,7 @@ Any key not listed above is treated as LIS-sourced. WILLET renders them in a "Ca
 
 ## 5. New Table: wsi.report_transmissions
 
-This table does not yet exist. It must be created via a new Flyway migration (V14) in Okapi's auth-system before WILLET Stage 4 integration. In standalone mode, it is mocked by MSW.
+This table does not yet exist. It must be created via a new Flyway migration (V14) in Starling's auth-system before WILLET Stage 4 integration. In standalone mode, it is mocked by MSW.
 
 ### 5.1 DDL
 
@@ -271,7 +271,7 @@ WILLET emits audit events via `POST /api/audit/events`. Events are batched (max 
 
 ### 6.3 Storage
 
-Audit events are stored by Okapi's auth-system. The audit table design is Okapi's responsibility. WILLET treats the audit endpoint as a write-only sink.
+Audit events are stored by Starling's auth-system. The audit table design is Starling's responsibility. WILLET treats the audit endpoint as a write-only sink.
 
 ---
 

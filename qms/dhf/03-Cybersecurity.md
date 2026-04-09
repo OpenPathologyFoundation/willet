@@ -10,11 +10,11 @@
 
 *This document will contain the threat model and security controls for WILLET, covering:*
 
-- *JWT handling and refresh (postMessage bridge with Okapi)*
+- *JWT handling and refresh (postMessage bridge with Starling)*
 - *CSRF protection on save endpoints*
 - *Lock service security (authorization checks on force takeover)*
 - *PHI exposure surface (voice transcription, LLM calls)*
 - *RTF payload integrity (version hash verification)*
 - *Audit log tamper resistance*
 
-*To be authored during Stage 4 (Okapi Integration) or earlier if security-critical design decisions arise.*
+*To be authored during Stage 4 (Starling Integration) or earlier if security-critical design decisions arise.*
