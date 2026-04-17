@@ -1,0 +1,330 @@
+{
+  "+Associated Syndrome": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Carney triad",
+      "Carney-Stratakis syndrome",
+      "Neurofibromatosis type 1",
+      "Familial GIST syndrome",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Preresection Treatment": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "No known preresection therapy",
+      "Previous biopsy or surgery",
+      "Systemic therapy performed (Specify systemic therapy performed)",
+      "Therapy performed, type not specified",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Local excision",
+      "Resection",
+      "Metastasectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Tumors": {
+    "caption": "Select only if applicable i.e. more than one tumor foci",
+    "type": "dropdown",
+    "suffix": "Foci",
+    "options": [
+      "Specify number",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tSizes of Tumors": {
+    "caption": "Specify sizes in Centimeters (cm) greatest dimension;\n\nFor the sizes multifocal tumors separate each measurement with a comma and a single white space (\", \")",
+    "type": "list",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Multiple Primary Sites": {
+    "caption": "Please complete a separate checklist for each primary site",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no additional primary site(s) present)",
+      "Present (Please specify site(s)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Esophagus (Please specify location)",
+      "Gastroesophageal junction",
+      "Stomach (Please specify location)",
+      "Duodenum",
+      "Jejunum",
+      "Ileum (excluding ileocecal valve)",
+      "Meckel diverticulum",
+      "Small intestine, NOS",
+      "Appendix",
+      "Ileocecal valve",
+      "Cecum",
+      "Ascending colon",
+      "Hepatic flexure of colon",
+      "Transverse colon",
+      "Splenic flexure of colon",
+      "Descending colon",
+      "Sigmoid colon",
+      "Rectosigmoid junction",
+      "Rectum",
+      "Large intestine, NOS",
+      "Retroperitoneum",
+      "Peritoneum / abdomen (Please specify location)",
+      "Other (Please specify)",
+      "Cannot be determined",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Gastrointestinal stromal tumor, spindle cell type",
+      "Gastrointestinal stromal tumor, epithelioid type",
+      "Gastrointestinal stromal tumor, mixed",
+      "Gastrointestinal stromal tumor, other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Mitotic Rate": {
+    "caption": "The mitotic rate should be determined in 5 mm2 of tumor. With the use of older model microscopes, 50 HPF is equivalent to 5 mm2. Most modern microscopes with wider fields require approximately 20 to 25 HPF to encompass 5 mm2. If necessary, please measure a field of view to accurately determine actual number of fields required to be counted on individual microscopes to encompass 5 mm2",
+    "type": "text",
+    "suffix": "mitoses per 5 mm2",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, low grade (mitotic rate less than or equal to 5 per 5 mm2)",
+      "G2, high grade (mitotic rate greater than 5 per 5 mm2)",
+      "Other (Please specify)",
+      "GX, cannot be assessed"
+    ],
+    "additional caption": ""
+  },
+  "+Necrosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Extent of Necrosis": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Risk Assessment": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "None",
+      "Very low risk",
+      "Low risk",
+      "Moderate risk",
+      "High risk",
+      "Overtly malignant / metastatic",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for GIST",
+      "GIST present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tClosest Margin(s) to GIST": {
+    "caption": "Select only if applicable (i.e. margins are negative for GIST)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Omental (radial)",
+      "Mucosal",
+      "Deep",
+      "Other",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tDistance from GIST to Closest Margin": {
+    "caption": "Select only if applicable (i.e. margins are negative for GIST);\n\nSpecify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeter (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by GIST": {
+    "caption": "Select only if applicable (i.e. margins are positive for GIST).\n\n",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Omental (radial)",
+      "Mucosal",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "Required if applicable (i.e. There are positive lymph nodes)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Include if applicable. Select al lthat may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

@@ -1,0 +1,520 @@
+{
+  "Procedure": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Excision",
+      "Endolaryngeal excision",
+      "Transoral laser excision (glottis)",
+      "Supraglottic laryngectomy",
+      "Supracricoid laryngectomy",
+      "Vertical hemilaryngectomy",
+      "Partial laryngectomy",
+      "Total laryngectomy",
+      "Neck (lymph node) dissection",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Multiple Primary Sites": {
+    "caption": "Please complete a separate checklist for each primary site.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no additional primary site(s) present)",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "supraglottis",
+      "glottis",
+      "subglottis",
+      "Other (Please specify)",
+      "Not Specified"
+    ],
+    "additional caption": ""
+  },
+  "\t+Tumor Subsite": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Epiglottis, lingual aspect",
+      "Epiglottis, laryngeal aspect",
+      "Aryepiglottic folds",
+      "Arytenoid(s)",
+      "False vocal cord",
+      "Ventricle",
+      "Anterior commissure",
+      "Posterior commissure"
+    ],
+    "additional caption": ""
+  },
+  "\t+Subglottic Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "Transglottic Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Laterality": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Midline",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma, conventional (keratinizing)",
+      "Squamous cell carcinoma, nonkeratinizing",
+      "Adenosquamous carcinoma",
+      "Basaloid squamous cell carcinoma",
+      "Papillary squamous cell carcinoma",
+      "Spindle cell squamous carcinoma",
+      "Verrucous carcinoma",
+      "Carcinoma cuniculatum",
+      "Lymphoepithelial carcinoma (non-nasopharyngeal)",
+      "Carcinoma ex pleomorphic adenoma, minimally invasive",
+      "Carcinoma ex pleomorphic adenoma, invasive",
+      "Carcinoma ex pleomorphic adenoma, intracapsular (noninvasive)",
+      "Carcinoma ex pleomorphic adenoma, extent cannot be determined",
+      "Mucoepidermoid carcinoma",
+      "Adenoid cystic carcinoma tubular / cribriform",
+      "Acinic cell carcinoma",
+      "Secretory carcinoma",
+      "Polymorphous adenocarcinoma, conventional",
+      "Polymorphous adenocarcinoma, cribriform subtype",
+      "Salivary duct carcinoma",
+      "Epithelial-myoepithelial carcinoma",
+      "Hyalinizing clear cell carcinoma",
+      "Microsecretory adenocarcinoma",
+      "Intraductal carcinoma",
+      "Basal cell adenocarcinoma",
+      "Carcinosarcoma",
+      "Mucinous adenocarcinoma, not otherwise specified",
+      "Mucinous adenocarcinoma, intraductal papillary mucinous neoplasia subtype",
+      "Mucinous adenocarcinoma, colloid / signet ring subtype",
+      "Sclerosing microcystic adenocarcinoma",
+      "Lymphoepithelial carcinoma",
+      "Myoepithelial carcinoma",
+      "Sebaceous adenocarcinoma",
+      "Sialoblastoma",
+      "Neuroendocrine tumor, grade 1",
+      "Neuroendocrine tumor, grade 2",
+      "Neuroendocrine tumor, grade 3",
+      "Neuroendocrine carcinoma, small cell type",
+      "Neuroendocrine carcinoma, large cell type",
+      "Combined (or composite) neuroendocrine carcinoma",
+      "Mucosal melanoma",
+      "Other histologic type not listed",
+      "Carcinoma, type cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tMalignant Component Histologic Type(s)": {
+    "caption": "Required for Carcinoma ex Pleiomorphic Adenoma",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Intraductal pattern",
+      "Salivary duct carcinoma",
+      "Epithelial-myoepithelial carcinoma",
+      "Myoepithelial carcinoma",
+      "Carcinosarcoma (sarcomatoid carcinoma)",
+      "Other (Pleas specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Solid Component": {
+    "caption": "For Adenoid Cystic Carcinoma; Specify Percentage (%) of Solid Component.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Percentage of Papillary Component": {
+    "caption": "For Polymorphous Adenocarcinoma; Specify Percentage (%) of Papillary Component.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Percentage of Cribriform Component": {
+    "caption": "For Polymorphous Adenocarcinoma; Specify Percentage (%) of Cribriform Component. ",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tType of Combined Histology": {
+    "caption": "Please note that the user must select at least one neuroendocrine type and at least one carcinoma type from the list below",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma",
+      "Adenocarcinoma",
+      "Neuroendocrine carcinoma, small cell type",
+      "Neuroendocrine carcinoma, large cell type",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "Required for non-salivary, non-neuroendocrine carcinomas",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed"
+    ],
+    "additional caption": ""
+  },
+  "Grade / Intrinsic Biologic Potential": {
+    "caption": "Required for salivary carcinomas",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Low",
+      "Intermediate",
+      "High / High-grade transformation",
+      "Cannot be assessed"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Extent": {
+    "caption": "Specify other structures / spaces involved",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Extent / Type of Perineural Invasion": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Intratumoral",
+      "Extratumoral",
+      "Intraneural"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Diameter of Involved Nerve": {
+    "caption": "Specify Diameter of Involved Nerve in Millimeters (mm)",
+    "type": "text",
+    "suffix": "Millimeters (mm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive tumor",
+      "Invasive tumor present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tDistance from Invasive Tumor to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tClosest Margin(s) to Invasive Tumor": {
+    "caption": "Use orientation when provided",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Other Close Margin(s) to Invasive Tumor": {
+    "caption": "",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Invasive Tumor": {
+    "caption": "",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Noninvasive Tumor (High-grade Dysplasia)": {
+    "caption": "Include only if applicable; Margin status for noninvasive tumor is required only for squamous cell carcinoma when closer than invasive tumor.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "All margins negative for noninvasive tumor",
+      "High-grade dysplasia / in situ disease present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Noninvasive Tumor to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Noninvasive Tumor": {
+    "caption": "Use orientation when provided",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Noninvasive Tumor": {
+    "caption": "Selecto only if applicable i.e. Margins (+) for High Grade Dysplasia",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Laterality of Lymph Node(s) with Tumor": {
+    "caption": "Not applicable for mucosal melanoma",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Ipsilateral (including midline)",
+      "Contralateral",
+      "Bilateral",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Intra / periparotid",
+      "Level I",
+      "Level II",
+      "Level III",
+      "Level IV",
+      "Level V",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tSize of Largest Nodal Metastatic Deposit": {
+    "caption": "Not applicable for mucosal melanoma; Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\tExtranodal Extension (ENE)": {
+    "caption": "Not applicable for mucosal melanoma",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Distance of ENE from Lymph Node Capsule": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than 2 mm (macroscopic ENE)",
+      "Less than or equal to 2 mm (microscopic ENE)",
+      "Less than 1 mm",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Include onluy if applicable. Select all that apply",
+    "type": "",
+    "suffix": "multiselect",
+    "options": [
+      "Not applicable",
+      "Lung",
+      "Bone",
+      "Brain",
+      "Liver",
+      "Other",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

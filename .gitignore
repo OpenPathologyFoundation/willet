@@ -13,6 +13,8 @@ public/mockServiceWorker.js
 # Test + coverage
 coverage/
 artifacts/
+playwright-report/
+test-results/
 
 # Secrets — never commit
 .env

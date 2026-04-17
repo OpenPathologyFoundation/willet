@@ -1,0 +1,413 @@
+{
+  "+Pre-Orchiectomy Serum Tumor Marker(s)": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Unknown",
+      "Serum marker studies within normal limits",
+      "Alpha-fetoprotein (AFP) elevation",
+      "Beta-subunit of human chorionic gonadotropin (b-hCG) elevation",
+      "Lactate dehydrogenase (LDH) elevation",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Post-Orchiectomy Serum Tumor Marker(s)": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Unknown",
+      "Serum marker studies within normal limits",
+      "Alpha-fetoprotein (AFP) elevation",
+      "Beta-subunit of human chorionic gonadotropin (b-hCG) elevation",
+      "Lactate dehydrogenase (LDH) elevation",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Serum Tumor Markers": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "SX (serum marker studies not available or performed)",
+      "S0 (serum marker study levels within normal limits)",
+      "S1 (less than 1.5 x the upper limit of normal for the LDH assay, and HCG less than 5,000 mIU / mL, and AFP less than 1,000 ng / mL)",
+      "S2 (1.5-10 x the upper limit of normal for the LDH assay, or HCG 5,000-50,000 mIU / mL, or AFP 1,000-10,000 ng / mL)",
+      "S3 (greater than 10 x the upper limit of normal for the LDH assay, or HCG greater than 50,000 mIU / mL, or AFP greater than 10,000 ng / mL)"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size ": {
+    "caption": "Greatest dimension of main tumor mass in Centimeters (cm).",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Centimeters (cm)"
+  },
+  "Greatest Dimension of Additional Tumor Nodule": {
+    "caption": "May repeat for each nodule. Greatest dimension of main tumor mass in Centimeters (cm).",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Not applicable",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Centimeters (cm)"
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Germ cell neoplasia in situ (GCNIS)",
+      "Gonadoblastoma",
+      "Seminoma",
+      "Seminoma with syncytiotrophoblastic cells",
+      "Non-seminomatous germ cell tumors",
+      "Embryonal carcinoma",
+      "Yolk sac tumor, postpubertal-type",
+      "Choriocarcinoma",
+      "Non-choriocarcinomatous trophoblastic tumor, NOS",
+      "Placental site trophoblastic tumor",
+      "Epithelioid trophoblastic tumor",
+      "Cystic trophoblastic tumor",
+      "Teratoma, postpubertal-type",
+      "Teratoma with somatic-type malignancy",
+      "Mixed germ cell tumor",
+      "Scar diagnostic of regressed germ cell tumor",
+      "Scar suspicious for regressed germ cell tumor",
+      "Spermatocytic tumor",
+      "Spermatocytic tumor with a sarcomatous component",
+      "Testicular neuroendocrine tumor, prepubertal-type",
+      "Mixed teratoma and yolk sac tumor, prepubertal-type",
+      "Yolk sac tumor, prepubertal-type",
+      "Leydig cell tumor",
+      "Sertoli cell tumor, NOS",
+      "Sertoli cell tumor, large cell calcifying",
+      "Sertoli cell tumor, intratubular large cell hyalinizing",
+      "Granulosa cell tumor, adult type",
+      "Sex cord-stromal tumor, mixed type",
+      "Sex cord-stromal tumor type, unclassified",
+      "Other histologic type not listed (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "",
+    "further": {
+      "caption": "Specify specific type of malignancy",
+      "type": "multiselect",
+      "suffix": "",
+      "options": [
+        "Adenocarcinoma",
+        "Embryonic-type neuroectodermal tumor",
+        "Rhabdomyosarcoma",
+        "Other (Please specify)"
+      ],
+      "additional captions": ""
+    }
+  },
+  "\tSeminoma": {
+    "caption": "Specify percentage (%). Include only if applicable i.e. Histologic Type  = Mixed Germ Cell Tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tEmbryonal Carcinoma": {
+    "caption": "Specify percentage (%). Include only if applicable i.e. Histologic Type  = Mixed Germ Cell Tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tYolk Sac Tumor, Postpubertal-type": {
+    "caption": "Specify percentage (%). Include only if applicable i.e. Histologic Type  = Mixed Germ Cell Tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tChoriocarcinoma": {
+    "caption": "Specify percentage (%). Include only if applicable i.e. Histologic Type  = Mixed Germ Cell Tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tTeratoma": {
+    "caption": "Specify percentage (%). Include only if applicable i.e. Histologic Type  = Mixed Germ Cell Tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Germ cell neoplasia in situ only",
+      "Limited to testis",
+      "Invades rete testis",
+      "Invades hilar soft tissue",
+      "Invades epididymis",
+      "Invades through tunica albuginea and perforates tunica vaginalis (mesothelial layer)",
+      "Invades spermatic cord",
+      "Invades scrotum",
+      "Invades other structures",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for tumor",
+      "Tumor present at margin",
+      "Others (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Tumor": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Spermatic cord",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNodal Site(s) with Tumor": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Interaortocaval",
+      "Paraaortic",
+      "Paracaval",
+      "Preaortic",
+      "Precaval",
+      "Retroaortic",
+      "Retrocaval",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "At least",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Nodal Site with Largest Metastatic Deposit": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Interaortocaval",
+      "Paraaortic",
+      "Paracaval",
+      "Preaortic",
+      "Precaval",
+      "Retroaortic",
+      "Retrocaval",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tSize of Largest Lymph Node or Nodal Mass with Tumor": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "At least",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Largest Lymph Node with Tumor": {
+    "caption": "Specify site",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tExtranodal Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be Determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tHistologic Subtype of Germ Cell Tumor in Involved Lymph Node(s)": {
+    "caption": "Include only if applicable i.e. Metastatic Germ Cell Tumor.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Seminoma (Specify percentage)",
+      "Seminoma with syncytiotrophoblastic cells (Specify percentage)",
+      "Embryonal carcinoma (Specify percentage)",
+      "Yolk sac tumor, postpubertal-type (Specify percentage)",
+      "Choriocarcinoma (Specify percentage)",
+      "Placental site trophoblastic tumor (Specify percentage)",
+      "Epithelioid trophoblastic tumor (Specify percentage)",
+      "Cystic trophoblastic tumor (Specify percentage)",
+      "Teratoma, postpubertal-type (Specify percentage)",
+      "Teratoma with somatic-type malignancy (Specify percentage)",
+      "Spermatocytic tumor",
+      "Spermatocytic tumor with a sarcomatous component",
+      "Yolk sac tumor, prepubertal-type",
+      "Leydig cell tumor",
+      "Sertoli cell tumor",
+      "Sertoli cell tumor, large cell calcifying",
+      "Granulosa cell tumor, adult type",
+      "Sex cord-stromal tumor type, mixed",
+      "Sex cord-stromal tumor type, unclassified",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Include only if applicable. Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-retroperitoneal lymph node(s)",
+      "Lung",
+      "Other organ(s) or site(s) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

@@ -70,7 +70,7 @@
       onenter(index);
     }
 
-    if (e.key === 'Backspace' && clause.text === '') {
+    if (e.key === 'Backspace' && (textareaEl?.value ?? '') === '') {
       e.preventDefault();
       ondelete(index);
     }
@@ -119,7 +119,6 @@
   function handleDragOver(e: DragEvent) {
     if (readOnly) return;
     e.preventDefault();
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
     isDragOver = true;
   }
 
@@ -130,28 +129,34 @@
   function handleDrop(e: DragEvent) {
     isDragOver = false;
     if (readOnly || !e.dataTransfer) return;
-    e.preventDefault();
-    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    const fromIndex = Number(e.dataTransfer.getData('text/plain'));
     if (!isNaN(fromIndex) && fromIndex !== index) {
       onmove?.(fromIndex, index);
     }
   }
+
+  function handleInsertAboveEnter() { showInsertAbove = true; }
+  function handleInsertAboveLeave() { showInsertAbove = false; }
+  function handleInsertAboveClick() {
+    showInsertAbove = false;
+    oninsert?.(index);
+  }
 </script>
 
-<!-- Insert-between handle (SRS-231) — shown on hover above this clause -->
-{#if !readOnly && oninsert}
+<!-- Insert-above zone (SRS-231) — visible on hover at top edge -->
+{#if !readOnly}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="group/insert relative h-0 overflow-visible"
-    onmouseenter={() => { showInsertAbove = true; }}
-    onmouseleave={() => { showInsertAbove = false; }}
+    class="relative h-0 group/insert"
+    onmouseenter={handleInsertAboveEnter}
+    onmouseleave={handleInsertAboveLeave}
   >
     {#if showInsertAbove}
-      <div class="absolute inset-x-0 -top-1 flex items-center justify-center z-10">
+      <div class="absolute -top-2 left-0 right-0 flex items-center justify-center z-10">
         <button
           type="button"
-          class="flex items-center gap-1 rounded-full border border-clinical-border bg-clinical-surface px-2 py-0.5 text-[9px] text-clinical-muted hover:text-clinical-primary hover:border-clinical-primary/50 shadow-sm transition-colors"
-          onclick={() => oninsert!(index)}
+          class="rounded-full bg-clinical-primary/10 px-2 py-0.5 text-[9px] text-clinical-primary hover:bg-clinical-primary/20 transition-colors"
+          onclick={handleInsertAboveClick}
           title="Insert clause here"
         >
           <svg class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -195,8 +200,7 @@
     title="Change clause type"
     class="mt-0.5 shrink-0 cursor-pointer appearance-none rounded px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider outline-none disabled:cursor-not-allowed {BADGE_COLORS[clause.type]}"
     onchange={(e) => {
-      const target = e.target as HTMLSelectElement;
-      ontypechange(index, target.value as ClauseType);
+      ontypechange(index, (e.target as HTMLSelectElement).value as ClauseType);
     }}
   >
     {#each CLAUSE_TYPES as ct}
@@ -222,12 +226,11 @@
   <!-- Delete button (visible on hover) -->
   {#if !readOnly}
     <button
-      type="button"
-      class="mt-1 shrink-0 opacity-0 group-hover/clause:opacity-100 transition-opacity text-clinical-muted hover:text-badge-rose-text"
-      onclick={() => ondelete(index)}
+      class="mt-0.5 shrink-0 opacity-0 group-hover/clause:opacity-100 transition-opacity text-clinical-muted hover:text-badge-rose-text"
       title="Delete clause"
+      onclick={() => ondelete(index)}
     >
-      <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>

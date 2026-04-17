@@ -1,0 +1,361 @@
+{
+  "Procedure": {
+    "caption": "#Anything less than a lobectomy, including substernal excision.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right partial excision#",
+      "Left partial excision#",
+      "Partial excision (Please specify type, if possible)#",
+      "Right lobectomy",
+      "Left lobectomy",
+      "Right lobectomy with isthmusectomy (hemithyroidectomy)",
+      "Left lobectomy with isthmusectomy (hemithyroidectomy)",
+      "Right hemithyroidectomy with partial left lobectomy (subtotal or near total thyroidectomy)",
+      "Left hemithyroidectomy with partial right lobectomy (subtotal or near total thyroidectomy)",
+      "Total thyroidectomy",
+      "Completion thyroidectomy (reoperative)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "For multiple tumors of the same cellular lineage (e.g., multifocal papillary carcinoma, follicular carcinoma, etc.), one may choose to repeat the following 10 elements (Tumor Site, Histologic Tumor Types and Subtypes, Tumor Size, Tumor Proliferative Activity, Tumor Necrosis, Angioinvasion, Lymphatic Invasion, Perineural Invasion, Extrathyroidal Extension, and Margin Status) for clinically relevant tumors. For medullary thyroid carcinoma, please use a separate synoptic report",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right lobe",
+      "Left lobe",
+      "Isthmus",
+      "Pyramidal lobe",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "dropdown",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Greatest dimension in Centimeters (cm) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Select one."
+  },
+  "Histologic Tumor Type and Subtype": {
+    "caption": "All papillary microcarcinomas (less than or equal to 1 cm) should be subtyped based on the 5th edition of the WHO classification of thyroid tumors. Papillary microcarcinoma does not stand alone as a subtype and should not be used alone without a subtype designation.\nFormerly known as squamous cell carcinoma of the thyroid is now considered a morphologic pattern of anaplastic thyroid carcinoma in the 5th edition of the WHO classification of thyroid tumors.",
+    "type": "dropdown",
+    "suffix": "subtype",
+    "options": [
+      "Thyroid follicular tumor of uncertain malignant potential",
+      "Thyroid well-differentiated tumor of uncertain malignant potential",
+      "Hyalinizing trabecular tumor",
+      "Non-invasive follicular thyroid neoplasm with papillary like nuclear features (NIFTP)",
+      "Minimally invasive follicular carcinoma",
+      "Encapsulated angioinvasive follicular carcinoma",
+      "Widely invasive follicular carcinoma",
+      "Minimally invasive follicular variant papillary carcinoma",
+      "Minimally invasive oncocytic follicular variant papillary carcinoma",
+      "Encapsulated angioinvasive follicular variant papillary carcinoma",
+      "Encapsulated angioinvasive oncocytic follicular variant papillary carcinoma",
+      "Widely invasive follicular variant papillary carcinoma",
+      "Widely invasive oncocytic follicular variant papillary carcinoma",
+      "Papillary thyroid carcinoma (Choose further)",
+      "Minimally invasive oncocytic carcinoma",
+      "Encapsulated angioinvasive oncocytic carcinoma",
+      "Widely invasive oncocytic carcinoma",
+      "High-grade follicular thyroid carcinoma (Please specify further - subtype)",
+      "High-grade invasive encapsulated follicular variant papillary thyroid carcinoma (Please specify further - subtype)",
+      "High-grade papillary thyroid carcinoma (Please specify futher - subtype)",
+      "High-grade oncocytic carcinoma of the thyroid (Please specify subtype)",
+      "High-grade differentiated thyroid carcinoma, NOS",
+      "Poorly differentiated thyroid carcinoma, NOS",
+      "Oncocytic poorly differentiated thyroid carcinoma",
+      "Anaplastic thyroid carcinoma, NOS",
+      "Anaplastic thyroid carcinoma, focal or minor component without extrathyroidal extension",
+      "Anaplastic thyroid carcinoma, major component",
+      "Medullary thyroid carcinoma",
+      "Mixed medullary carcinoma and follicular thyroid carcinoma (Please specify further)",
+      "Mixed medullary carcinoma and follicular variant papillary carcinoma (Please specify further)",
+      "Mixed medullary carcinoma and papillary thyroid carcinoma (Please specify further)",
+      "Mucoepidermoid carcinoma of the thyroid gland",
+      "Secretory carcinoma of salivary gland type",
+      "Spindle epithelial tumor with thymus-like elements (SETTLE)",
+      "Cribriform-morular thyroid carcinoma",
+      "Sclerosing mucoepidermoid carcinoma with eosinophilia (SMECE)",
+      "Thyroblastoma",
+      "Others (Please specify)",
+      "Malignant thyroid neoplasm, type cannot be determined (Explain)"
+    ],
+    "additional caption": "Please specify subtype",
+    "further": {
+      "caption": "Please select all possible subtypes for papillary thyroid carcinoma that may apply",
+      "type": "multiselect",
+      "suffix": "subtype",
+      "options": [
+        "classic",
+        "encapsulated classic",
+        "oncocytic classic",
+        "infiltrative follicular",
+        "tall cell",
+        "hobnail",
+        "columnar cell",
+        "clear cell",
+        "spindle cell",
+        "solid",
+        "diffuse sclerosing",
+        "with fibromatosis / fasciitis-like / desmoid type stroma",
+        "Warthin-like",
+        "Other (Please specify)"
+      ],
+      "additional caption": "Please specigy subtype"
+    }
+  },
+  "Mitotic Rate": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than 3 mitoses per 2mm2",
+      "Greater than or equal to 3 but less than 5 mitoses per 2 mm2",
+      "Greater than or equal to 5 mitoses per 2 mm2",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Mitoses": {
+    "caption": "Specify specific number of mitoses per 2 mm2",
+    "type": "text",
+    "suffix": "mitoses per 2 mm2",
+    "options": [],
+    "additional caption": ""
+  },
+  "Ki-67 Labeling Index": {
+    "caption": "Required only if applicable.",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Not applicable",
+      "Specify percent (%) (Please specify)",
+      "Pending (To follow)"
+    ],
+    "additional caption": ""
+  },
+  "\tMethodology": {
+    "caption": "For Ki-67 Labeling Index - required only if applicable.",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Manual count",
+      "Automated image analysis"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Necrosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Angioinvasion (vascular invasion)": {
+    "caption": "Historically, less than 4 vessels have been considered as focal and involvement of 4 or more vessels has been referred to extensive angioinvasion in follicular cell-derived thyroid carcinomas. However, the 5th edition of the WHO classification questioned the validity of the cut-off point applied for this distinction. For this reason, pathologists are encouraged to document the extent of angioinvasion based on the number of vessels involved.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present - extensive",
+      "Present - extent not specified",
+      "Present (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Extrathyroidal Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present, microscopic strap muscle invasion only, with no clinical / macroscopic evidence of invasion",
+      "Present, clinical / macroscopic AND histologically confirmed - Invading only strap muscles",
+      "Present, clinical / macroscopic AND histologically confirmed - Invading subcutaneous soft tissues, larynx, trachea, esophagus or recurrent laryngeal nerve",
+      "Present, clinical / macroscopic AND histologically confirmed - Invading prevertebral fascia or encasing the carotid artery or mediastinal vessels",
+      "Margins involved by the tumor, no microscopic extrathyroidal extension (strap muscle invasion) is noted in the sections examined, and no clinical (intraoperative and / or radiologic) or macroscopic  evidence of extrathyroidal extensionMargins involved by the tumor, no macroscopic / microscopic extrathyroidal extension (strap muscle) is noted in the sections examined, and clinical (intraoperative and / or radiologic) evidence of extrathyroidal extension",
+      "Margins involved by the tumor, no macroscopic / microscopic extrathyroidal extension (strap  muscle invasion) is noted in the sections examined, and no documented data available for intraoperative and / or radiologic evidence of extrathyroidal extension",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for carcinoma",
+      "Carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify exact distance in Millimeters (mm)",
+    "type": "text",
+    "suffix": "Millimeter(s) (mm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Carcinoma": {
+    "caption": "Specify involved margins, separated by a comma and a white space (\", \")",
+    "type": "text",
+    "suffix": "margins",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "Tumor present in regional lymph node(s)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "text",
+    "suffix": "lymph node(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tNodal Level(s) Involved": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Level VI - pretracheal, paratracheal and prelaryngeal / Delphian, perithyroidal (central compartment dissection)",
+      "Level VII (superior mediastinal lymph nodes)",
+      "Right Lateral Level I",
+      "Right Lateral Level II",
+      "Right Lateral Level III",
+      "Right Lateral Level IV",
+      "Right Lateral Level V",
+      "Left Lateral Level I",
+      "Left Lateral Level II",
+      "Left Lateral Level III",
+      "Left Lateral Level IV",
+      "Left Lateral Level V",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tSize of Largest Metastatic Deposit": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tExtranodal Extension (ENE)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "text",
+    "suffix": "lymph node(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tNodal Level(s) Examined": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Level VI - pretracheal, paratracheal and prelaryngeal / Delphian, perithyroidal (central compartment dissection)",
+      "Level VII (superior mediastinal lymph nodes)",
+      "Right Lateral Level I",
+      "Right Lateral Level II",
+      "Right Lateral Level III",
+      "Right Lateral Level IV",
+      "Right Lateral Level V",
+      "Left Lateral Level I",
+      "Left Lateral Level II",
+      "Left Lateral Level III",
+      "Left Lateral Level IV",
+      "Left Lateral Level V",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Lung",
+      "Bone",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

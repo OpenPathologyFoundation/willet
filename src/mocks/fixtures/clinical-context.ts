@@ -227,6 +227,66 @@ Part A (Sigmoid polyps, polypectomy):
 Tubular adenoma with low grade dysplasia (x2).
 Fragments are completely excised.`,
     },
+    {
+      id: 'pp-0004-003',
+      caseId: 'S25-8821-MSI',
+      reportDate: '2026-01-02',
+      specimenType: 'Molecular pathology, MSI',
+      anatomicSite: 'Colon, ascending',
+      diagnosisSummary: 'Microsatellite stable (MSS), all MMR proteins intact',
+      relevance: 'PRIMARY',
+      body: `MOLECULAR PATHOLOGY REPORT
+
+CASE: S25-8821-MSI
+TEST: Mismatch Repair Protein Immunohistochemistry
+DATE REPORTED: 01/02/2026
+PATHOLOGIST: Dr. Hlemsesor
+
+SPECIMEN: Colon, ascending, biopsy (S25-8821, Part A)
+
+RESULTS:
+MLH1:  Intact nuclear expression
+MSH2:  Intact nuclear expression
+MSH6:  Intact nuclear expression
+PMS2:  Intact nuclear expression
+
+INTERPRETATION:
+All four mismatch repair proteins show intact nuclear expression.
+This result is consistent with a microsatellite stable (MSS) tumor.
+No further molecular testing for Lynch syndrome is indicated based on these findings.`,
+    },
+    {
+      id: 'pp-0004-004',
+      caseId: 'S25-8821-KRAS',
+      reportDate: '2026-01-05',
+      specimenType: 'Molecular pathology, KRAS/NRAS/BRAF',
+      anatomicSite: 'Colon, ascending',
+      diagnosisSummary: 'KRAS G12D mutation detected, BRAF wild type',
+      relevance: 'PRIMARY',
+      body: `MOLECULAR PATHOLOGY REPORT
+
+CASE: S25-8821-KRAS
+TEST: Extended RAS/RAF Panel (NGS)
+DATE REPORTED: 01/05/2026
+PATHOLOGIST: Dr. Bmodeswuv
+
+SPECIMEN: Colon, ascending, biopsy (S25-8821, Part A)
+
+RESULTS:
+KRAS:  Mutation detected — c.35G>A (p.G12D), exon 2
+       Variant allele frequency: 42%
+NRAS:  No mutation detected (wild type)
+BRAF:  No mutation detected (wild type, V600E negative)
+
+INTERPRETATION:
+A KRAS G12D mutation was detected. This mutation is associated with
+resistance to anti-EGFR therapy (cetuximab, panitumumab).
+BRAF V600E is wild type. NRAS is wild type.
+
+CLINICAL SIGNIFICANCE:
+Patient is NOT eligible for anti-EGFR monoclonal antibody therapy
+based on KRAS mutation status.`,
+    },
   ],
 };
 

@@ -1,0 +1,271 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Excision (less than total mastectomy)",
+      "Total mastectomy (including nipple-sparing and skin-sparing mastectomy)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Site": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Upper outer quadrant",
+      "Lower outer quadrant",
+      "Upper inner quadrant",
+      "Lower inner quadrant",
+      "Central",
+      "Nipple",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "\t+Specify Clock Position": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "1 o'clock",
+      "2 o'clock",
+      "3 o'clock",
+      "4 o'clock",
+      "5 o'clock",
+      "6 o'clock",
+      "7 o'clock",
+      "8 o'clock",
+      "9 o'clock",
+      "10 o'clock",
+      "11 o'clock",
+      "12 o'clock"
+    ],
+    "additional caption": ""
+  },
+  "+Distance from the Nipple": {
+    "caption": "Specify distance from nipple in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Millimeters (mm)",
+    "type": "text",
+    "suffix": "Milimmeters (mm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "A diagnosis of malignant phyllodes tumor requires the presence of all five of the following features: marked stromal cellularity, marked stromal atypia, stromal overgrowth, an infiltrative tumor border and greater than or equal to 10 mitoses per 10 high power fields (HPFs). Tumors should be classified as borderline when some but not all of these changes are present. Malignant phyllodes tumor is also diagnosed when malignant heterologous elements other than pure well differentiated liposarcoma are present, even if not all of the other histologic features of malignancy are observed.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Phyllodes tumor, benign",
+      "Phyllodes tumor, borderline",
+      "Phyllodes tumor, malignant"
+    ],
+    "additional caption": ""
+  },
+  "Stromal Cellularity": {
+    "caption": "Mild - stromal nuclei are non-overlapping\nModerate - some overlapping stromal nuclei\nMarked - many overlapping stromal nuclei",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Mild",
+      "Moderate",
+      "Marked"
+    ],
+    "additional caption": ""
+  },
+  "Stromal Atypia": {
+    "caption": "Mild - minimal variation in nuclear size, even chromatin, and smooth nuclear contours\nModerate - more variation in nuclear size and irregular nuclear membranes\nMarked - marked nuclear pleomorphism, hyperchromasia, and irregular nuclear contours",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "None",
+      "Mild",
+      "Moderate",
+      "Marked"
+    ],
+    "additional caption": ""
+  },
+  "Stromal Overgrowth": {
+    "caption": "Stromal overgrowth is present when there is at least one low-power microscopic field (4x objective and 10x eyepiece or 22.9 mm2) that contains stroma only without epithelial elements.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Absent",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Mitotic Rate": {
+    "caption": "Malignant phyllodes tumors have greater than or equal to 10 mitoses per 10 high-power fields (40x objective and 10x eyepiece) or greater than or equal to 5 mitoses / mm2. Benign phyllodes tumors have less than 5 mitoses per 10 HPFs (less than 2.5 mitoses / mm2).",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": "mitoses per 10 High Power Fields (HPFs)"
+  },
+  "Histologic Tumor Border": {
+    "caption": "A circumscribed border is smooth and well-defined or shows a minimally irregular tumor interface with adjacent stroma. Infiltrative (permeative) tumor borders can be focally infiltrative (unequivocal invasion into adjacent stroma in one low power field) or extensively infiltrative (unequivocal invasion in a wide area or in multiple foci along the tumor periphery). ",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Circumscribed (well-defined; pushing)",
+      "Infiltrative/permeative (Focal)",
+      "Infiltrative/permeative (Extensive)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Malignant Heterologous Elements": {
+    "caption": "A phyllodes tumor is regarded as malignant when there are malignant heterologous elements, even when not all of the other histological features of malignancy are present. This rule does not apply if the only heterologous element is well differentiated liposarcoma. In the breast, those tumors usually lack MDM2 and CDK4 amplifications and have a low metastatic risk. A diagnosis of malignant phyllodes tumor should therefore not be based solely on the presence of well-differentiated liposarcoma without all of the other histologic features of malignancy.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Liposarcoma (excluding well-differentiated liposarcoma)",
+      "Osteosarcoma",
+      "Chondrosarcoma",
+      "Other (PLease specify)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Phyllodes Tumor": {
+    "caption": "Margin status is listed as positive if there is ink on phyllodes tumor (i.e., the distance is 0 mm)",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for phyllodes tumor",
+      "Phyllodes tumor present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tClosest Margin(s) to Phyllodes Tumor": {
+    "caption": "Select al lthat may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Anterior",
+      "Posterior",
+      "Superior",
+      "Inferior",
+      "Medial",
+      "Lateral",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Phyllodes Tumor to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Phyllodes Tumor": {
+    "caption": "Add only if applicable (i.e. positive margins for phyllodes tumor)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Anterior",
+      "Posterior",
+      "Superior",
+      "Inferior",
+      "Medial",
+      "Lateral",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph nodes",
+      "Tumor present in regional lymph nodes (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Nodes Comment": {
+    "caption": "",
+    "type": "",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Add only if applicable.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not spplicable",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

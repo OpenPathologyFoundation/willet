@@ -1,0 +1,256 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Cold knife cone excision",
+      "Loop electrical excision procedure (LEEP) / large loop excision of the transformation zone (LLETZ)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Site": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Left superior (anterior) quadrant (12 to 3 o\u2019clock)",
+      "Left inferior (posterior) quadrant (3 to 6 o\u2019clock)",
+      "Right inferior (posterior) quadrant (6 to 9 o\u2019clock)",
+      "Right superior (anterior) quadrant (9 to 12 o\u2019clock)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma, HPV-associated",
+      "Squamous cell carcinoma, HPV-independent",
+      "Squamous cell carcinoma, NOS (acceptable when p16 or HPV testing is not available)",
+      "Adenocarcinoma, NOS",
+      "Adenocarcinoma, HPV-associated",
+      "Adenocarcinoma, HPV-independent, NOS",
+      "Adenocarcinoma, HPV-independent, gastric type",
+      "Adenocarcinoma, HPV-independent, clear cell type",
+      "Adenocarcinoma, HPV-independent, mesonephric type",
+      "Endometrioid adenocarcinoma, NOS",
+      "Carcinosarcoma",
+      "Adenosquamous carcinoma",
+      "Adenoid basal carcinoma",
+      "Mucoepidermoid carcinoma",
+      "Carcinoma, unclassifiable (undifferentiated carcinoma)",
+      "Neuroendocrine tumor, NOS",
+      "Neuroendocrine tumor, grade 1",
+      "Neuroendocrine tumor, grade 2",
+      "Small cell neuroendocrine carcinoma, high grade",
+      "Large cell neuroendocrine carcinoma, high grade",
+      "Neuroendocrine carcinoma, NOS",
+      "Mixed neuroendocrine non-neuroendocrine carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Stromal Invasion": {
+    "caption": "This will serve as a subsection header. You may proceed to the other subsections below.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tDepth of Stromal Invasion": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify in Millimeters (mm) (Please specify)",
+      "Not more than 3 mm",
+      "Greater than 3 mm but not more than 5 mm",
+      "Greater than 5 mm",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Horizontal Extent of Stromal Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Not applicable (in larger tumors that can be measured grossly)",
+      "Specify in Millimeters (mm) (Please specify)",
+      "Estimated to be less than or equal to 7 Millimeters (mm)",
+      "Estimated to be greater than 7 Millimeters (mm)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Blocks Involved": {
+    "caption": "Include only if applicable i.e. horizontal extent of stromal invasion is to be reported",
+    "type": "",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Silva System for Invasion": {
+    "caption": "Silva System (applicable only to invasive endocervical adenocarcinomas)",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Pattern A",
+      "Pattern B",
+      "Pattern C"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Ectocervical",
+      "Endocervical",
+      "Deep margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Include only if applicable i.e. margins are involved by invasive carcinoma. Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Ectocervical",
+      "Endocervical",
+      "Deep margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for HSIL or AIS": {
+    "caption": "Reporting high-grade squamous intraepithelial lesion (CIN 2-3) and / or AIS is not required if margin is involved by invasive carcinoma.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for high-grade squamous intraepithelial lesion (HSIL) and / or adenocarcinoma in situ (AIS)",
+      "High-grade squamous intraepithelial lesion (HSIL) present at margin",
+      "Adenocarcinoma in situ (AIS) present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain, if possible)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Additional Findings": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "None identified",
+      "Low-grade squamous intraepithelial lesion (CIN 1)",
+      "High-grade squamous intraepithelial lesion (CIN 2 or 3)",
+      "Endocervical adenocarcinoma in situ",
+      "Inflammation",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+p16 Immunohistochemistry": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Positive",
+      "Negative"
+    ],
+    "additional caption": ""
+  }
+}

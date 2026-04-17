@@ -19,8 +19,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
-# Load .env from server directory
-load_dotenv(Path(__file__).parent / ".env")
+# Load .env from server directory (override=True ensures fresh keys are picked up)
+load_dotenv(Path(__file__).parent / ".env", override=True)
 
 from tools.correction import correct_transcription
 from tools.interpreter import interpret_instruction

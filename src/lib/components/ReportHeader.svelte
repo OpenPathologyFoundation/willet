@@ -1,11 +1,24 @@
 <script lang="ts">
+  import type { ReportEditMode } from '$lib/types';
   import { reportStore } from '$lib/stores/report.svelte';
+  import { preferencesStore } from '$lib/stores/preferences.svelte';
+  import { getServices } from '$lib/services/context';
   import SaveIndicator from './SaveIndicator.svelte';
+
+  const services = getServices();
 
   const caseData = $derived(reportStore.caseData);
   const patient = $derived(reportStore.patient);
   const pathologists = $derived(reportStore.pathologists);
   const reportState = $derived(reportStore.reportState);
+  const editMode = $derived(preferencesStore.editMode);
+  const isReadOnly = $derived(reportStore.isReadOnly);
+
+  function setEditMode(mode: ReportEditMode) {
+    preferencesStore.update({ editMode: mode });
+    // Persist preference (fire-and-forget)
+    services.api.savePreferences({ editMode: mode }).catch(() => {});
+  }
 </script>
 
 <header class="shrink-0 border-b border-clinical-border bg-clinical-surface px-6 py-4">
@@ -35,7 +48,39 @@
       {/if}
     </div>
 
-    <SaveIndicator />
+    <div class="flex items-center gap-3">
+      <!-- Edit mode toggle (only for editable reports) -->
+      {#if !isReadOnly}
+        <div class="flex rounded-md border border-clinical-border bg-clinical-bg p-0.5" role="radiogroup" aria-label="Edit mode">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={editMode === 'structured'}
+            class="rounded px-2 py-0.5 text-[11px] font-medium transition-colors
+              {editMode === 'structured'
+                ? 'bg-clinical-primary text-white shadow-sm'
+                : 'text-clinical-muted hover:text-clinical-text'}"
+            onclick={() => setEditMode('structured')}
+          >
+            Structured
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={editMode === 'quick-entry'}
+            class="rounded px-2 py-0.5 text-[11px] font-medium transition-colors
+              {editMode === 'quick-entry'
+                ? 'bg-clinical-primary text-white shadow-sm'
+                : 'text-clinical-muted hover:text-clinical-text'}"
+            onclick={() => setEditMode('quick-entry')}
+          >
+            Quick Entry
+          </button>
+        </div>
+      {/if}
+
+      <SaveIndicator />
+    </div>
   </div>
 
   {#if patient || pathologists.length > 0}

@@ -24,7 +24,7 @@ describe('voiceStore', () => {
       clauseIndex: 0,
       clauseType: 'DIAGNOSIS',
     });
-    expect(voiceStore.lastFocusedClause).toEqual({
+    expect(voiceStore.lastFocusedClause).toMatchObject({
       partId: 'part-a',
       partLabel: 'A',
       clauseIndex: 0,
@@ -127,12 +127,18 @@ describe('voiceStore', () => {
     });
     const snapshot = voiceStore.snapshotFocusForDictation();
     expect(snapshot).toEqual({
+      kind: 'clause',
       partId: 'part-a',
       partLabel: 'A',
       clauseIndex: 0,
       clauseType: 'DIAGNOSIS',
     });
-    expect(voiceStore.dictationSnapshot).toEqual(snapshot);
+    expect(voiceStore.dictationSnapshot).toMatchObject({
+      partId: 'part-a',
+      partLabel: 'A',
+      clauseIndex: 0,
+      clauseType: 'DIAGNOSIS',
+    });
   });
 
   it('snapshot survives blur debounce expiring', () => {
@@ -170,9 +176,10 @@ describe('voiceStore', () => {
     expect(voiceStore.lastFocusedClause).not.toBeNull();
   });
 
-  it('snapshot is null when no clause was focused', () => {
+  it('snapshot defaults to conversational when no clause was focused', () => {
     const snapshot = voiceStore.snapshotFocusForDictation();
-    expect(snapshot).toBeNull();
+    expect(snapshot).toEqual({ kind: 'conversational' });
+    // Legacy getter still returns null for clause-specific snapshot
     expect(voiceStore.dictationSnapshot).toBeNull();
   });
 

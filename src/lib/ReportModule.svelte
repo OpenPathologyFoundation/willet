@@ -9,14 +9,21 @@
   import { voiceStore, type FocusedClause } from '$lib/stores/voice.svelte';
   import type { CorrectionResult } from '$lib/services/transcription-correction';
   import { preferencesStore } from '$lib/stores/preferences.svelte';
+  import { synopticStore } from '$lib/stores/synoptic.svelte';
   import { applyFinalizationTemplate, hashRtf } from '$lib/rtf/template';
   import { findTemplate, getTemplateForPart, type ReportTemplate } from '../mocks/fixtures/templates';
+  import { findProtocolForSpecimen, loadProtocol } from '$lib/data/protocols';
   import ReportHeader from '$lib/components/ReportHeader.svelte';
   import PromptArea from '$lib/components/PromptArea.svelte';
   import PartEditor from '$lib/components/PartEditor.svelte';
   import ContextDock from '$lib/components/ContextDock.svelte';
+  import CaseCommentEditor from '$lib/components/CaseCommentEditor.svelte';
+  import QuickEntryEditor from '$lib/components/QuickEntryEditor.svelte';
   import FinalizeDialog from '$lib/components/FinalizeDialog.svelte';
   import DictationIndicator from '$lib/components/DictationIndicator.svelte';
+  import MnemonicPopover from '$lib/components/MnemonicPopover.svelte';
+  import type { MnemonicHit } from '$lib/types';
+  import { rtfToHtml } from 'svelte-rtf-editor';
 
   let { caseId, jwt, role, apiBase, onEvent }: ReportModuleProps = $props();
 
@@ -31,6 +38,9 @@
   let finalizeHtml = $state('');
   let finalizeError = $state<string | null>(null);
 
+  // Synoptic protocol state
+  let hasSynoptic = $state(false);
+
   // Template state (SRS-220–224)
   let matchedTemplate = $state<ReportTemplate | null>(null);
   let templateDismissed = $state(false);
@@ -40,8 +50,158 @@
     reportStore.parts.every(p => !p.finalDiagnosis || p.finalDiagnosis.trim() === ''),
   );
 
+  // ---------------------------------------------------------------------------
+  // Inline mnemonic popover (Cmd+M / Ctrl+M)
+  // ---------------------------------------------------------------------------
+  let showMnemonicPopover = $state(false);
+  let mnemonicPopoverX = $state(0);
+  let mnemonicPopoverY = $state(0);
+  // Saved insertion context — where to put the mnemonic content
+  let mnemonicInsertTarget = $state<{
+    kind: 'textarea';
+    element: HTMLTextAreaElement;
+    selectionStart: number;
+    selectionEnd: number;
+  } | {
+    kind: 'contenteditable';
+    element: HTMLElement;
+    savedRange: Range;  // Captured selection range — restored before insertion
+  } | null>(null);
+
+  function handleGlobalKeydown(e: KeyboardEvent) {
+    // Cmd+M (Mac) or Ctrl+M (Win/Linux) — invoke mnemonic popover
+    if (e.key === 'm' && (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+      e.preventDefault();
+
+      if (isReadOnly || showMnemonicPopover) return;
+
+      const active = document.activeElement;
+
+      if (active instanceof HTMLTextAreaElement) {
+        // Structured mode — clause textarea
+        mnemonicInsertTarget = {
+          kind: 'textarea',
+          element: active,
+          selectionStart: active.selectionStart,
+          selectionEnd: active.selectionEnd,
+        };
+        // Position popover near cursor
+        const rect = active.getBoundingClientRect();
+        mnemonicPopoverX = rect.left + 20;
+        mnemonicPopoverY = rect.top + 24;
+      } else if (active instanceof HTMLElement && active.isContentEditable) {
+        // Quick entry mode — contentEditable InkEditor
+        // Capture the current selection range BEFORE focus moves to the popover
+        const sel = window.getSelection();
+        let savedRange: Range;
+        if (sel && sel.rangeCount > 0) {
+          savedRange = sel.getRangeAt(0).cloneRange(); // Clone — the original is invalidated on blur
+          const rect = savedRange.getBoundingClientRect();
+          mnemonicPopoverX = rect.left || active.getBoundingClientRect().left + 20;
+          mnemonicPopoverY = (rect.bottom || active.getBoundingClientRect().top) + 4;
+        } else {
+          // No selection — create a range at the end
+          savedRange = document.createRange();
+          savedRange.selectNodeContents(active);
+          savedRange.collapse(false); // collapse to end
+          const rect = active.getBoundingClientRect();
+          mnemonicPopoverX = rect.left + 20;
+          mnemonicPopoverY = rect.top + 24;
+        }
+        mnemonicInsertTarget = { kind: 'contenteditable', element: active, savedRange };
+      } else {
+        // No focused text field — place popover in center-ish of authoring area
+        mnemonicInsertTarget = null;
+        mnemonicPopoverX = window.innerWidth * 0.3;
+        mnemonicPopoverY = window.innerHeight * 0.3;
+      }
+
+      showMnemonicPopover = true;
+    }
+  }
+
+  function handleMnemonicSelect(hit: MnemonicHit) {
+    showMnemonicPopover = false;
+
+    // Parse RTF to plain text for textarea, or HTML for contentEditable
+    let plainText: string;
+    let html: string;
+    try {
+      html = rtfToHtml(hit.commentText);
+      // Strip HTML tags for plain text insertion into textareas
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      plainText = temp.textContent ?? hit.commentText;
+    } catch {
+      plainText = hit.commentText;
+      html = `<p>${plainText}</p>`;
+    }
+
+    const target = mnemonicInsertTarget;
+
+    if (target?.kind === 'textarea') {
+      // Insert into textarea at saved cursor position
+      const el = target.element;
+      const before = el.value.substring(0, target.selectionStart);
+      const after = el.value.substring(target.selectionEnd);
+      el.value = before + plainText + after;
+      // Trigger the input event so Svelte binding picks up the change
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      // Restore focus and place cursor after inserted text
+      el.focus();
+      const newPos = target.selectionStart + plainText.length;
+      el.setSelectionRange(newPos, newPos);
+    } else if (target?.kind === 'contenteditable') {
+      // Insert into contentEditable at the saved cursor position
+      const el = target.element;
+      el.focus();
+      // Restore the selection range that was captured when Cmd+M was pressed
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(target.savedRange);
+      }
+      document.execCommand('insertHTML', false, html);
+    } else {
+      // No specific target — append to quick entry editor or first clause
+      if (editMode === 'quick-entry') {
+        quickEntryRef?.insertDictation(plainText);
+      }
+    }
+
+    mnemonicInsertTarget = null;
+  }
+
+  function handleMnemonicDismiss() {
+    showMnemonicPopover = false;
+    // Restore focus and cursor position to the original element
+    if (mnemonicInsertTarget?.kind === 'textarea') {
+      const el = mnemonicInsertTarget.element;
+      el.focus();
+      el.setSelectionRange(mnemonicInsertTarget.selectionStart, mnemonicInsertTarget.selectionEnd);
+    } else if (mnemonicInsertTarget?.kind === 'contenteditable') {
+      const el = mnemonicInsertTarget.element;
+      el.focus();
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(mnemonicInsertTarget.savedRange);
+      }
+    }
+    mnemonicInsertTarget = null;
+  }
+
   // Part editor refs for cross-part navigation
   let partRefs: PartEditor[] = [];
+
+  // Case comment editor ref for dictation routing
+  let caseCommentRef: CaseCommentEditor | null = null;
+
+  // Quick entry editor ref for finalization and dictation
+  let quickEntryRef: QuickEntryEditor | null = null;
+
+  // Edit mode from preferences
+  const editMode = $derived(preferencesStore.editMode);
 
   // beforeunload guard for unsaved changes (SDS 04-01 §5.3)
   function handleBeforeUnload(e: BeforeUnloadEvent) {
@@ -68,15 +228,93 @@
 
   async function handleFinalizeClick() {
     finalizeError = null;
+
+    // Force all part editors to sync their local clause state to the report store.
+    // This reads clause text directly from DOM textareas because Svelte 5's $effect
+    // resync can drop newly-created empty clauses (parseClauses filters empty lines).
+    for (const ref of partRefs) {
+      ref?.flush();
+    }
+
+    // Safety net: scan ALL clause textareas in the authoring area.
+    // Svelte 5's $effect resync can drop newly-created clauses when parseClauses
+    // filters empty lines. This direct DOM scan captures orphaned textareas.
+    if (editMode === 'structured' && reportStore.parts.length > 0) {
+      // For single-part cases, read all clause textareas from the authoring zone
+      // (excluding the case comment textarea which has a distinct placeholder)
+      const authoringZone = document.querySelector('[role="main"]');
+      if (authoringZone) {
+        const allTextareas = authoringZone.querySelectorAll('textarea');
+        const clauseTextareas: HTMLTextAreaElement[] = [];
+        allTextareas.forEach(ta => {
+          const textarea = ta as HTMLTextAreaElement;
+          // Exclude case comment textarea (identified by placeholder)
+          if (!textarea.placeholder?.includes('case-level comment')) {
+            clauseTextareas.push(textarea);
+          }
+        });
+
+        // For single-part reports, all clause textareas belong to the one part
+        if (reportStore.parts.length === 1 && clauseTextareas.length > 0) {
+          const part = reportStore.parts[0];
+          const lines = clauseTextareas.map(ta => ta.value);
+          const types = clauseTextareas.map(ta => {
+            const select = ta.closest('.group\\/clause')?.querySelector('select');
+            return (select as HTMLSelectElement)?.value ?? 'ANCILLARY';
+          });
+          const newDiag = lines.join('\n');
+          if (newDiag !== (part.finalDiagnosis ?? '')) {
+            reportStore.updatePart(part.id, newDiag, { clause_types: types });
+          }
+        } else if (reportStore.parts.length > 1) {
+          // Multi-part: read from each part container
+          for (const part of reportStore.parts) {
+            const container = document.querySelector(`[data-part-id="${part.id}"]`);
+            if (!container) continue;
+            const textareas = container.querySelectorAll('textarea');
+            if (textareas.length === 0) continue;
+            const lines: string[] = [];
+            const types: string[] = [];
+            textareas.forEach(ta => {
+              lines.push((ta as HTMLTextAreaElement).value);
+              const select = ta.closest('.group\\/clause')?.querySelector('select');
+              types.push((select as HTMLSelectElement)?.value ?? 'ANCILLARY');
+            });
+            const newDiag = lines.join('\n');
+            if (newDiag !== (part.finalDiagnosis ?? '')) {
+              reportStore.updatePart(part.id, newDiag, { clause_types: types });
+            }
+          }
+        }
+      }
+    }
+
     await saveStore.flush();
 
+    // Quick entry mode: get HTML directly from the RTF editor
+    if (editMode === 'quick-entry') {
+      const html = quickEntryRef?.getHTML() ?? '';
+      if (!html || html.replace(/<[^>]*>/g, '').trim().length === 0) {
+        finalizeError = 'The report is empty. Enter content before finalizing.';
+        return;
+      }
+      if (role !== 'ATTENDING' && role !== 'DIRECTOR') {
+        finalizeError = `Your role (${role}) does not have finalization permission.`;
+        return;
+      }
+      finalizeHtml = html;
+      showFinalizeDialog = true;
+      return;
+    }
+
+    // Structured mode: validate parts and assemble from template
     const validationError = validateForFinalization();
     if (validationError) {
       finalizeError = validationError;
       return;
     }
 
-    finalizeHtml = applyFinalizationTemplate(reportStore.parts);
+    finalizeHtml = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
     showFinalizeDialog = true;
   }
 
@@ -103,6 +341,7 @@
       });
 
       showFinalizeDialog = false;
+      finalizeHtml = '';
     } catch (err) {
       finalizeError = err instanceof Error ? err.message : 'Finalization failed';
     }
@@ -219,6 +458,41 @@
     }
   }
 
+  // Synoptic finalization — combines report + synoptic and opens finalize dialog
+  function handleSynopticFinalize(synopticText: string) {
+    const partsHtml = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
+    const escapedSynoptic = synopticText
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const synopticHtml = `<h3>Synoptic Report — ${synopticStore.protocolLabel}</h3>\n<pre>${escapedSynoptic}</pre>`;
+    finalizeHtml = partsHtml + '\n<br>\n' + synopticHtml;
+    finalizeError = null;
+    showFinalizeDialog = true;
+
+    services.emitEvent({
+      type: 'REPORT_SAVED',
+      caseId,
+      timestamp: new Date().toISOString(),
+      payload: {
+        action: 'SYNOPTIC_FINALIZED',
+        protocol: synopticStore.protocolLabel,
+        fieldsCompleted: synopticStore.filledCount,
+        fieldsTotal: synopticStore.totalCount,
+      },
+    });
+  }
+
+  // Free-text dictation routing — case comment or quick entry (SRS-260)
+  function handleFreetextDictation(text: string, targetKind: 'case-comment' | 'quick-entry') {
+    switch (targetKind) {
+      case 'quick-entry':
+        quickEntryRef?.insertDictation(text);
+        break;
+      case 'case-comment':
+        caseCommentRef?.insertDictation(text);
+        break;
+    }
+  }
+
   // Direct dictation routing (SDS 04-03 §14.1, SRS-180, SRS-181)
   async function handleDictation(rawText: string, correctedText: string, target: FocusedClause, corrections: CorrectionResult['corrections'] = []) {
     const partIdx = reportStore.parts.findIndex((p) => p.id === target.partId);
@@ -300,6 +574,12 @@
   // Step 2: Load scaffold on mount, then lazy-load secondary data
   onMount(async () => {
     window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Clear any stale InkEditor localStorage to prevent cross-session contamination.
+    // The InkEditor defaults to autosave with key 'ink-editor-content' — if a previous
+    // session left content there, it could appear in the finalization dialog.
+    try { localStorage.removeItem('ink-editor-content'); } catch { /* */ }
+
     reportStore.setLoading();
 
     // Load preferences first (SRS-190)
@@ -317,6 +597,33 @@
           if (found) matchedTemplate = found;
         }
       }
+
+      // Check for matching CAP synoptic protocol (SRS-210)
+      if (scaffold.case.specimenType) {
+        const protocolEntry = findProtocolForSpecimen(scaffold.case.specimenType);
+        if (protocolEntry) {
+          try {
+            const protocolData = await loadProtocol(protocolEntry.file);
+            synopticStore.loadProtocol(protocolData, protocolEntry.label);
+            hasSynoptic = true;
+
+            // Initial population from existing clause data
+            if (scaffold.parts.length > 0) {
+              synopticStore.populateFromClauses(scaffold.parts);
+            }
+
+            // Also populate from clinical context (prior molecular reports)
+            try {
+              const clinicalBundle = await services.api.fetchClinical(caseId);
+              synopticStore.populateFromClinicalContext(clinicalBundle);
+            } catch {
+              // Clinical context not available — non-critical
+            }
+          } catch (e) {
+            console.warn('Failed to load synoptic protocol:', e);
+          }
+        }
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load case';
       reportStore.setError(message);
@@ -329,6 +636,23 @@
     }
   });
 
+  // Reactive clause → synoptic sync (hybrid model)
+  // When clauses change in structured mode, re-populate synoptic fields
+  // that are still empty or suggested. Edited/applied fields are protected.
+  $effect(() => {
+    if (!synopticStore.isLoaded) return;
+
+    // Read reportStore.parts as reactive dependency — this triggers on every clause change
+    const parts = reportStore.parts;
+
+    // Debounce: skip initial render and very rapid changes
+    const timer = setTimeout(() => {
+      synopticStore.populateFromClauses(parts);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  });
+
   // Unmount: flush saves, release lock (SDS 04-01 §2.2)
   onDestroy(async () => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -338,8 +662,11 @@
     clearAllHistory();
     promptStore.reset();
     voiceStore.reset();
+    synopticStore.reset();
   });
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <div class="flex h-full flex-col bg-clinical-bg text-clinical-text">
   {#if reportStore.loadState === 'loading'}
@@ -376,29 +703,13 @@
     <div class="flex flex-1 overflow-hidden">
       <!-- Authoring zone (flex-1): clause editors + finalize + prompt at bottom -->
       <div class="flex flex-1 flex-col overflow-hidden" role="main" aria-label="Report authoring">
-        <!-- Scrollable part list -->
-        <div class="flex-1 overflow-auto p-6">
-          <div class="mx-auto max-w-3xl space-y-4">
-            {#each reportStore.parts as part, i (part.id)}
-              <div class="group">
-                <PartEditor
-                  bind:this={partRefs[i]}
-                  {part}
-                  readOnly={isReadOnly}
-                  template={matchedTemplate}
-                  showTemplateBar={showTemplateBar && i === 0}
-                  onfocusnextpart={() => partRefs[i + 1]?.focusFirst()}
-                  onfocusprevpart={() => partRefs[i - 1]?.focusLast()}
-                  ontemplateapply={handleTemplateApply}
-                  ontemplatedismiss={handleTemplateDismiss}
-                />
-              </div>
-            {/each}
-          </div>
+        {#if editMode === 'quick-entry'}
+          <!-- Quick Entry mode: mnemonic search + RTF editor -->
+          <QuickEntryEditor bind:this={quickEntryRef} readOnly={isReadOnly} />
 
-          <!-- Finalize button (SDS 04-05 §3.1) -->
+          <!-- Finalize button for quick entry -->
           {#if !isReadOnly && (role === 'ATTENDING' || role === 'DIRECTOR')}
-            <div class="mx-auto mt-6 max-w-3xl">
+            <div class="border-t border-clinical-border px-6 py-3">
               {#if finalizeError}
                 <div class="mb-3 rounded-md border border-badge-rose-bg bg-badge-rose-bg/50 px-4 py-2 text-xs text-badge-rose-text">
                   {finalizeError}
@@ -413,16 +724,60 @@
               </button>
             </div>
           {/if}
-        </div>
+        {:else}
+          <!-- Structured mode: part editors + case comment -->
+          <div class="flex-1 overflow-auto p-6">
+            <div class="mx-auto max-w-3xl space-y-4">
+              {#each reportStore.parts as part, i (part.id)}
+                <div class="group">
+                  <PartEditor
+                    bind:this={partRefs[i]}
+                    {part}
+                    readOnly={isReadOnly}
+                    template={matchedTemplate}
+                    showTemplateBar={showTemplateBar && i === 0}
+                    onfocusnextpart={() => partRefs[i + 1]?.focusFirst()}
+                    onfocusprevpart={() => partRefs[i - 1]?.focusLast()}
+                    ontemplateapply={handleTemplateApply}
+                    ontemplatedismiss={handleTemplateDismiss}
+                  />
+                </div>
+              {/each}
+            </div>
+
+            <!-- Case-level comment (SRS-260) -->
+            <div class="mx-auto mt-4 max-w-3xl">
+              <CaseCommentEditor bind:this={caseCommentRef} readOnly={isReadOnly} />
+            </div>
+
+            <!-- Finalize button (SDS 04-05 §3.1) -->
+            {#if !isReadOnly && (role === 'ATTENDING' || role === 'DIRECTOR')}
+              <div class="mx-auto mt-6 max-w-3xl">
+                {#if finalizeError}
+                  <div class="mb-3 rounded-md border border-badge-rose-bg bg-badge-rose-bg/50 px-4 py-2 text-xs text-badge-rose-text">
+                    {finalizeError}
+                  </div>
+                {/if}
+                <button
+                  class="w-full rounded-lg bg-clinical-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-clinical-primary/90 disabled:opacity-50"
+                  onclick={handleFinalizeClick}
+                  disabled={saveStore.state === 'SAVING' || saveStore.state === 'DEGRADED'}
+                >
+                  Finalize Report
+                </button>
+              </div>
+            {/if}
+          </div>
+        {/if}
 
         <!-- Prompt area — anchored at bottom of authoring zone (SDS 04-03 §2.3) -->
         {#if !isReadOnly}
-          <PromptArea {caseId} onaction={handlePromptActions} ondictation={handleDictation} />
+          <PromptArea {caseId} onaction={handlePromptActions} ondictation={handleDictation} onfreetextdictation={handleFreetextDictation} />
         {/if}
       </div>
 
       <!-- Context dock — right side with vertical tabs (SRS-200) -->
-      <ContextDock />
+      <ContextDock {hasSynoptic} onsynopticfinalize={handleSynopticFinalize} />
     </div>
 
     <!-- Dictation indicator overlay (SRS-184) -->
@@ -434,7 +789,17 @@
         mode="finalize"
         initialHtml={finalizeHtml}
         onconfirm={handleFinalizeConfirm}
-        oncancel={() => { showFinalizeDialog = false; }}
+        oncancel={() => { showFinalizeDialog = false; finalizeHtml = ''; }}
+      />
+    {/if}
+
+    <!-- Inline mnemonic popover (Cmd+M / Ctrl+M) -->
+    {#if showMnemonicPopover}
+      <MnemonicPopover
+        anchorX={mnemonicPopoverX}
+        anchorY={mnemonicPopoverY}
+        onselect={handleMnemonicSelect}
+        ondismiss={handleMnemonicDismiss}
       />
     {/if}
   {/if}

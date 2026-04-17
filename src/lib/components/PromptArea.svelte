@@ -10,19 +10,24 @@
   } from '$lib/types';
   import { reportStore, parseClauses } from '$lib/stores/report.svelte';
   import { promptStore } from '$lib/stores/prompt.svelte';
-  import { voiceStore, type FocusedClause } from '$lib/stores/voice.svelte';
+  import { voiceStore, type FocusedClause, type DictationTarget, type ClauseTarget } from '$lib/stores/voice.svelte';
   import { getServices } from '$lib/services/context';
   import { transcribe } from '$lib/services/whisper';
   import { correctTranscription, type CorrectionResult } from '$lib/services/transcription-correction';
   import { normalizeFindingSingular } from '$lib/services/instruction-classifier';
+  import PipelineProgress from './PipelineProgress.svelte';
+  import type { PipelineStage } from './PipelineProgress.svelte';
 
   interface Props {
     caseId: string;
     onaction: (actions: LlmAction[]) => void;
+    /** Clause-level dictation: raw + corrected text routed to a specific clause. */
     ondictation?: (text: string, correctedText: string, target: FocusedClause, corrections: CorrectionResult['corrections']) => void;
+    /** Free-text dictation: corrected text routed to case comment or quick entry. */
+    onfreetextdictation?: (text: string, targetKind: 'case-comment' | 'quick-entry') => void;
   }
 
-  let { caseId, onaction, ondictation }: Props = $props();
+  let { caseId, onaction, ondictation, onfreetextdictation }: Props = $props();
 
   const services = getServices();
 
@@ -96,6 +101,28 @@
   let correctionNotice = $state<string | null>(null);
   let correctionNoticeTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // Pipeline progress indicator
+  let pipelineStages = $state<PipelineStage[]>([]);
+  let pipelineTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function setPipeline(stages: PipelineStage[]) {
+    pipelineStages = stages;
+    // Auto-clear after 3 seconds of all-done
+    if (pipelineTimer) clearTimeout(pipelineTimer);
+    if (stages.every(s => s.status === 'done' || s.status === 'error')) {
+      pipelineTimer = setTimeout(() => { pipelineStages = []; }, 2500);
+    }
+  }
+
+  function updateStage(id: string, status: PipelineStage['status']) {
+    pipelineStages = pipelineStages.map(s => s.id === id ? { ...s, status } : s);
+    // Check if all done
+    if (pipelineStages.every(s => s.status === 'done' || s.status === 'error')) {
+      if (pipelineTimer) clearTimeout(pipelineTimer);
+      pipelineTimer = setTimeout(() => { pipelineStages = []; }, 2500);
+    }
+  }
+
   // Pending confirmation for medium-confidence actions (SDS 04-03 §5.1)
   let pendingConfirmation = $state<{
     instruction: string;
@@ -113,6 +140,13 @@
       textareaEl.style.height = 'auto';
     }
     promptStore.setProcessing();
+
+    // Initialize instruction pipeline progress
+    setPipeline([
+      { id: 'rules', label: 'Rules engine', icon: 'pencil', status: 'active' },
+      { id: 'llm', label: 'AI model', icon: 'brain', status: 'pending' },
+      { id: 'apply', label: 'Applying', icon: 'check', status: 'pending' },
+    ]);
 
     const request: LlmInstructionRequest = {
       instruction,
@@ -138,7 +172,9 @@
       // The LLM returns LlmAction[] directly — same format as the rules engine.
       // No conversion needed, just use the actions.
       const shouldEscalate = response.confidence < 0.8 || response.actions.length === 0;
+      updateStage('rules', 'done');
       if (shouldEscalate) {
+        updateStage('llm', 'active');
         try {
           const llmResult = await services.api.interpretInstruction(
             instruction, request.caseContext, promptStore.history,
@@ -176,6 +212,9 @@
           mcpAvailable = false;
         }
       }
+
+      updateStage('llm', 'done');
+      updateStage('apply', 'active');
 
       if (response.clarifications.length > 0) {
         promptStore.setClarification(response.clarifications[0]);
@@ -218,9 +257,14 @@
         promptStore.addEntry(entry);
       }
 
+      updateStage('apply', 'done');
       promptStore.setIdle();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to process instruction';
+      // Mark current active stage as error
+      const activeStageId = pipelineStages.find(s => s.status === 'active')?.id;
+      if (activeStageId) updateStage(activeStageId, 'error');
+
       if (message.includes('503')) {
         promptStore.setUnavailable();
       } else {
@@ -249,6 +293,44 @@
     if (!textareaEl) return;
     textareaEl.style.height = 'auto';
     textareaEl.style.height = Math.min(240, textareaEl.scrollHeight) + 'px';
+  }
+
+  // --- Dictation routing ---
+
+  /**
+   * Route transcribed text to the correct target based on the focus snapshot.
+   * This is the single decision point for all dictation — no scattered if/else chains.
+   */
+  function routeDictation(
+    target: DictationTarget | null,
+    rawText: string,
+    correctedText: string,
+    corrections: CorrectionResult['corrections'],
+  ) {
+    if (!target) target = { kind: 'conversational' };
+
+    switch (target.kind) {
+      case 'clause':
+        // Direct dictation into a specific clause (SRS-180, SRS-181)
+        ondictation?.(rawText, correctedText, target, corrections);
+        break;
+
+      case 'case-comment':
+        // Insert into case comment editor (SRS-260)
+        onfreetextdictation?.(correctedText, 'case-comment');
+        break;
+
+      case 'quick-entry':
+        // Insert into quick entry RTF editor
+        onfreetextdictation?.(correctedText, 'quick-entry');
+        break;
+
+      case 'conversational':
+        // Fallback: put text in the prompt input for conversational processing
+        inputText = (inputText ? inputText + ' ' : '') + correctedText;
+        handleTextareaInput();
+        break;
+    }
   }
 
   // --- Voice recording (Whisper) ---
@@ -280,14 +362,14 @@
   }
 
   /**
-   * Global keyboard shortcut: Ctrl+Alt+Space (Win/Linux) or Ctrl+Option+Space (Mac).
+   * Global keyboard shortcut: Cmd+L (Mac) or Ctrl+L (Win/Linux).
    * Toggles dictation without moving focus. Because the cursor stays in the clause
    * textarea, there's no blur/snapshot timing issue — the focus is always captured
    * correctly. This also maps to foot pedals that emit keyboard shortcuts.
    * (SRS-196)
    */
   function handleGlobalKeydown(e: KeyboardEvent) {
-    if (e.code === 'Space' && e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey) {
+    if (e.key === 'l' && (e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
       e.preventDefault();
       if (isRecording) {
         stopRecording();
@@ -326,8 +408,14 @@
         cancelAnimationFrame(animationFrameId);
         audioLevels = new Array(5).fill(4);
 
-        // Use the snapshot captured synchronously when mic was clicked (SDS 04-03 §14.1)
-        const focusTarget = voiceStore.dictationSnapshot;
+        // Snapshot was captured synchronously when mic was clicked (SDS 04-03 §14.1)
+
+        // Initialize voice pipeline progress
+        setPipeline([
+          { id: 'transcribe', label: 'Transcribing', icon: 'mic', status: 'active' },
+          { id: 'correct', label: 'Correcting', icon: 'pencil', status: 'pending' },
+          { id: 'route', label: 'Inserting', icon: 'arrow', status: 'pending' },
+        ]);
 
         isTranscribing = true;
         voiceStore.setTranscribing(true);
@@ -337,7 +425,11 @@
 
         if (result.error) {
           voiceError = result.error;
+          updateStage('transcribe', 'error');
         } else if (result.text) {
+          updateStage('transcribe', 'done');
+          updateStage('correct', 'active');
+
           // Apply transcription correction (SRS-185) — both paths get corrected text
           // Try MCP server API first, fall back to local deterministic table (SDS §8 graceful degradation)
           const specimenType = reportStore.caseData?.specimenType ?? null;
@@ -359,14 +451,13 @@
           }
           const correctedText = correction.text;
 
-          if (focusTarget && ondictation) {
-            // Direct dictation path (SRS-180, SRS-181): insert into focused clause
-            ondictation(result.text, correctedText, focusTarget, correction.corrections);
-          } else {
-            // Conversational path: put corrected text in prompt input
-            inputText = (inputText ? inputText + ' ' : '') + correctedText;
-            handleTextareaInput();
-          }
+          updateStage('correct', 'done');
+          updateStage('route', 'active');
+
+          // Route dictated text based on the snapshot target captured at mic press
+          routeDictation(voiceStore.snapshot, result.text, correctedText, correction.corrections);
+
+          updateStage('route', 'done');
 
           // Show brief correction notice for either path (SRS-186)
           if (correction.corrected) {
@@ -381,12 +472,13 @@
           voiceStore.clearDictationSnapshot();
 
           // Restore focus to where the user was before recording (so Enter works immediately)
+          const wasConversational = voiceStore.snapshot?.kind === 'conversational';
           if (preDictationFocusEl) {
             requestAnimationFrame(() => {
               preDictationFocusEl?.focus();
               preDictationFocusEl = null;
             });
-          } else if (!focusTarget) {
+          } else if (wasConversational) {
             // Conversational path: focus the prompt textarea so Enter submits
             requestAnimationFrame(() => textareaEl?.focus());
           }
@@ -572,6 +664,11 @@
     </div>
   {/if}
 
+  <!-- Pipeline progress indicator -->
+  {#if pipelineStages.length > 0}
+    <PipelineProgress stages={pipelineStages} />
+  {/if}
+
   <!-- MCP server status (shown after first escalation attempt) -->
   {#if mcpAvailable === false}
     <div class="border-b border-clinical-border px-4 py-1 text-[10px] text-badge-amber-text bg-badge-amber-bg/10 flex items-center gap-1.5">
@@ -592,12 +689,12 @@
           {/each}
         </div>
         <span class="text-[10px] text-amber-500">Listening...</span>
-        <span class="text-[9px] text-amber-500/60 hidden sm:inline">Ctrl+Alt+Space</span>
+        <span class="text-[9px] text-amber-500/60 hidden sm:inline">Cmd+L</span>
         <button
           type="button"
           class="shrink-0 rounded bg-amber-500 p-1 text-white hover:bg-amber-600"
           onclick={stopRecording}
-          title="Stop (or Ctrl+Alt+Space)"
+          title="Stop (or Cmd+L)"
         >
           <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
         </button>
@@ -624,7 +721,7 @@
           onpointerdown={captureSnapshotEarly}
           onclick={startRecording}
           disabled={isTranscribing || promptStore.isProcessing}
-          title="Dictate (or Ctrl+Alt+Space from any field)"
+          title="Dictate (or Cmd+L from any field)"
         >
           {#if isTranscribing}
             <span class="block h-4 w-4 animate-spin rounded-full border-2 border-amber-500/30 border-t-amber-500"></span>

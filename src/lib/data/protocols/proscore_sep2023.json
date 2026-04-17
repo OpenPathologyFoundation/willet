@@ -1,0 +1,256 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Systematic biopsy",
+      "Targeted biopsy",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Acinar adenocarcinoma, conventional (usual)",
+      "Acinar adenocarcinoma, signet-ring-like cell",
+      "Acinar adenocarcinoma, pleomorphic giant cell",
+      "Acinar adenocarcinoma, sarcomatoid",
+      "Acinar adenocarcinoma, prostatic intraepithelial neoplasia-like",
+      "Isolated intraductal carcinoma",
+      "Ductal adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Squamous cell carcinoma",
+      "Basal cell (adenoid cystic) carcinoma",
+      "Adenocarcinoma with neuroendocrine differentiation",
+      "Well-differentiated neuroendocrine tumor",
+      "Small cell neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Other histologic type not listed",
+      "Carcinoma, type cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Overall Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Grade group 1 (Gleason Score 3 + 3 = 6)",
+      "Grade group 2 (Gleason Score 3 + 4 = 7)",
+      "Grade group 3 (Gleason Score 4 + 3 = 7)",
+      "Grade group 4 (Gleason Score 4 + 4 = 8)",
+      "Grade group 4 (Gleason Score 3 + 5 = 8)",
+      "Grade group 4 (Gleason Score 5 + 3 = 8)",
+      "Grade group 5 (Gleason Score 4 + 5 = 9)",
+      "Grade group 5 (Gleason Score 5 + 4 = 9)",
+      "Grade group 5 (Gleason Score 5 + 5 = 10)",
+      "Cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Pattern 4": {
+    "caption": "Required only if applicable (i.e. Grade group 2 (Gleason Score 3 + 4 = 7), Grade group 3 (Gleason Score 4 + 3 = 7), Grade group 5 (Gleason Score 4 + 5 = 9), or Grade group 5 (Gleason Score 5 + 4 = 9))",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than or equal to 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Pattern 5": {
+    "caption": "Required only if applicable (i.e. Grade group 2 (Gleason Score 3 + 4 = 7), Grade group 3 (Gleason Score 4 + 3 = 7), Grade group 5 (Gleason Score 4 + 5 = 9), or Grade group 5 (Gleason Score 5 + 4 = 9))",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than or equal to 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%"
+    ],
+    "additional caption": ""
+  },
+  "Intraductal Carcinoma (IDC)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      ""
+    ],
+    "additional caption": ""
+  },
+  "\tIDC Incorporated into Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Yes",
+      "No",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Cribriform Glands": {
+    "caption": "Applicable to Gleason Score 7 or 8 cancer only",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "If treatment effect is present, you may specify the type of treatment effect present",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Treatment effect present and de novo cancer present",
+      "Radiation therapy effect present",
+      "Hormonal therapy effect present",
+      "Other therapy effect(s) present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Total Number of Cores": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "Core(s)",
+    "options": [
+      "Exact number",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Number of Positive Cores": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "Core(s)",
+    "options": [
+      "Exact number",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Measurement Technique": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Single continuous focus",
+      "Consider multiple foci as continuous tumor",
+      "Consider multiple foci as discontinuous tumor"
+    ],
+    "additional caption": ""
+  },
+  "Greatest Percentage of Core Involvement by Cancer in Any Core": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than 1%",
+      "1 - 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Total Prostatic Tissue Involved by Tumor": {
+    "caption": "",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "Periprostatic Fat Invasion": {
+    "caption": "Report only if identified in the specimen.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Seminal Vesicle Invasion": {
+    "caption": "Report only if identified in the specimen.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  }
+}
