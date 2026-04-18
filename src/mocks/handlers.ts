@@ -13,6 +13,7 @@ let mockPreferences: Partial<UserPreferences> = {};
 
 // In-memory state for autosave persistence during dev session
 const savedParts = new Map<string, { finalDiagnosis: string; metadata: Record<string, unknown> }>();
+const savedCaseComments = new Map<string, string>();
 
 export const handlers = [
   // GET /api/report/:caseId/scaffold — Load report scaffold
@@ -38,6 +39,12 @@ export const handlers = [
         part.finalDiagnosis = saved.finalDiagnosis;
         part.metadata = { ...part.metadata, ...saved.metadata };
       }
+    }
+
+    // Apply saved case comment
+    const savedComment = savedCaseComments.get(caseId);
+    if (savedComment !== undefined) {
+      result.caseComment = savedComment;
     }
 
     return HttpResponse.json(result);
@@ -95,6 +102,27 @@ export const handlers = [
     const existing = savedParts.get(key) ?? { finalDiagnosis: '', metadata: {} };
     existing.metadata = { ...existing.metadata, authored_label: body.authored_label };
     savedParts.set(key, existing);
+
+    return HttpResponse.json({ savedAt: new Date().toISOString() });
+  }),
+
+  // PUT /api/report/:caseId/comment — Save case comment (SRS-261)
+  http.put('/api/report/:caseId/comment', async ({ params, request }) => {
+    await delay(100);
+
+    const caseId = params.caseId as string;
+    const body = (await request.json()) as { caseComment: string };
+
+    const scaffold = fixtureIndex[caseId];
+    if (!scaffold) {
+      return HttpResponse.json({ error: 'Case not found' }, { status: 404 });
+    }
+
+    if (scaffold.reportState === 'FINALIZED') {
+      return HttpResponse.json({ error: 'Report is finalized' }, { status: 409 });
+    }
+
+    savedCaseComments.set(caseId, body.caseComment);
 
     return HttpResponse.json({ savedAt: new Date().toISOString() });
   }),
@@ -230,8 +258,131 @@ export const handlers = [
   // which routes to the MCP server at localhost:8001/interpret for real LLM interpretation.
   // If the MCP server is not running, the fetch fails and the frontend uses the local fallback.
 
+  // GET /api/mnemonics/search — Mnemonic search (standalone mock)
+  http.get('/api/mnemonics/search', async ({ request }) => {
+    await delay(80);
+    const url = new URL(request.url);
+    const q = (url.searchParams.get('q') ?? '').toLowerCase().trim();
+    if (!q) {
+      return HttpResponse.json({ hits: [], totalHits: 0, processingTimeMs: 1 });
+    }
+
+    // Simple prefix/substring match against mock mnemonics
+    const hits = MOCK_MNEMONICS.filter(m =>
+      m.abbr.toLowerCase().includes(q) ||
+      (m.description ?? '').toLowerCase().includes(q) ||
+      m.mnemonic.toLowerCase().includes(q) ||
+      (m.lookupDisplay ?? '').toLowerCase().includes(q),
+    );
+
+    return HttpResponse.json({
+      hits: hits.slice(0, 20),
+      totalHits: hits.length,
+      processingTimeMs: 5,
+    });
+  }),
+
+  // POST /api/mnemonics/:mnemonicId/use — Record usage (no-op in standalone)
+  http.post('/api/mnemonics/:mnemonicId/use', async () => {
+    await delay(50);
+    return new HttpResponse(null, { status: 200 });
+  }),
+
+  // GET /api/mnemonics/top — Top mnemonics (empty in standalone)
+  http.get('/api/mnemonics/top', async () => {
+    await delay(50);
+    return HttpResponse.json([]);
+  }),
+
   // POST /api/audit/events — Audit event sink (no-op in standalone)
   http.post('/api/audit/events', async () => {
     return HttpResponse.json({ accepted: true });
   }),
+];
+
+// ---------------------------------------------------------------------------
+// Mock mnemonic data for standalone mode
+// ---------------------------------------------------------------------------
+
+const MOCK_MNEMONICS = [
+  {
+    mnemonicId: 'mn-001',
+    abbr: 'HR2',
+    mnemonic: 'HR2',
+    description: 'High risk genotypes',
+    lookupDisplay: 'HPV-Hi',
+    commentText: 'High Risk Type HPV-DNA was performed by PCR amplification. High-risk HPV genotypes DETECTED.',
+    texttypeId: '$procint',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-002',
+    abbr: 'QC',
+    mnemonic: 'QC',
+    description: 'GI',
+    lookupDisplay: 'Chronic gastritis',
+    commentText: 'Gastric antral-type mucosa with chronic inactive gastritis.\nNo intestinal metaplasia identified.\nNo Helicobacter organisms identified on H&E.',
+    texttypeId: '$final',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-003',
+    abbr: 'ADEN',
+    mnemonic: 'ADEN',
+    description: 'Colon',
+    lookupDisplay: 'Tubular adenoma',
+    commentText: 'Tubular adenoma with low-grade dysplasia.\nNo high-grade dysplasia or invasive carcinoma identified.',
+    texttypeId: '$final',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-004',
+    abbr: 'NMLB',
+    mnemonic: 'NMLB',
+    description: 'Breast',
+    lookupDisplay: 'Benign breast',
+    commentText: 'Breast tissue with fibrocystic changes.\nNo atypia or malignancy identified.',
+    texttypeId: '$final',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-005',
+    abbr: 'MSI',
+    mnemonic: 'MSI',
+    description: 'Molecular',
+    lookupDisplay: 'MSI stable',
+    commentText: 'Microsatellite instability (MSI) testing was performed by immunohistochemistry for MLH1, MSH2, MSH6, and PMS2.\nAll four mismatch repair proteins show intact nuclear expression.\nInterpretation: Microsatellite stable (MSS).',
+    texttypeId: '$procint',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-006',
+    abbr: 'HPNEG',
+    mnemonic: 'HPNEG',
+    description: 'GI',
+    lookupDisplay: 'H. pylori negative',
+    commentText: 'Giemsa stain is negative for Helicobacter pylori organisms.',
+    texttypeId: '$procres',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-007',
+    abbr: 'PROS',
+    mnemonic: 'PROS',
+    description: 'Prostate',
+    lookupDisplay: 'Benign prostate',
+    commentText: 'Benign prostatic tissue with nodular hyperplasia.\nNo adenocarcinoma identified.',
+    texttypeId: '$final',
+    userUseCount: 0,
+  },
+  {
+    mnemonicId: 'mn-008',
+    abbr: 'IHC4',
+    mnemonic: 'IHC4',
+    description: 'Breast IHC panel',
+    lookupDisplay: 'ER/PR/HER2/Ki67',
+    commentText: 'Estrogen receptor (ER): Positive, >95% of tumor nuclei, strong intensity.\nProgesterone receptor (PR): Positive, 80% of tumor nuclei, moderate intensity.\nHER2: Negative (score 1+) by immunohistochemistry.\nKi-67 proliferation index: 15%.',
+    texttypeId: '$procint',
+    userUseCount: 0,
+  },
 ];

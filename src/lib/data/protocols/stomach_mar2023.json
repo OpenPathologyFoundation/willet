@@ -1,0 +1,332 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Endoscopic resection",
+      "Partial gastrectomy, proximal",
+      "Partial gastrectomy, distal",
+      "Partial gastrectomy, other (Please specify)",
+      "Total gastrectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "Use the esophageal checklist if the tumor involves the EGJ and the tumor midpoint is 2 cm or less into the proximal stomach.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Cardia",
+      "Fundus - Anterior Wall",
+      "Fundus - Posterior Wall",
+      "Body - Anterior Wall",
+      "Body - Posterior Wall",
+      "Body - Greater Curvature",
+      "Body - Lesser Curvature",
+      "Antrum - Anterior Wall",
+      "Antrum - Posterior Wall",
+      "Antrum - Greater Curvature",
+      "Antrum - Lesser Curvature",
+      "Pylorus",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma",
+      "Tubular adenocarcinoma",
+      "Poorly cohesive carcinoma (includes signet-ring cell carcinoma and other variants)",
+      "Mucinous adenocarcinoma (greater than 50% mucinous)",
+      "Papillary adenocarcinoma",
+      "Mixed carcinoma (mixture of discrete glandular (tubular / papillary) and signet-ring / poorly cohesive cellular histological components)",
+      "Hepatoid adenocarcinoma",
+      "(Adeno)carcinoma with lymphoid stroma",
+      "Micropapillary adenocarcinoma",
+      "Adenocarcinoma of fundic-gland type",
+      "Squamous cell carcinoma",
+      "Adenosquamous carcinoma",
+      "Undifferentiated (anaplastic) carcinoma",
+      "Gastroblastoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Neuroendocrine carcinoma (poorly differentiated)",
+      "Mixed adenocarcinoma-neuroendocrine carcinoma (small cell or large cell neuroendocrine carcinoma)",
+      "Mixed adenocarcinoma-neuroendocrine tumor",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Lauren Classification of Adenocarcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intestinal type",
+      "Diffuse type",
+      "Mixed (approximately equal amounts of intestinal and diffuse)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated, undifferentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": "Greatest dimension in Centimeters (cm)"
+  },
+  "Tumor Extent": {
+    "caption": "Intramural extension to the duodenum or esophagus is not considered invasion of an adjacent structure, but is classified using the depth of the greatest invasion in any of these sites.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Carcinoma in situ (intraepithelial tumor without invasion of the lamina propria, high-grade dysplasia)",
+      "Invades lamina propria",
+      "Invades muscularis mucosae",
+      "Invades submucosa",
+      "Invades muscularis propria",
+      "Penetrates subserosal connective tissue without invasion of visceral peritoneum or adjacent structures",
+      "Invades serosa (visceral peritoneum)",
+      "Cannot be determined (Explained)",
+      "Directly invades adjacent structure(s) or organ(s) (Specify individually)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Present, with no viable cancer cells (complete response, score 0)",
+      "Present, with single cells or rare small groups of cancer cells (near complete response, score 1)",
+      "Present, with residual cancer showing evident tumor regression, but more than single cells or rare small groups of cancer cells (partial response, score 2)",
+      "Present (not otherwise specified)",
+      "Absent, with extensive residual cancer and no evident tumor regression (poor or no response, score 3)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and/or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Omental (radial)",
+      "Mucosal",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Greater omental",
+      "Lesser omental",
+      "Omental (radial)",
+      "Mucosal",
+      "Deep",
+      "Specify individually",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Dysplasia": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for dysplasia",
+      "Carcinoma in situ (high-grade dysplasia) present at margin",
+      "Low-grade dysplasia present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Carcinoma in Situ": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Mucosal",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Low-Grade Dysplasia": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Mucosal",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Specify only if applicable; select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s) (Specify individually)",
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

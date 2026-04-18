@@ -1,0 +1,271 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Thymectomy",
+      "Partial thymectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Thymus",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Type A thymoma (including atypical subtype)",
+      "Type AB thymoma",
+      "Type B1 thymoma",
+      "Type B2 thymoma",
+      "Type B3 thymoma",
+      "Micronodular thymoma with lymphoid stroma",
+      "Metaplastic thymoma",
+      "Thymoma with more than one histological pattern",
+      "Squamous cell carcinoma",
+      "Basaloid carcinoma",
+      "Lymphoepithelial carcinoma",
+      "NUT carcinoma",
+      "Clear cell carcinoma",
+      "Low-grade papillary adenocarcinoma",
+      "Mucoepidermoid carcinoma",
+      "Thymic carcinoma with adenoid cystic carcinoma-like features",
+      "Enteric-type adenocarcinoma",
+      "Adenocarcinoma NOS",
+      "Adenosquamous carcinoma",
+      "Sarcomatoid carcinoma",
+      "Undifferentiated carcinoma",
+      "Thymic carcinoma NOS",
+      "Typical carcinoid / Neuroendocrine tumor, grade 1",
+      "Atypical carcinoid / Neuroendocrine tumor, grade 2",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histological Patterns Present": {
+    "caption": "For Thymomas with more than one histologic pattern. Select all that apply.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "A (Specify Percentage)",
+      "B1 (Specify Percentage)",
+      "B2 (Specify Percentage)",
+      "B3 (Specify Percentage)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Residual Viable Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be dtermined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Site(s) Involved by Direct Tumor Invasion": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Encapsulated tumor or capsule missing but without invasion into surrounding tissue",
+      "Microscopic transcapsular invasion into thymic or perithymic fat",
+      "Macroscopic invasion into thymic or perithymic fat",
+      "Confined to thymus",
+      "Invades mediastinal pleura",
+      "Invades pericardium",
+      "Invades diaphragm",
+      "Lung (specify lobe(s) involved)",
+      "Brachiocephalic vein",
+      "Superior vena cava",
+      "Phrenic nerve",
+      "Chest wall",
+      "Extrapericardial pulmonary artery",
+      "Extrapericardial pulmonary veins",
+      "Ascending aorta",
+      "Aortic arch",
+      "Descending aorta",
+      "Arch vessels",
+      "Intrapericardial pulmonary artery",
+      "Myocardium",
+      "Trachea",
+      "Esophagus",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for tumor",
+      "Tumor present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Specify involved margin(s) (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNodal Site(s) with Tumor": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Anterior (perithymic)",
+      "Deep intrathoracic",
+      "Cervical",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Pleural metastasis",
+      "Pericardial metastasis",
+      "Pleural nodule(s)",
+      "Pericardial nodule(s)",
+      "Intraparenchymal pulmonary nodule(s)",
+      "Other distant organs (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

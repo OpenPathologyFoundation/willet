@@ -59,6 +59,7 @@ export const caseS26_0004: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: 'Discussed with oncology team regarding additional immunohistochemistry.',
 };
 
 /**
@@ -123,6 +124,7 @@ export const caseS26_0005: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: null,
 };
 
 /**
@@ -181,6 +183,7 @@ export const caseS26_0002: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: null,
 };
 
 /**
@@ -237,6 +240,7 @@ export const caseS26_0001_finalized: ReportScaffold = {
       role: 'PRIMARY',
     },
   ],
+  caseComment: null,
   reportState: 'FINALIZED',
   transmission: {
     id: 'tx-0001',
@@ -306,6 +310,7 @@ export const caseS26_0006: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: null,
 };
 
 /**
@@ -445,6 +450,7 @@ export const caseS26_0007: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: null,
 };
 
 /**
@@ -500,6 +506,7 @@ export const caseS26_0008: ReportScaffold = {
   ],
   reportState: 'DRAFT',
   transmission: null,
+  caseComment: null,
 };
 
 /** Index by caseId for mock handler lookup */

@@ -1,0 +1,492 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Radical prostatectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Prostate Weight in Grams": {
+    "caption": "Prostate Weight in Grams (g",
+    "type": "text",
+    "suffix": "grams (g)",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Prostate Size in Centimeters (cm)": {
+    "caption": "Prostate Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Acinar adenocarcinoma, conventional (usual)",
+      "Acinar adenocarcinoma, signet-ring-like cell",
+      "Acinar adenocarcinoma, pleomorphic giant cell",
+      "Acinar adenocarcinoma, sarcomatoid",
+      "Acinar adenocarcinoma, prostatic intraepithelial neoplasia-like",
+      "Intraductal carcinoma",
+      "Ductal adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Squamous cell carcinoma",
+      "Basal cell (adenoid cystic) carcinoma",
+      "Adenocarcinoma with neuroendocrine differentiation",
+      "Well-differentiated neuroendocrine tumor",
+      "Small cell neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Grade group 1 (Gleason Score 3 + 3 = 6)",
+      "Grade group 2 (Gleason Score 3 + 4 = 7)",
+      "Grade group 3 (Gleason Score 4 + 3 = 7)",
+      "Grade group 4 (Gleason Score 4 + 4 = 8)",
+      "Grade group 4 (Gleason Score 3 + 5 = 8)",
+      "Grade group 4 (Gleason Score 5 + 3 = 8)",
+      "Grade group 5 (Gleason Score 4 + 5 = 9)",
+      "Grade group 5 (Gleason Score 5 + 4 = 9)",
+      "Grade group 5 (Gleason Score 5 + 5 = 10)",
+      "Cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMinor Tertiary Pattern 5 (less than 5%)": {
+    "caption": "Required only if applicable i.e. this is an option for Grade Group 2(Gleason Score 3+4 = 7) and Grade Group 3 (Gleason Score 4+3 = 7) with a tertiary pattern of grade 5 of less than 5%.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Present",
+      "Not applicable / Not identified"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Pattern 4": {
+    "caption": "This is an option for Gleason Score 3+4 = 7.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than or equal to 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      ">90%"
+    ],
+    "additional caption": ""
+  },
+  "Intraductal Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be Determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "IDC Incorporated into Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Yes",
+      "No"
+    ],
+    "additional caption": ""
+  },
+  "Cribriform Glands": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Radiation therapy effect present",
+      "Hormonal therapy effect present",
+      "Other therapy effect(s) present (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Estimated Percentage of Prostate Involved by Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than 1%",
+      "1 - 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Greatest Dimension of Dominant Nodule": {
+    "caption": "Greatest Dimension of Dominant Nodule in Millimeters (mm)",
+    "type": "text",
+    "suffix": "Millimeters (mm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Extraprostatic Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present, focal",
+      "Present, nonfocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Location of Extraprostatic Extension": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right apical",
+      "Right bladder neck",
+      "Right anterior",
+      "Right lateral",
+      "Right posterolateral (neurovascular bundle)",
+      "Right posterior",
+      "Left apical",
+      "Left bladder neck",
+      "Left anterior",
+      "Left lateral",
+      "Left posterolateral (neurovascular bundle)",
+      "Left posterior",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Urinary Bladder Neck Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be Determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Seminal Vesicle Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present, right",
+      "Present, left",
+      "Present, bilateral",
+      "Present, laterality cannot be determined",
+      "No seminal vesicle present"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not Identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Cannot be assessed",
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin"
+    ],
+    "additional caption": ""
+  },
+  "\t+Linear Length of Margin(s) Involved by Carcinoma": {
+    "caption": "",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact length in Millimeters (mm)",
+      "Less than 3 mm (limited)",
+      "Greater than or equal to 3 mm (non-limited)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Focality of Margin Involvement": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Include only if applicable i.e. Margins are positive for carcinoma. Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right apical",
+      "Right bladder neck",
+      "Right anterior",
+      "Right lateral",
+      "Right posterolateral (neurovascular bundle)",
+      "Right posterior",
+      "Left apical",
+      "Left bladder neck",
+      "Left anterior",
+      "Left lateral",
+      "Left posterolateral (neurovascular bundle)",
+      "Left posterior",
+      "Other(s) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin Involvement by Invasive Carcinoma in Area of Extraprostatic Extension": {
+    "caption": "Include only if applicable i.e. Margin(s) positive for carcinoma.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Margin(s) Involved by Invasive Carcinoma in Area of EPE": {
+    "caption": "Include only if applicable i.e. Margin(s) positive for carcinoma.",
+    "type": "text",
+    "suffix": "Margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Gleason Pattern at Margin(s) Involved by Carcinoma": {
+    "caption": "Include only if applicable i.e. Margin(s) positive for carcinoma.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Pattern 3",
+      "Pattern 4",
+      "Pattern 5"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Hypogastric (Specify laterality)",
+      "Obturator (Specify laterality)",
+      "Internal Iliac (Specify laterality)",
+      "External Iliact (Specify laterality)",
+      "Iliac, NOS",
+      "Pelvic, NOS",
+      "Lateral Sacral",
+      "Presacral",
+      "Promontory",
+      "Sacral, NOS",
+      "Other (Please specify)"
+    ],
+    "additional caption": "",
+    "further": {
+      "caption": "Specify laterality",
+      "type": "dropdown",
+      "suffix": "",
+      "options": [
+        "Right",
+        "Left",
+        "Right and Left",
+        "Bilateral"
+      ]
+    }
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "At least",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Nodal Site with Largest Metastatic Deposit": {
+    "caption": "Specify site",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Lymph Node with Tumor": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Largest Lymph Node with Tumor": {
+    "caption": "Specify site.",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Extranodal Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Nonregional lymph node(s)",
+      "Bone",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

@@ -1,0 +1,588 @@
+{
+  "Procedure": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Trachelectomy",
+      "Total hysterectomy and bilateral salpingo-oophorectomy",
+      "Radical hysterectomy",
+      "Simple hysterectomy",
+      "Pelvic exenteration (specify included organs)",
+      "Bilateral salpingo-oophorectomy",
+      "Right salpingo-oophorectomy",
+      "Left salpingo-oophorectomy",
+      "Salpingo-oophorectomy, side not specified",
+      "Right oophorectomy",
+      "Left oophorectomy",
+      "Oophorectomy, side not specified",
+      "Bilateral salpingectomy",
+      "Right salpingectomy",
+      "Left salpingectomy",
+      "Salpingectomy, side not specified",
+      "Vaginal cuff resection",
+      "Omentectomy",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Hysterectomy Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Abdominal",
+      "Vaginal",
+      "Vaginal, laparoscopic-assisted",
+      "Laparoscopic",
+      "Laparoscopic, robotic-assisted",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Site": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Left superior (anterior) quadrant (12 to 3 o'clock)",
+      "Left inferior (posterior) quadrant (3 to 6 o'clock)",
+      "Right inferior (posterior) quadrant (6 to 9 o'clock)",
+      "Right superior (anterior) quadrant (9 to 12 o'clock)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Per AJCC Staging Manual, Tumor Size is reported in Centimeters (cm).",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma, HPV-associated",
+      "Squamous cell carcinoma, HPV-independent",
+      "Squamous cell carcinoma, NOS",
+      "Adenocarcinoma, NOS",
+      "Adenocarcinoma, HPV-associated",
+      "Adenocarcinoma, HPV-independent, NOS",
+      "Adenocarcinoma, HPV-independent, gastric type",
+      "Adenocarcinoma, HPV-independent, clear cell type",
+      "Adenocarcinoma, HPV-independent, mesonephric type",
+      "Endometrioid adenocarcinoma, NOS",
+      "Carcinosarcoma",
+      "Adenosquamous carcinoma",
+      "Adenoid basal carcinoma",
+      "Mucoepidermoid carcinoma",
+      "Carcinoma, unclassifiable (undifferentiated carcinoma)",
+      "Neuroendocrine tumor, NOS",
+      "Neuroendocrine tumor, grade 1",
+      "Neuroendocrine tumor, grade 2",
+      "Small cell neuroendocrine carcinoma, high grade",
+      "Large cell neuroendocrine carcinoma, high grade",
+      "Neuroendocrine carcinoma, NOS",
+      "Mixed neuroendocrine non-neuroendocrine carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "GX, cannot be assessed",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Stromal Invason": {
+    "caption": "This will serve as a subsection header. You may proceed to the other subsections below.\n\nIf pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tDepth of Stromal Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Exact depth in Millimeters (mm) (Please specify)",
+      "Not more than 3 mm",
+      "Greater than 3 mm but not more than 5 mm",
+      "Greater than 5 mm",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Extent of Depth of Stromal Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Superficial one-third",
+      "Middle one-third",
+      "Deep one-third",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Horizontal Extent of Stromal Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Not applicable (in larger tumors that can be measured grossly)",
+      "Exact width in Millimeters (mm) (Please specify)",
+      "Estimated to be less than or equal to 7 Millimeters (mm)",
+      "Estimated to be greater than 7 Millimeters (mm)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Silva System for Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Pattern A",
+      "Pattern B",
+      "Pattern C"
+    ],
+    "additional caption": ""
+  },
+  "Other Tissue / Organ Involvement": {
+    "caption": "Any organ not selected is either not involved or was not submitted.\n\nFor bladder and bowel involvement, tumor should involve the mucosal surface.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Specify individually",
+      "Parametrium",
+      "Vagina, upper two-thirds",
+      "Vagina, lower one-third",
+      "Vagina (location not specified)",
+      "Pelvic wall",
+      "Bladder wall",
+      "Bladder mucosa",
+      "Rectal wall",
+      "Bowel mucosa",
+      "Other organs / tissue (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Ectocervical (Please specify location, if possible)",
+      "Radial / circumferential (Please specify location, if possible)",
+      "Endocervical / lower uterine segment (Please specify location, if possible)",
+      "Vaginal cuff",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Ectocervical (Please specify location, if possible)",
+      "Radial / circumferential (Please specify location, if possible)",
+      "Endocervical / lower uterine segment (Please specify location, if possible)",
+      "Vaginal cuff",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for HSIL or AIS": {
+    "caption": "Reporting high-grade squamous intraepithelial lesion (CIN 2-3 or VAIN 2-3) and / or AIS is not required if margin is involved by invasive carcinoma. ",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for high-grade squamous intraepithelial lesion (HSIL) and / or adenocarcinoma in situ (AIS)",
+      "High-grade squamous intraepithelial lesion (HSIL) present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain if possible)",
+      "Not applicable "
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Nodes": {
+    "caption": "Lymph nodes designated as pelvic (parametrial, obturator, internal iliac (hypogastric), external iliac, common iliac, sacral, presacral) and para-aortic are considered regional lymph nodes. Any other involved nodes should be categorized as metastases (pM1) and reported in the distant metastasis section. Presence of isolated tumor cells no greater than 0.2 mm in regional lymph node(s) is considered N0 (i+).",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor cells",
+      "All regional lymph nodes negative for tumor cells (Specify individually)",
+      "Tumor present in pelvic lymph node(s)",
+      "Tumor present in para-aortic lymph node(s)",
+      "Tumor present in pelvic and para-aortic lymph node(s)",
+      "Tumor present in pelvic and/or para-aortic lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPelvic Lymph Nodes": {
+    "caption": "Required only if present.\n\nThis will serve as a subsection header. You may proceed to the other subsections below.\n\nIf pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tTotal Number of Pelvic Nodes with Macrometastasis (sentinel and non-sentinel)": {
+    "caption": "Macrometastases (greater than 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Pelvic Sentinel Nodes with Macrometastasis": {
+    "caption": "Macrometastases (greater than 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Pelvic Nodes with Micrometastasis (sentinel and non-sentinel)": {
+    "caption": "Micrometastases (greater than 0.2 mm to 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Pelvic Sentinel Nodes with Micrometastasis": {
+    "caption": "Micrometastases (greater than 0.2 mm to 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Pelvic Nodes with Isolated Tumor Cells": {
+    "caption": "Isolated Tumor Cells (ITC): less than or equal to 0.2 mm or single cells or clusters of cells less than or equal to 200 cells in a single lymph node cross section.\n\nReporting the number of lymph nodes with isolated tumor cells is required only in the absence of macrometastasis or micrometastasis in other lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Pelvic Sentinel Nodes with ITCs ": {
+    "caption": "Isolated Tumor Cells (ITC): less than or equal to 0.2 mm or single cells or clusters of cells less than or equal to 200 cells in a single lymph node cross section.\n\nReporting the number of lymph nodes with isolated tumor cells is required only in the absence of macrometastasis or micrometastasis in other lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Laterality of Pelvic Node(s) with Tumor": {
+    "caption": "Required only if present.\n\nSelect all that apply",
+    "type": "multiselect",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Right sentinel",
+      "Right non-sentinel",
+      "Left sentinel",
+      "Left non-sentinel",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Pelvic Nodal Metastatic Deposit": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-size",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\tTotal Number of Pelvic Nodes Examined (sentinel and non-sentinel)": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Pelvic Sentinel Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPara-aortic Lymph Nodes": {
+    "caption": "Required only if present.\n\nThis will serve as a subsection header. You may proceed to the other subsections below.\n\nIf pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tTotal Number of Para-aortic Nodes with Macrometastasis (sentinel and non-sentinel)": {
+    "caption": "Macrometastases (greater than 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Para-aortic Sentinel Nodes with Macrometastasis": {
+    "caption": "Macrometastases (greater than 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Para-aortic Nodes with Micrometastasis (sentinel and non-sentinel)": {
+    "caption": "Micrometastases (greater than 0.2 mm to 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Para-aortic Sentinel Nodes with Micrometastasis": {
+    "caption": "Micrometastases (greater than 0.2 mm to 2 mm)",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Para-aortic Nodes with Isolated Tumor Cells": {
+    "caption": "Isolated Tumor Cells (ITC): less than or equal to 0.2 mm or single cells or clusters of cells less than or equal to 200 cells in a single lymph node cross section.\n\nReporting the number of lymph nodes with isolated tumor cells is required only in the absence of macrometastasis or micrometastasis in other lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Number of Para-aortic Sentinel Nodes with ITCs ": {
+    "caption": "Isolated Tumor Cells (ITC): less than or equal to 0.2 mm or single cells or clusters of cells less than or equal to 200 cells in a single lymph node cross section.\n\nReporting the number of lymph nodes with isolated tumor cells is required only in the absence of macrometastasis or micrometastasis in other lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Laterality of Para-aortic Node(s) with Tumor": {
+    "caption": "Required only if present.\n\nSelect all that apply",
+    "type": "multiselect",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Right sentinel",
+      "Right non-sentinel",
+      "Left sentinel",
+      "Left non-sentinel",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Para-aortic Nodal Metastatic Deposit": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-size",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\tTotal Number of Para-aortic Nodes Examined (sentinel and non-sentinel)": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Para-aortic Sentinel Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Seelect only if applicable. Select all that apply.\n\nThis excludes metastasis to pelvic or para-aortic lymph nodes, or vagina.",
+    "type": "",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Uterine serosa",
+      "Adnexa",
+      "Inguinal lymph node(s)",
+      "Omentum",
+      "Extrapelvic peritoneum",
+      "Lung",
+      "Liver",
+      "Bone",
+      "Other (PLease specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

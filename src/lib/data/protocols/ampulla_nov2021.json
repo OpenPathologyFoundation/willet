@@ -1,0 +1,284 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Ampullectomy",
+      "Pancreaticoduodenectomy (Whipple resection)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intra-ampullary - Arising from intra-ampullary papillary-tubular neoplasm (IAPN)",
+      "Intra-ampullary - Ampullary ductal (pancreaticobiliary-type)",
+      "Peri-ampullary / ampullary duodenal (arising from duodenal surface of the papilla)",
+      "Intra-ampullary and peri-ampullary (mixed type)",
+      "Other (Please specify)",
+      "Cannot be determined",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma, pancreaticobiliary type",
+      "Adenocarcinoma, intestinal type",
+      "Tubular adenocarcinoma with mixed features",
+      "Mucinous adenocarcinoma",
+      "Signet-ring cell carcinoma (poorly cohesive cell carcinoma)",
+      "Medullary carcinoma",
+      "Invasive papillary adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Undifferentiated carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine tumor (mixed adenoneuroendocrine carcinoma)",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, not otherwise specified"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Carcinoma in situ / high-grade dysplasia",
+      "Limited to ampulla of Vater or sphincter of Oddi",
+      "Invades beyond sphincter of Oddi (perisphincteric invasion)",
+      "Invades into duodenal submucosa",
+      "Invades into muscularis propria of duodenum",
+      "Directly invades pancreas (up to 0.5 cm)",
+      "Extends more than 0.5 cm into pancreas",
+      "Extends into peripancreatic soft tissues",
+      "Extends into periduodenal tissue",
+      "Extends into duodenal serosa",
+      "Invades other adjacent organ(s) or structure(s) other than pancreas (Please specify)",
+      "Cannot be determined",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select only if applicable (i.e. Margins are negative for Carcinoma)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Deep (radial)",
+      "Duodenal mucosal",
+      "Pancreatic duct",
+      "Bile duct",
+      "Pancreatic neck / parenchymal",
+      "Uncinate (retroperitoneal / superior mesenteric artery)",
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Not applicable",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select only if applicable (i.e. Margins are positive for Carcinoma)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Deep (radial)",
+      "Duodenal mucosal",
+      "Pancreatic duct",
+      "Bile duct",
+      "Pancreatic neck / parenchymal",
+      "Uncinate (retroperitoneal / superior mesenteric artery)",
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Dysplasia and Intraepithelial Neoplasia": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for dysplasia and intraepithelial neoplasia",
+      "Pancreatic high-grade intraepithelial neoplasia present at pancreatic neck / parenchymal margin",
+      "High-grade intraepithelial neoplasia present at bile duct margin",
+      "High-grade dysplasia present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by High-Grade Dysplasia": {
+    "caption": "Select only if applicable",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "Select only if applicable (i.e. lymph nodes are positive with tumor)",
+    "type": "dropdown-count",
+    "suffix": "Lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "Lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Include only if applicable",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Liver",
+      "Other",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

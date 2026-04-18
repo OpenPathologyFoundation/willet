@@ -1,0 +1,282 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Wedge resection",
+      "Partial hepatectomy, major (3 segments or more)",
+      "Partial hepatectomy, minor (less than 3 segments)",
+      "Partial hepatectomy (not otherwise specified)",
+      "Total hepatectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Hepatocellular carcinoma",
+      "Hepatocellular carcinoma, fibrolamellar",
+      "Hepatocellular carcinoma, scirrhous",
+      "Hepatocellular carcinoma, clear cell type",
+      "Other histologic type not listed (PLease specify)",
+      "Carcinoma, type cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "For multiple tumors, select the worst grade.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "G4, undifferentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Solitary",
+      "Multiple",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Characteristics": {
+    "caption": "This will serve as a subsection header. You may proceed to the other subsections below.\n\nIf pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tTumor Site": {
+    "caption": "For multiple tumors, repeat this section for up to 5 largest tumor nodules",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right lobe",
+      "Left lobe",
+      "Caudate lobe",
+      "Quadrate lobe",
+      "Segmental location (Please specify)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tTumor Size": {
+    "caption": "Greatest dimension of viable tumor in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": "Specify in Centimeters (cm)"
+  },
+  "\tTreatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Complete necrosis (no viable tumor)",
+      "Incomplete necrosis (viable tumor present)",
+      "No necrosis",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Extent of Tumor Necrosis": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Satellitosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Confined to liver",
+      "Involves a major branch of the portal vein",
+      "Involves hepatic vein(s)",
+      "Perforates visceral peritoneum",
+      "Directly invades gallbladder",
+      "Directly invades diaphragm",
+      "Directly invades other adjacent organ(s) (Please specify)",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Vascular Invasion": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Small vessel",
+      "Large vessel (major branch of hepatic vein or portal vein)",
+      "Present (not otherwise specified)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Not applicable",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tClosest Margin(s) to Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Parenchymal",
+      "Other (Please specify)",
+      "Cannot be determined "
+    ],
+    "additional caption": ""
+  },
+  "Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Centimers (mm)"
+  },
+  "Margin(s) Involved by Invasive Carcinoma": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Parenchymal",
+      "Other (Please specify)",
+      "Cannot be determined "
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Distant Site(s) Involved",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

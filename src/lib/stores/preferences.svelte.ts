@@ -1,6 +1,8 @@
 // Preferences Store — user settings with localStorage fallback
 // SDS 04-00 §4.3, SRS-190 through SRS-193
 
+import type { ReportEditMode } from '$lib/types';
+
 export interface UserPreferences {
   theme: 'light' | 'system' | 'dark';
   fontSize: number;                        // px, 12–20
@@ -9,6 +11,7 @@ export interface UserPreferences {
   voiceHotkey: string | null;             // KeyboardEvent.code value, e.g. 'F13'
   voiceTarget: 'clause' | 'prompt';       // default routing when no focus context
   clauseTypeSuggestion: boolean;          // enable/disable clause type suggestions (SRS-232)
+  editMode: ReportEditMode;              // 'structured' or 'quick-entry'
 }
 
 const DEFAULTS: UserPreferences = {
@@ -19,6 +22,7 @@ const DEFAULTS: UserPreferences = {
   voiceHotkey: null,
   voiceTarget: 'clause',
   clauseTypeSuggestion: true,
+  editMode: 'structured',
 };
 
 const STORAGE_KEY = 'willet-preferences';
@@ -35,6 +39,7 @@ class PreferencesStore {
   get voiceHotkey() { return this.preferences.voiceHotkey; }
   get voiceTarget() { return this.preferences.voiceTarget; }
   get clauseTypeSuggestion() { return this.preferences.clauseTypeSuggestion; }
+  get editMode() { return this.preferences.editMode; }
 
   /**
    * Load preferences from API (with localStorage fallback).

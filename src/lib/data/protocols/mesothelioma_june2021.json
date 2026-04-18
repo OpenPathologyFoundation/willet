@@ -1,0 +1,307 @@
+{
+  "+Clinical History": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Neoadjuvant therapy performed (Please specify type, if known)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Extrapleural pneumonectomy",
+      "Extended pleurectomy / decortication",
+      "Pleurectomy / decortication",
+      "Partial pleurectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Localized",
+      "Diffuse",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Parietal pleura",
+      "Visceral pleura",
+      "Diaphragm",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Size": {
+    "caption": "For localized tumors only. Greatest dimension in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Epithelioid Mesothelioma",
+      "Sarcomatoid Mesothelioma",
+      "Biphasic Mesothelioma",
+      "Other histologic type not listed (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Architectural Pattern": {
+    "caption": "For Epithelioid Mesothelioma. May include percentages totaling 100%",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Tubulopapillary (Specify percentage)",
+      "Trabecular (Specify percentage)",
+      "Adenomatoid (Specify percentage)",
+      "Solid (Specify percentage)",
+      "Micropapillary (Specify percentage)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Cytological Features": {
+    "caption": "For Sarcomatoid mesothelioma. Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Lymphohistiocytoid",
+      "Transitional",
+      "Pleomorphic",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Stromal Features": {
+    "caption": "For sarcomatoid mesothelioma. Select all that apply.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Desmoplastic",
+      "With heterologous differentiation",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Sarcomatoid Pattern": {
+    "caption": "For Biphasic Mesothelioma. Please specify exact percentage",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Nuclear Atypia Score": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "1 (mild)",
+      "2 (moderate)",
+      "3 (severe)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Mitotic Count Score": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "1 (low, up to 1 mitosis per 2 mm\u00b2)",
+      "2 (intermediate, 2 to 4 mitoses per 2 mm\u00b2)",
+      "3 (high, 5 or more mitoses per 2 mm\u00b2)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Nuclear Grade": {
+    "caption": "This is the sum of nuclear atypia and mitotic count scores",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "1 (sum score of 2 or 3)",
+      "2 (sum score of 4 or 5)",
+      "3 (sum score of 6)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Necrosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Low grade (nuclear grades 1 and 2 without necrosis)",
+      "High grade (nuclear grade 2 with necrosis, or nuclear grade 3 with or without necrosis)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Limited to parietal pleura without involvement of ipsilateral visceral, mediastinal, or diaphragmatic pleura",
+      "Limited to parietal pleura with focal involvement of ipsilateral visceral, mediastinal, or diaphragmatic pleura",
+      "All ipsilateral pleural surfaces (including fissure)",
+      "Diaphragmatic muscle",
+      "Lung parenchyma",
+      "Endothoracic fascia",
+      "Mediastinal fat",
+      "Soft tissues of chest wall in a solitary focus",
+      "Soft tissues of chest wall diffusely or in multiple foci",
+      "Into but not through the pericardium",
+      "Rib(s)",
+      "Mediastinal organ(s)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Residual Viable Tumor": {
+    "caption": "For cases with known presurgical therapy. Specify percentage",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Others (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNodal Site(s) with Tumor": {
+    "caption": "Select all that apply.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Bronchopulmonary",
+      "Hilar",
+      "Ipsilateral mediastinal (including internal mammary, peridiaphragmatic, pericardial fat pad, or intercostal nodes)",
+      "Contralateral mediastinal (including internal mammary, peridiaphragmatic, pericardial fat pad, or intercostal nodes)",
+      "Supraclavicular",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

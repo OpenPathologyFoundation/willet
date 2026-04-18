@@ -35,8 +35,9 @@ function renderPartHeader(part: PartData): string {
 /**
  * Render all parts into formatted HTML for the finalization preview.
  * Each part gets a header and its clauses rendered with type-based formatting.
+ * If a case-level comment is provided, it is rendered after all parts (SRS-262).
  */
-export function applyFinalizationTemplate(parts: PartData[]): string {
+export function applyFinalizationTemplate(parts: PartData[], caseComment?: string): string {
   const sections: string[] = [];
 
   for (const part of parts) {
@@ -44,6 +45,10 @@ export function applyFinalizationTemplate(parts: PartData[]): string {
     const header = renderPartHeader(part);
     const body = clauses.map(renderClause).join('\n');
     sections.push(`${header}\n${body}`);
+  }
+
+  if (caseComment && caseComment.trim().length > 0) {
+    sections.push(`<h3>Comment</h3>\n<p>${escapeHtml(caseComment)}</p>`);
   }
 
   return sections.join('\n<br>\n');

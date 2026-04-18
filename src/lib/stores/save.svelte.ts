@@ -49,7 +49,7 @@ class SaveStore {
         this.debounceTimer = setTimeout(() => this.executeSave(), DEBOUNCE_MS);
       }
     } catch (err: unknown) {
-      const status = (err as any)?.status;
+      const status = err instanceof Error && 'status' in err ? (err as { status: number }).status : undefined;
 
       // Non-retriable errors
       if (status === 401 || status === 409 || status === 423) {

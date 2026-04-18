@@ -58,15 +58,28 @@ This separation is deliberate and non-negotiable:
 
 #### 2.5.1 Activation Contract (What WILLET Expects)
 
-When WILLET is activated, the host environment (Starling, or the standalone dev harness) must provide:
+WILLET is activated by the Starling orchestrator using the shared `@starling/module-protocol` v1.0 message envelope (see `starling/qms/dhf/04-SDS/07-Module-Orchestration-Architecture.md`). WILLET remains independent of the Starling codebase: it implements a protocol-compatible adapter locally at `src/lib/orchestrator-bridge.ts`, and the `ReportModule` component continues to expose the same typed props so that the standalone dev harness (URL-param mode, mocked API) exercises the same code paths as the integrated mode.
 
-| Input | Type | Description | Provider |
+**Wire-level contract (integrated mode).** Starling opens the integrated entry (`/report/orchestrated` behind the platform reverse proxy) in an iframe and sends one `orchestrator:init` postMessage:
+
+| Message | Field | Type | Description |
 |---|---|---|---|
-| `caseId` | `string` | The accession number or case identifier for the case to author. Must correspond to an existing record in `wsi.cases`. | Starling (from worklist selection, case search, or direct URL) |
-| `jwt` | `string` | A valid JWT with the user's identity, roles, and permissions. WILLET uses this for API authentication and permission enforcement. | Starling auth system (minted at login or refreshed via postMessage) |
-| `role` | `UserRole` | The user's clinical role (`RESIDENT`, `FELLOW`, `ATTENDING`, `DIRECTOR`). Determines permission defaults (e.g., FINALIZE access). | Derived from JWT claims by Starling |
-| `apiBase` | `string` | Base URL for the auth-system REST API (e.g., `/api` or `http://localhost:8080/api`). | Starling configuration |
-| `onEvent` | `(ModuleEvent) => void` | Callback for lifecycle events emitted by WILLET back to the host. | Starling (or dev harness no-op) |
+| `orchestrator:init` | `token` | `string` | Short-lived JWT minted by Starling (issuer = Starling, audience includes Willet). |
+| `orchestrator:init` | `userId` | `string` | Stable user identifier derived from the JWT `sub` claim. |
+| `orchestrator:init` | `orchestratorOrigin` | `string` | Expected parent origin; used by WILLET to validate every inbound `postMessage`. |
+| `orchestrator:init` | `caseId` | `string` | Accession / case identifier; must exist in `wsi.cases`. |
+| `orchestrator:init` | `accession` | `string` | Human-readable accession (may equal `caseId`). |
+| `orchestrator:init` | `role` | `UserRole` | Clinical role (`RESIDENT`, `FELLOW`, `ATTENDING`, `DIRECTOR`), derived from JWT claims. |
+| `orchestrator:init` | `apiBase` | `string` | Base URL for the Starling auth-system REST API (e.g., `/api`). |
+| `orchestrator:token-refresh` | `token` | `string` | Refreshed JWT; WILLET replaces its in-memory token. |
+| `orchestrator:heartbeat` | `timestamp` | `number` | WILLET acks with `module:heartbeat-ack`. |
+| `orchestrator:logout` | — | — | Host-initiated logout; WILLET clears state and stops rendering. |
+
+**Component-level contract (unchanged).** Inside WILLET, `ReportModule.svelte` continues to accept the same typed props (`caseId`, `jwt`, `role`, `apiBase`, `onEvent`). The integrated entrypoint is responsible for translating between the wire protocol above and those props. This preserves three properties:
+
+- Standalone dev harness (with mocks and URL params) still renders the exact same `ReportModule` without any host.
+- Component-level tests are unchanged.
+- The wire contract can evolve in step with `@starling/module-protocol` without touching the editor.
 
 WILLET does **not** receive or depend on: patient demographics (fetched internally from `wsi.cases` → `core.patients`), worklist state, navigation history, viewer window state, or any other orchestrator-internal concern.
 
@@ -83,6 +96,8 @@ WILLET emits typed lifecycle events to the host via the `onEvent` callback:
 | `SESSION_ERROR` | Unrecoverable state (e.g., lock service down) | Surface error to user; offer module reload |
 
 These events are the **only** mechanism by which WILLET communicates state changes to the host. The host must not inspect WILLET internal state by any other means.
+
+On the wire, every `ModuleEvent` is serialized by the integrated entrypoint as a `module:audit-event` message (per `@starling/module-protocol` v1.0) with `eventType` prefixed `willet.` and the original event payload placed in `metadata`. Starling's `AuthAuditService` persists these audit events.
 
 #### 2.5.3 Database Contract (Shared Schema)
 
@@ -105,8 +120,8 @@ WILLET does **not** create, alter, or drop tables. Schema evolution is Starling'
 | Concern | Owner | WILLET's Role |
 |---|---|---|
 | User login, OIDC/SAML, session management | Starling | Receives JWT |
-| Worklist display, case search, case navigation | Starling | Not involved |
-| Case page UI, "Edit Report" button, viewer launch | Starling | Mounted when user clicks "Edit Report" |
+| Worklist display, case search, case navigation | Starling | Not involved — in orchestrated mode WILLET's internal case selector shall be suppressed and the caseId delivered via §2.5.1 is authoritative. The selector remains active in the standalone dev harness only. |
+| Case page UI, "Edit Report" button, viewer launch | Starling | Mounted in the case page main column when the user clicks "Edit Report"; WILLET replaces the case-page placeholder block for the active case. |
 | Report scaffold (wsi.parts) creation from LIS ingest | Starling / LIS interface | Reads the scaffold |
 | Report authoring, voice, LLM, nomenclature | **WILLET** | Full ownership |
 | Concurrency locking (single-editor rule) | **WILLET** | Full ownership (via FDP WebSocket hub) |
@@ -1269,6 +1284,25 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 ---
 
+### 5.26 Case-Level Comments
+
+#### UN-089 · Phase 1
+
+**Requirement:** The user shall be able to add a free-text comment that applies to the entire case report, distinct from part-level COMMENT clauses. The case-level comment shall be visible and editable in the authoring workspace, and shall be included in the finalized report after all specimen parts.
+
+**Rationale:** Pathologists routinely need to add case-wide notes that do not belong to any specific specimen part — for example, clinical correlation recommendations, case-wide qualifications, or references to ancillary reports spanning multiple parts. The existing part-level COMMENT clause (one per part, UN-006) does not fulfill this need. A dedicated case-level comment field provides an unambiguous location for whole-report annotations.
+
+**Source:** Clinical authoring workflow; distinct from part-level COMMENT clause (UN-006) and from educational commenting workflows (UN-061).
+
+**Acceptance:**
+- A case-level comment input area is displayed in the authoring workspace below all specimen part sections.
+- The field is free-text multi-line, editable by any user with authoring access.
+- Changes to the case-level comment are included in the standard autosave cycle.
+- The case-level comment is rendered in the finalized RTF report as a distinct section following all specimen parts.
+- Changes to the case-level comment are recorded in the audit trail (author identity and timestamp).
+
+---
+
 ## 6. Open Questions Affecting Requirements
 
 The following questions remain unresolved and may result in additional or modified requirements. Each question is tracked with its current status and the requirement areas it affects.
@@ -1310,6 +1344,7 @@ The following traceability matrix will be completed as Design Inputs are derived
 | 2.0 | 2026-03-13 | DRAFT | Major expansion from UI Critical Review and Design Dialogue. Added 23 new requirements (UN-063 through UN-085) in 8 new sections: §5.18 Direct Dictation and Voice Input Routing (UN-063–066), §5.19 User Preferences (UN-067–068), §5.20 Context Dock (UN-069–071), §5.21 Synoptic Reporting (UN-072–075), §5.22 Report Templates (UN-076–079), §5.23 Clause Editor Enhancements (UN-080–082), §5.24 Layout and Workspace (UN-083–084), §5.25 Accessibility (UN-085). Updated UN-058 to cross-reference detailed synoptic requirements. Resolved Open Question #7. Added Open Questions #9–12. Total requirements: 85 (76 Phase 1, 9 Phase 2). |
 | 2.1 | 2026-03-13 | DRAFT | Added UN-086 (context-aware transcription correction) and UN-087 (clause-type-driven normalization) to §5.18 Direct Dictation section. These address speech recognition accuracy with accented speech and the clinical-to-clerical text transformation during dictation. Total requirements: 87 (78 Phase 1, 9 Phase 2). |
 | 2.2 | 2026-03-14 | DRAFT | Added UN-088 (contextual prompt seeding for STT model). Pre-transcription vocabulary biasing reduces domain-specific speech recognition errors at source. Total requirements: 88 (79 Phase 1, 9 Phase 2). |
+| 2.3 | 2026-04-09 | DRAFT | Added UN-089 (case-level comment field) in new §5.26 Case-Level Comments. Addresses the need for a whole-report free-text annotation distinct from part-level COMMENT clauses. Total requirements: 89 (80 Phase 1, 9 Phase 2). |
 
 ---
 

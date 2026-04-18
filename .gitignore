@@ -13,6 +13,8 @@ public/mockServiceWorker.js
 # Test + coverage
 coverage/
 artifacts/
+playwright-report/
+test-results/
 
 # Secrets — never commit
 .env
@@ -25,8 +27,9 @@ artifacts/
 .idea/
 .vscode/
 
-# Local dev notes (per-iteration PR drafts, scratch)
-.dev-notes/
+# Local dev notes (per-iteration PR drafts, scratch) — README is tracked, everything else is not
+.dev-notes/*
+!.dev-notes/README.md
 
 # Python (mcp-server)
 .venv/

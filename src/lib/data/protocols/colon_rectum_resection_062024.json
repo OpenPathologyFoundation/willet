@@ -1,0 +1,444 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right hemicolectomy",
+      "Transverse colectomy",
+      "Left hemicolectomy",
+      "Sigmoidectomy",
+      "Low anterior resection",
+      "Total abdominal colectomy",
+      "Abdominoperineal resection",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Macroscopic Evaluation of Mesorectum": {
+    "caption": "Required only for rectal cancers",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Complete",
+      "Near complete",
+      "Incomplete",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Cecum",
+      "Ileocecal valve",
+      "Ascending colon",
+      "Hepatic flexure",
+      "Transverse colon",
+      "Splenic flexure",
+      "Descending colon",
+      "Sigmoid colon",
+      "Rectosigmoid",
+      "Rectum",
+      "Colon, not otherwise specified",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Rectal Tumor Location": {
+    "caption": "Applicable only to rectal primaries",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Entirely above anterior peritoneal reflection",
+      "Entirely below anterior peritoneal reflection",
+      "Straddles anterior peritoneal reflection",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma",
+      "Mucinous adenocarcinoma",
+      "Signet-ring cell carcinoma (poorly cohesive carcinoma)",
+      "Medullary adenocarcinoma",
+      "Serrated adenocarcinoma",
+      "Micropapillary carcinoma",
+      "Adenoma-like adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Undifferentiated carcinoma",
+      "Carcinoma with sarcomatoid component",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine neoplasm (Please specify components)",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well-differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "G4, undifferentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Specify the largest tumor dimension in centimeters (cm)",
+    "type": "text",
+    "suffix": "centimeters (cm)",
+    "options": [],
+    "additional caption": "Specify the largest tumor dimension in centimeters (cm)"
+  },
+  "\t+Additional Dimension": {
+    "caption": "Speciy in Centimeters (cm)",
+    "type": "text",
+    "suffix": "centimeters (cm)",
+    "options": []
+  },
+  "Multiple Primary Sites": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no additional primary site(s) present)",
+      "Present (Please specify)"
+    ],
+    "additional caption": "Please complete a separate checklist for each primary site.\n\nPresence of multiple tumors can be challenging from staging perspective. In case of multiple tumors prefix 'm' should be used similar to other sites and the final stage is based on the highest stage tumor. One situation is where separate resections are performed for each tumor, in which case each tumor is staged independently, and a synoptic summary is provided for each specimen. The other situation is where 2 or more tumors are identified in the same resection specimen. In this setting most often the regional lymph nodes for each tumor site cannot be separated and only one synoptic report is suggested where each tumor can be identified separately (e.g., T1, T2, etc.) with features specific to each tumor, recorded under each tumor (T stage, histologic type and grade, LVI, ancillary molecular tests when performed, etc.) and other common feature recorded in the synoptic summary as combined findings (e.g., specimen length, margin status, nodal status, etc.). The final stage should be based on the worst tumor."
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No invasion (high grade dysplasia)",
+      "Invades lamina propria / muscularis mucosae (intramucosal carcinoma)",
+      "Invades submucosa",
+      "Invades into muscularis propria",
+      "Invades through muscularis propria into the pericolonic or perirectal tissue",
+      "Invades visceral peritoneum (including tumor continuous with serosal surface through area of inflammation)",
+      "Directly invades or adheres to adjacent structure(s) (Please specify)",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Sub-mucosal Invasion": {
+    "caption": "Required only for pT1 tumors",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (not a pT1 tumor)",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "\tDepth of Sub-mucosal Invasion": {
+    "caption": "Required only for pT1 tumors",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Less than 1 mm",
+      "Greater than or equal to 1 mm and less than 2 mm",
+      "Greater than 2 mm",
+      "Exact depth in Millimeters (mm) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tExtent of Sub-mucosal Invasion": {
+    "caption": "Required only for pT1 tumors",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Tumor invades into upper one third of submucosa",
+      "Tumor invades into middle one third of submucosa",
+      "Tumor invades into lower one third of submucosa",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Macroscopic Tumor Perforation": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Small vessel (explain)",
+      "Large vessel (venous), intramural",
+      "Large vessel (venous), extramural",
+      "Present (not otherwise specified)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Budding Score": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Low (0-4)",
+      "Intermediate (5-9)",
+      "High (10 or more)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Number of Tumor Buds (per \u2018hotspot\u2019 field)": {
+    "caption": "Specify number in one \u2018hotspot\u2019 field (in an area = 0.785 mm2)",
+    "type": "text",
+    "suffix": "per 'hotspot'",
+    "options": [],
+    "additional caption": "Specify number in one \u2018hotspot\u2019 field (in an area = 0.785 mm2)"
+  },
+  "+Type of Polyp in which Invasive Carcinoma Arose": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "None identified",
+      "Tubular adenoma",
+      "Villous adenoma",
+      "Tubulovillous adenoma",
+      "Traditional serrated adenoma",
+      "Sessile serrated adenoma / sessile serrated polyp",
+      "Hamartomatous polyp",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Present, with no viable cancer cells (complete response, score 0)",
+      "Present, with single cells or rare small groups of cancer cells (near complete response, score 1)",
+      "Present, with residual cancer showing evident tumor regression, but more than single cells or rare small groups of cancer cells (partial response, score 2)",
+      "Present (not otherwise specified)",
+      "Absent, with extensive residual cancer and no evident tumor regression (poor or no response, score 3)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "Put in any additional comment here",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": "Put in any additional comment here"
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "Margin(s)",
+    "options": [
+      "Proximal (Explain)",
+      "Distal (Please Explain)",
+      "Radial (circumferential) (Explain)",
+      "Mesenteric (Explain)",
+      "Deep (Explain)",
+      "Mucosal (Please specify location, if possible)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in centimeters (cm)",
+    "type": "dropdown",
+    "suffix": "centimeters (cm)",
+    "options": [
+      "Exact distance in cm (Please specify)",
+      "Greater than 10 mm (1.0 cm)"
+    ],
+    "additional caption": "Specify in centimeters (cm)"
+  },
+  "\tDistance from Invasive Carcinoma to Radial": {
+    "caption": "Required only for rectal tumors.\n\nSpecify in centimeters (cm)",
+    "type": "text",
+    "suffix": "centimeters (cm)",
+    "options": [],
+    "additional caption": "Specify in centimeters"
+  },
+  "\t+Distance from Invasive Carcinoma to Distal Margin": {
+    "caption": "Required only for rectal tumors",
+    "type": "text",
+    "suffix": "centimeters (cm)",
+    "options": [],
+    "additional caption": "Specify in centimeters"
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "margins",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Radial (circumferential)",
+      "Mesenteric",
+      "Deep",
+      "Mucosal (Please specify location, if possible)",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Non-Invasive Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for high-grade dysplasia / intramucosal carcinoma and low-grade dysplasia",
+      "High-grade dysplasia / intramucosal carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by High-Grade Dysplasia / Intramucosal Carcinoma": {
+    "caption": "Required only if High-Grade Dysplasia and/ror Intramural Carcinoma is identified at the margins.\n\nSelect all that apply",
+    "type": "multiselect",
+    "suffix": "margins",
+    "options": [
+      "Proximal",
+      "Distal",
+      "Mucosal (Please specify location, if possible)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Low-Grade Dysplasia": {
+    "caption": "Required only if Low-grade is identified at the margins.\n\nSelect all that apply",
+    "type": "",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "Tumor present in regional lymph node(s)",
+      "Other (Please specify)",
+      "Cannot be Determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number (Please specify)",
+      "At least (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "text",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number (Please specify)",
+      "At least (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Deposits": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "deposits",
+    "options": [
+      "Not Identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Tumor Deposits": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "deposits",
+    "options": [
+      "Specify number (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select all that apply (if applicable)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s) (Please specify)",
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}
