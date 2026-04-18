@@ -1,0 +1,470 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Local excision",
+      "Wide excision",
+      "Partial vulvectomy",
+      "Total vulvectomy",
+      "Radical vulvectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal",
+      "Cannot be determined (Explain)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right Labium majus",
+      "Right Labium minus",
+      "Right Bartholin gland",
+      "Left Labium majus",
+      "Left Labium minus",
+      "Left Bartholin gland",
+      "Clitoris",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Centimeters (cm)"
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma, HPV-associated",
+      "Squamous cell carcinoma, HPV-independent",
+      "Squamous cell carcinoma, NOS",
+      "Basal cell carcinoma, NOS",
+      "Adenocarcinoma, NOS",
+      "Adenocarcinoma of mammary gland type",
+      "Adenocarcinoma, intestinal type",
+      "Paget disease, extramammary",
+      "Apocrine adenocarcinoma",
+      "Eccrine adenocarcinoma",
+      "Porocarcinoma, NOS",
+      "Adenoid cystic carcinoma",
+      "Squamous cell carcinoma, HPV-positive",
+      "Adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Carcinoma, poorly differentiated, NOS",
+      "Adenoid cystic carcinoma",
+      "Neuroendocrine tumor, NOS",
+      "Myoepithelial carcinoma",
+      "Epithelial-myoepithelial carcinoma",
+      "Neuroendocrine tumor, grade 1",
+      "Neuroendocrine tumor, grade 2",
+      "Small cell neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Combined small cell neuroendocrine carcinoma",
+      "Combined large cell neuroendocrine carcinoma",
+      "Germ cell tumor, NOS",
+      "Yolk sac tumor, NOS",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well-differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "GX, cannot be assessed",
+      "Other (Please specify)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Depth of Invasion": {
+    "caption": "Using the FIGO 2021 method. Specify in Millimeters (mm)",
+    "type": "dropdown-depth",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact depth",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Depth of Invasion": {
+    "caption": "Using the conventional method",
+    "type": "dropdown-depth",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact depth",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Growth Pattern": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Pushing",
+      "Infiltrating",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Other Tissue / Organ Involvement": {
+    "caption": "Any organ not selected is either not involved or was not submitted.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Vagina, lower one-third",
+      "Vagina, upper two-thirds",
+      "Urethra, lower one-third",
+      "Urethra, upper two-thirds",
+      "Anus",
+      "Bladder mucosa",
+      "Rectal mucosa",
+      "Pelvic bone",
+      "Other organs / tissue (Please specify)",
+      "Cannot be determined",
+      "Specify individually"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "Margin status for precursor lesions of squamous cell carcinoma and / or Paget disease should be reported if present, even if margin is involved by invasive carcinoma.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Precursor Lesions of Squamous Cell Carcinoma": {
+    "caption": "Includes high-grade squamous intraepithelial lesion (HSIL), differentiated vulvar intraepithelial neoplasia (dVIN) and / or vulvar aberrant maturation / HPV-independent, p53-wild-type verruciform acanthotic vulvar intraepithelial neoplasia (VAM / HPVi (p53wt) vaVIN).",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for squamous precursor lesions",
+      "Squamous precursor lesion present at margin",
+      "High-grade squamous intraepithelial lesion (HSIL) present at margin",
+      "Differentiated vulvar intraepithelial neoplasia (dVIN) present at margin",
+      "Vulvar aberrant maturation (VAM) / HPV-independent, p53-wild-type verruciform acanthotic vulvar intraepithelial neoplasia (HPVi (p53wt) vaVIN) present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by Squamous Precursor Lesion(s)": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Peripheral",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by HSIL": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Peripheral",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by dVIN": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Peripheral",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by VAM / HPVi (p53wt) vaVIN": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Peripheral",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Paget Disease": {
+    "caption": "Required only if applicable",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "All margins negative for Paget disease",
+      "Paget disease present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by Paget Disease": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Peripheral",
+      "Deep",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "Only inguinal and femoral nodes are considered regional lymph nodes. Any other involved nodes are categorized as metastases (pM1) and should be described in a comment in the distant metastasis section. Presence of isolated tumor cells no greater than 0.2 mm, or single cells or cell clusters no more than 200 cells in regional lymph node(s) is considered N0(i+).",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor cells",
+      "All regional lymph nodes negative for tumor cells (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Metastasis Greater than 5 mm": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymhp node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Metastasis 5 mm or Less but Greater than 2 mm": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Micrometastasis 2 mm or Less but Greater than 0.2 mm": {
+    "caption": "Excludes isolated tumor cells",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Isolated Tumor Cells": {
+    "caption": "Reporting the number of lymph nodes with isolated tumor cells is required only in the absence of metastasis greater than 0.2 mm in other lymph nodes.\n\nIsolated tumor cells are 0.2 mm or Less, or Single Cells, or Cell Clusters not more than 200 Cells in a Single Node Cross-section",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-size",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right inguinal",
+      "Left inguinal",
+      "Inguinal, NOS",
+      "Right femoral",
+      "Left femoral",
+      "Femoral, NOS",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tAdditional Lymph Node Findings": {
+    "caption": "Required only if applicable. Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "None identified",
+      "Extranodal extension / extracapsular spread",
+      "Fixed and / or ulcerated nodes",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) Examined": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right inguinal",
+      "Left inguinal",
+      "Inguinal, NOS",
+      "Right femoral",
+      "Left femoral",
+      "Femoral, NOS",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Sentinel Nodes Examined": {
+    "caption": "Required only if applicable",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicable",
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Required only if applicable. Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Pelvic lymph node(s)",
+      "Internal iliac / hypogastric lymph node(s)",
+      "External iliac lymph node(s)",
+      "Common iliac lymph node(s)",
+      "Presacral lymph node(s)",
+      "Lung",
+      "Liver",
+      "Bone",
+      "Other (PLease specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

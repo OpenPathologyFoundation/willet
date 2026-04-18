@@ -1,0 +1,273 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Simple cholecystectomy (laparoscopic or open)",
+      "Radical cholecystectomy (with liver resection and lymphadenectomy)",
+      "Other (Please)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Fundus",
+      "Body",
+      "Neck",
+      "Cystic duct",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma, biliary type",
+      "Adenocarcinoma, intestinal type",
+      "Mucinous adenocarcinoma",
+      "Clear cell adenocarcinoma",
+      "Signet-ring cell carcinoma (poorly cohesive carcinoma)",
+      "Adenosquamous carcinoma",
+      "Mucinous cystic neoplasm with an associated invasive carcinoma",
+      "Squamous cell carcinoma",
+      "Undifferentiated carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine tumor (Mixed adenoneuroendocrine carcinoma)",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "Other",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Invades lamina propria",
+      "Invades muscular layer",
+      "Invades perimuscular connective tissue on the peritoneal side without serosal involvement",
+      "Invades perimuscular connective tissue on the hepatic side without liver involvement",
+      "Perforates serosa (visceral peritoneum)",
+      "Directly invades liver",
+      "Directly invades other adjacent organ(s) or structure(s) (Choose further))",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": "",
+    "further": {
+      "caption": "Please select all adjacent structures invaded by tumor",
+      "type": "multiselect",
+      "suffix": "",
+      "options": [
+        "Stomach",
+        "Duodenum",
+        "Colon",
+        "Pancreas",
+        "Extrahepatic bile ducts",
+        "Omentum",
+        "Main portal vein",
+        "Hepatic artery",
+        "Other (Please specify)"
+      ],
+      "additional caption": "Please specify"
+    }
+  },
+  "+Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tDistance from Invasive Carcinoma to Cystic Duct Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Liver Parenchymal Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Cystic duct",
+      "Liver parenchymal",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Intraepithelial Neoplasia": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for high-grade intraepithelial neoplasia",
+      "High-grade biliary intraepithelial neoplasia present at cystic duct margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "Text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

@@ -1,0 +1,525 @@
+{
+  "Procedure": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Total hysterectomy and bilateral salpingo-oophorectomy",
+      "Radical hysterectomy",
+      "Simple hysterectomy",
+      "Supracervical hysterectomy",
+      "Bilateral salpingo-oophorectomy",
+      "Right salpingo-oophorectomy",
+      "Left salpingo-oophorectomy",
+      "Salpingo-oophorectomy, side not specified",
+      "Right oophorectomy",
+      "Left oophorectomy",
+      "Oophorectomy, side not specified",
+      "Bilateral salpingectomy",
+      "Right salpingectomy",
+      "Left salpingectomy",
+      "Salpingectomy, side not specified",
+      "Omentectomy",
+      "Bilateral lymph node samplingMultiple peritoneal biopsies",
+      "Peritoneal tumor debulking",
+      "Peritoneal washing",
+      "Peritoneal fluid cytologyPelvic washing",
+      "Ascitic fluid",
+      "Pleurocentesis (pleural fluid)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Hysterectomy Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Abdominal",
+      "Vaginal",
+      "Vaginal, laparoscopic-assisted",
+      "Laparoscopic",
+      "Laparoscopic, robotic-assisted",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Integrity": {
+    "caption": "This will serve as a subsection header. You may proceed to the other subsections below.\n\n). If pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tRight Ovary Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Capsule intact",
+      "Capsule ruptured",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Time of Rupture (Right Ovary)": {
+    "caption": "Specify time of rupture for the right ovary.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Preoperative",
+      "Intraoperative",
+      "Unknown"
+    ],
+    "additional caption": ""
+  },
+  "\tLeft Ovary Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Capsule intact",
+      "Capsule ruptured",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Time of Rupture (Left Ovary)": {
+    "caption": "Specify time of rupture for the right ovary.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Preoperative",
+      "Intraoperative",
+      "Unknown"
+    ],
+    "additional caption": ""
+  },
+  "\tRight Fallopian Tube Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Serosa intact",
+      "Serosa ruptured",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tLeft Fallopian Tube Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Serosa intact",
+      "Serosa ruptured",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tFallopian Tube Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Serosa intact",
+      "Serosa ruptured",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Uterus Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intact",
+      "Opened",
+      "Morcellated",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "Please select the primary tumor site of origin only. For bilateral ovarian tumors with identical histology, choose \"bilateral ovaries\".",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right ovary",
+      "Left ovary",
+      "Bilateral ovaries",
+      "Ovary, laterality cannot be determined (explain)",
+      "Right fallopian tube",
+      "Left fallopian tube",
+      "Bilateral fallopian tubes",
+      "Fallopian tube, laterality cannot be determined (explain)",
+      "Right tubo-ovarian",
+      "Left tubo-ovarian",
+      "Bilateral tubo-ovarian",
+      "Tubo-ovarian, laterality cannot be determined (explain)",
+      "Primary peritoneum",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Specify in Centimeters (cm).\nFor bilateral tumors, please report maximum dimension for the largest (if borderline only) or malignant tumor. For carcinomas that arise in a borderline tumor, report the size of the carcinoma component only.",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Serous borderline tumor",
+      "Serous borderline tumor, micropapillary / cribriform variant",
+      "Serous borderline tumor with microinvasion",
+      "Microinvasive low-grade serous carcinoma",
+      "Low-grade serous carcinoma",
+      "High-grade serous carcinoma",
+      "Mucinous borderline tumor",
+      "Mucinous borderline tumor with intraepithelial carcinoma",
+      "Mucinous borderline tumor with microinvasion",
+      "Microinvasive mucinous adenocarcinoma",
+      "Mucinous adenocarcinoma",
+      "Endometrioid borderline tumor",
+      "Endometrioid carcinoma",
+      "Endometrioid carcinoma, seromucinous type",
+      "Seromucinous borderline tumor",
+      "Clear cell borderline tumor",
+      "Clear cell carcinoma",
+      "Borderline Brenner tumor",
+      "Malignant Brenner tumor",
+      "Mesonephric-like adenocarcinoma",
+      "Small cell carcinoma, hypercalcemic type",
+      "Dedifferentiated carcinoma",
+      "Undifferentiated carcinoma, NOS",
+      "Carcinosarcoma",
+      "Carcinoma, subtype cannot be determined",
+      "Mixed epithelial borderline tumor (Please specify types and percentages)",
+      "Mixed carcinoma (Please specify types and percentages)",
+      "Endometrioid stromal sarcoma, low-grade",
+      "Endometrioid stromal sarcoma, high-grade",
+      "Adenosarcoma",
+      "Leiomyosarcoma",
+      "Fibrosarcoma",
+      "Granulosa cell tumor, adult type",
+      "Granulosa cell tumor, juvenile type",
+      "Steroid cell tumor, NOS",
+      "Steroid cell tumor, malignant",
+      "Sertoli-Leydig cell tumor",
+      "Other sex cord-stromal tumor (Please specify type)",
+      "Immature teratoma",
+      "Teratoma with malignant transformation (Please specify type)",
+      "Malignant struma ovarii (Please specify type)",
+      "Dysgerminoma",
+      "Yolk sac tumor",
+      "Embryonal carcinoma",
+      "Gonadoblastoma",
+      "Choriocarcinoma, non-gestational type",
+      "Mixed malignant germ cell tumor (Please specify types and percentages)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "Required for endometrioid and mucinous carcinomas, immature teratomas, and Sertoli-Leydig cell tumors.\n\nThe FIGO Grading System is recommended for endometrioid carcinomas and may also be used for mucinous carcinomas; when severe nuclear atypia is present in the majority of the tumor cells in grade 1 or 2 tumors (grade 3 nuclei), the FIGO grade is increased by one.\n\nSilverberg Grading System is recommended for mucinous carcinomas and may also be used for endometrioid carcinomas.\n\nGrowth Pattern-based Grading is recommended for mucinous carcinomas only.\n\n2-Tier Grading System is recommended for immature teratomas only.\n\n3-Tier Grading System is recommended for immature teratomas only)",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "GB, borderline tumor",
+      "G1, well-differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "GX, cannot be assessed",
+      "FIGO Grade 1 (5% or less of non-squamous solid growth)",
+      "FIGO Grade 2 (6% to 50% of non-squamous solid growth)",
+      "FIGO Grade 3 (more than 50% of non-squamous solid growth)",
+      "Silverberg Grade 1 (scores 3-5)",
+      "Silverberg Grade 2 (scores 6-7)",
+      "Silverberg Grade 3 (scores 8-9)",
+      "Low-grade, growth pattern-based (confluent / expansile growth, or less than or equal to 10% infiltrative growth)",
+      "High-grade, growth pattern-based (infiltrative growth in greater than 10% of tumor)",
+      "Other growth pattern-based grading (Please specify)",
+      "Low-grade",
+      "High-grade",
+      "Grade 1 (low-grade)",
+      "Grade 2 (high-grade)",
+      "Grade 3 (high-grade)"
+    ],
+    "additional caption": ""
+  },
+  "Ovarian Surface Involvement": {
+    "caption": "Required only if applicable",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present, right",
+      "Present, left",
+      "Present, right and left",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Fallopian Tube Surface Involvement": {
+    "caption": "Required only if applicable",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present, right",
+      "Present, left",
+      "Present, right and left",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Implants": {
+    "caption": "Required for advanced stage serous / seromucinous borderline tumors only.\nSerous borderline tumor implants that were formerly classified as \"invasive implants\" are now considered extraovarian low-grade serous carcinoma. If the foci cannot be categorized as non-invasive or invasive, they are indeterminate.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not sampled",
+      "Not identified",
+      "Present (Please specify sites)",
+      "Indeterminate"
+    ],
+    "additional caption": ""
+  },
+  "Other Tissue / Organ Involvement": {
+    "caption": "Any organ not selected is either not involved or was not submitted.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Specify individually",
+      "Right ovary",
+      "Left ovary",
+      "Ovary (side not specified)",
+      "Right fallopian tube",
+      "Left fallopian tube",
+      "Fallopian tube (side not specified)",
+      "Uterine corpus",
+      "Uterine cervix",
+      "Pelvic peritoneum",
+      "Abdominal peritoneum",
+      "Omentum",
+      "",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Largest Extrapelvic Peritoneal Focus": {
+    "caption": "Required only if applicable",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Microscopic",
+      "Macroscopic (2 cm or less) (Please specify site, if applicable)",
+      "Macroscopic (greater than 2 cm) (Please specify site, if applicable)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Peritoneal / Ascitic Fluid Involvement": {
+    "caption": "If the ovary shows borderline tumor, but neoplastic cells are present in fluids, they should be classified as \u201catypia of undetermined significance\u201d, rather than \u201csuspicious for malignancy\u201d, if the International System for Reporting Serous Fluid Cytopathology categories are used. If the staging is category T1, borderline tumors with neoplastic cells in fluids are staged as T1c3. The category of \\\u201csuspicious for malignancy\\\u201d should be reserved only for malignant ovarian tumors",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not submitted / unknown",
+      "Negative for malignant cells",
+      "Atypical (Explain)",
+      "Neoplastic cells present (serous neoplasm, low-grade, see corresponding surgical specimen)",
+      "Other (Please specify)",
+      "Suspicious (Please specify)",
+      "Malignant cells present",
+      "Cannot be determined (Explain)",
+      "Results pending"
+    ],
+    "additional caption": ""
+  },
+  "Chemotherapy Response Score (CRS)": {
+    "caption": "Required only if applicable.\nRequired only for high-grade serous carcinomas. Treatment effect is based on assessment of residual tumor in the omentum.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "No known presurgical therapy",
+      "CRS1 (no definite or minimal response)",
+      "CRS2 (moderate response)",
+      "CRS3 (marked response with no or minimal residual cancer)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "Lymph nodes designated as pelvic (parametrial, obturator, internal iliac (hypogastric), external iliac, common iliac, sacral), para-aortic, and retroperitoneal are considered regional lymph nodes. Intra-omental and peri-intestinal lymph nodes are not considered regional nodes and their involvement is regarded as part of T3 intraperitoneal disease for staging purposes. Any other involved nodes should be categorized as metastases (pM1) and reported on in the distant metastasis section. Although there is limited evidence, Stage IIIA1 is subdivided based on the 10 mm cut-off for nodal metastases. The presence of isolated tumor cells no greater than 0.2 mm in regional lymph node(s) is considered N0(i+).",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor cells",
+      "All regional lymph nodes negative for tumor cells (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Others (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Metastasis Greater than 10 mm": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Metastasis 10 mm or Less (excluding isolated tumor cells)": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Nodes with Isolated Tumor Cells (ITCs) (0.2 mm or less)": {
+    "caption": "Reporting the number of lymph nodes with isolated tumor cells is required only in the absence of metastasis greater than 0.2 mm in other lymph nodes.",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Not applicableExact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "Select all that apply",
+    "type": "",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Right pelvic",
+      "Left pelvic",
+      "Pelvic, NOS",
+      "Right para-aortic",
+      "Left para-aortic",
+      "Para-aortic, NOS",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-size",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Location of Largest Nodal Metastatic Deposit": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right pelvic",
+      "Left pelvic",
+      "Pelvic, NOS",
+      "Right para-aortic",
+      "Left para-aortic",
+      "Para-aortic, NOS",
+      "Other (Plese specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Not applicableExact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) Examined": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right pelvic",
+      "Left pelvic",
+      "Pelvic, NOS",
+      "Right para-aortic",
+      "Left para-aortic",
+      "Para-aortic, NOS",
+      "Other (Plese specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Pleural effusion with positive cytology",
+      "Liver parenchyma",
+      "Splenic parenchyma",
+      "Inguinal lymph node(s) and lymph node(s) outside of the abdominal cavity (such as supraclavicular or axillary)Transmural involvement of intestine",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

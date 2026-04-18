@@ -1,18 +1,21 @@
 <!-- ContextDock — right-side collapsible panel with vertical tabs -->
 <!-- SDS 04-01 §14, Design Dialogue Part IX -->
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import type { ClinicalContextBundle, ClinicalReport, PriorPathologyCase, RelevanceFlag } from '$lib/types';
   import { getServices } from '$lib/services/context';
   import { reportStore } from '$lib/stores/report.svelte';
   import ReportViewer from './ReportViewer.svelte';
+  import SynopticPanel from './synoptic/SynopticPanel.svelte';
 
   type TabId = 'clinical' | 'images' | 'synoptic';
 
   interface Props {
     hasSynoptic?: boolean;
+    onsynopticfinalize?: (synopticText: string) => void;
   }
 
-  let { hasSynoptic = false }: Props = $props();
+  let { hasSynoptic = false, onsynopticfinalize }: Props = $props();
 
   const services = getServices();
 
@@ -39,11 +42,30 @@
 
   const MIN_WIDTH = 280;
   const MAX_WIDTH = 500;
+  const SYNOPTIC_MIN_WIDTH = 600;
+  const SYNOPTIC_MAX_WIDTH = 960; // ~50% of 1920px screen
+
+  let normalWidth = $state(380); // Remembered width for non-synoptic tabs
 
   const isExpanded = $derived(activeTab !== null);
+  const isSynopticActive = $derived(activeTab === 'synoptic' && hasSynoptic);
 
   function toggleTab(tab: TabId) {
+    // Remember current width before switching
+    if (activeTab !== 'synoptic' && activeTab !== null) {
+      normalWidth = dockWidth;
+    }
+
     activeTab = activeTab === tab ? null : tab;
+
+    // Expand for synoptic (~50% of viewport), restore for other tabs
+    if (activeTab === 'synoptic' && hasSynoptic) {
+      const halfViewport = Math.floor(window.innerWidth * 0.5);
+      dockWidth = Math.min(SYNOPTIC_MAX_WIDTH, Math.max(SYNOPTIC_MIN_WIDTH, halfViewport));
+    } else if (activeTab !== null) {
+      dockWidth = normalWidth;
+    }
+
     // Lazy-load clinical data on first tab open
     if (tab === 'clinical' && !clinicalFetched) {
       fetchClinicalData();
@@ -77,7 +99,9 @@
   function handleDragMove(e: MouseEvent) {
     if (!isDragging) return;
     const delta = dragStartX - e.clientX;
-    dockWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, dragStartWidth + delta));
+    const maxW = isSynopticActive ? SYNOPTIC_MAX_WIDTH : MAX_WIDTH;
+    const minW = isSynopticActive ? SYNOPTIC_MIN_WIDTH : MIN_WIDTH;
+    dockWidth = Math.min(maxW, Math.max(minW, dragStartWidth + delta));
   }
 
   function handleDragEnd() {
@@ -85,6 +109,14 @@
     document.removeEventListener('mousemove', handleDragMove);
     document.removeEventListener('mouseup', handleDragEnd);
   }
+
+  // Clean up drag listeners if component unmounts mid-drag
+  onDestroy(() => {
+    if (isDragging) {
+      document.removeEventListener('mousemove', handleDragMove);
+      document.removeEventListener('mouseup', handleDragEnd);
+    }
+  });
 
   // Helpers
   function relevanceBadge(r: RelevanceFlag): { label: string; cls: string } {
@@ -336,19 +368,18 @@
           </div>
 
         {:else if activeTab === 'synoptic'}
-          <div class="space-y-4">
-            {#if hasSynoptic}
-              <p class="text-xs text-clinical-text">Synoptic protocol form will be rendered here when the synoptic engine is implemented.</p>
-            {:else}
+          {#if hasSynoptic}
+            <SynopticPanel readOnly={reportStore.isReadOnly} onfinalize={onsynopticfinalize} />
+          {:else}
+            <div class="space-y-4">
               <div class="rounded border border-dashed border-clinical-border p-6 text-center">
                 <svg class="mx-auto h-8 w-8 text-clinical-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
                 <p class="mt-2 text-[10px] text-clinical-muted">No synoptic protocol applies to this case</p>
-                <p class="mt-1 text-[10px] text-clinical-muted/70">Coming soon</p>
               </div>
-            {/if}
-          </div>
+            </div>
+          {/if}
         {/if}
       </div>
     </div>

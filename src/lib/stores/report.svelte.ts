@@ -20,10 +20,18 @@ import type {
 export function parseClauses(part: PartData): Clause[] {
   if (!part.finalDiagnosis) return [];
 
-  const lines = part.finalDiagnosis.split('\n').filter((l) => l.length > 0);
   const types = part.metadata.clause_types ?? [];
+  const lines = part.finalDiagnosis.split('\n');
 
-  return lines.map((text, i) => ({
+  // If we have clause_types metadata, use it to determine the exact clause count
+  // (preserving empty clauses that the user just created via Enter).
+  // Without metadata, filter empty lines for backward compatibility with
+  // scaffold data that may have trailing newlines.
+  const effectiveLines = types.length > 0
+    ? lines.slice(0, Math.max(lines.length, types.length))
+    : lines.filter((l) => l.length > 0);
+
+  return effectiveLines.map((text, i) => ({
     text,
     type: types[i] ?? ('ANCILLARY' as ClauseType),
     confidence: part.metadata.confidence?.[i],
@@ -59,6 +67,7 @@ class ReportStore {
   pathologists = $state<PathologistAssignment[]>([]);
   reportState = $state<ReportState>('DRAFT');
   transmission = $state<TransmissionRecord | null>(null);
+  caseComment = $state<string>('');
 
   // Derived
   isReadOnly = $derived(
@@ -74,6 +83,7 @@ class ReportStore {
     this.pathologists = scaffold.pathologists;
     this.reportState = scaffold.reportState;
     this.transmission = scaffold.transmission;
+    this.caseComment = scaffold.caseComment ?? '';
     this.loadState = 'loaded';
     this.error = null;
   }
@@ -105,6 +115,10 @@ class ReportStore {
     this.parts = newOrder;
   }
 
+  updateCaseComment(text: string): void {
+    this.caseComment = text;
+  }
+
   reset(): void {
     this.loadState = 'idle';
     this.error = null;
@@ -114,6 +128,7 @@ class ReportStore {
     this.pathologists = [];
     this.reportState = 'DRAFT';
     this.transmission = null;
+    this.caseComment = '';
   }
 }
 

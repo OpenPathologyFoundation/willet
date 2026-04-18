@@ -1,0 +1,400 @@
+{
+  "+Treatment History": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known preoperative therapy",
+      "Preoperative therapy given",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Patient Age": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Congenital / neonatal (birth - 6 months)",
+      "Childhood / pre-pubertal (7 months - 10 years)",
+      "Post-pubertal / adult (greater than or equal to 11 years)"
+    ],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Debulking",
+      "Gross total resection",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Head and neck region (including thyroid; excluding intracranial)",
+      "Mediastinum (pericardium, heart, thymus, and lung)",
+      "Retroperitoneum / abdomen (intraperitoneal)",
+      "Sacrococcygeal",
+      "Vaginal",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Mature teratoma",
+      "Immature teratoma",
+      "Yolk sac tumor",
+      "Dysgerminoma / Seminoma",
+      "Embryonal carcinoma",
+      "ChoriocarcinomaMixed germ cell tumor (Please specify components)",
+      "Mature Teratoma with Associated somatic-type Malignancy (Please specify)",
+      "Immature Teratoma with Associated somatic-type Malignancy (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Teratoma Composed of Immature Elements": {
+    "caption": "Add only if applicable e.g. (Immature Teratoma). Specify percentage (%)",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "Add only if applicable i.e. for immature teratomas only.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "1 (Low grade)",
+      "2 (High grade)",
+      "3 (High grade)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Microscopic Coccyx Involvement": {
+    "caption": "Add only if applicable i.e. applicable to sacrococcygeal resections only.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Extent": {
+    "caption": "Add only if applicable i.e. applicable to adult [post-pubertal] extragonadal germ cell tumors.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Well-circumscribed without focal adhesions",
+      "Well-circumscribed with focal adhesions to pleura or pericardium",
+      "Well-circumscribed with focal adhesions to peritoneum, viscera and/or vessels",
+      "Well-circumscribed with focal adhesions to muscle, rectum",
+      "Confined to the mediastinum with macroscopic and/or microscopic invasion into adjacent structures (i.e., pleura, pericardium, and great vessels)",
+      "Retroperitoneal / intraperitoneal extension (Specify extent)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Treatment Effect": {
+    "caption": "To include necrosis, fibrosis, and other treatment effects",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Residual Viable Tumor": {
+    "caption": "Add only if applicable i.e. with history of pre-surgical treatment",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Necrosis": {
+    "caption": "Add only if applicable i.e. with history of pre-surgical treatment",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Stroma ": {
+    "caption": "Add only if applicable i.e. with history of pre-surgical treatment\n\nIncludes fibrosis and inflammation",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for tumor",
+      "Tumor present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "margin(s)",
+    "options": [
+      "Specify closest margin(s) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Tumor to Closest Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by Tumor": {
+    "caption": "Add only if applicable i.e. Tumor involving the surgical margins.",
+    "type": "dropdown",
+    "suffix": "margin(s)",
+    "options": [
+      "Specify involved margin(s) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "Add only if applicable i.e. Positive lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNodal Site(s) with Tumor": {
+    "caption": "Add only if applicable i.e. Nodal Sites with tumor are known",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not known",
+      "Specify nodal site(s) (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Present in Involved Node(s)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Specify type(s) (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": "Please specify histologic types separated by a comma and single white space (, )"
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Add only if applicable. Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Intrathoracic organ(s) or site(s) (i.e., lymph nodes, lung, etc.)",
+      "Liver",
+      "Other Other extrathoracic organ(s) or site(s)",
+      "Specify individually",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Children\u2019s Oncology Group Staging for any Malignant Extragonadal Germ Cell Tumor": {
+    "caption": "COG Staging is based on pretreatment tumor characteristics. Clinical information required to definitively assign stage (e.g., gross residual disease or presence of metastatic disease) may not be available to the pathologist. If applicable, the appropriate stage group may be assigned by the pathologist.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Stage I: Complete resection at any site; coccygectomy for sacrococcygeal site; negative tumor margins",
+      "Stage II: Microscopic residual; lymph nodes negative",
+      "Stage III: Lymph nodes involved by metastatic disease. Gross residual or biopsy only, retroperitoneal nodes negative or positive",
+      "Stage IV: Distant metastases, including liver",
+      "Staging not assigned"
+    ],
+    "additional caption": ""
+  },
+  "+Moran and Suster Proposed Clinical Staging for Mediastinal Germ Cell Tumors": {
+    "caption": "Applies to adult (postpubertal) extragonadal germ cell tumors",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Stage I: Well-circumscribed tumor with or without focal adhesions to the pleura or pericardium but without microscopic evidence of invasion into adjacent structures",
+      "Stage II: Tumor confined to the mediastinum with macroscopic and/or microscopic evidence of infiltration into adjacent structures (i.e., pleura, pericardium, and great vessels)",
+      "Stage III: Tumor with metastases",
+      "Stage IIIA: With metastases to intrathoracic organs (lymph nodes, lung, etc)",
+      "Stage IIIB: With extrathoracic metastases",
+      "Staging not assigned"
+    ],
+    "additional caption": ""
+  },
+  "+Associated Syndrome(s)": {
+    "caption": "Add only if applicable. Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not known",
+      "Klinefelter",
+      "Down",
+      "Gonadal dysgenesis (specify type, if known)",
+      "Other (e.g., intersex, Li Fraumeni) (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Germ Cell Associated Hematologic Malignancy": {
+    "caption": "Add only if applicable. Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Leukemia (Please specify)",
+      "Myelodysplastic syndrome (Please specify)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Other Clinical Findings": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  }
+}

@@ -1,0 +1,517 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Partial cystectomy",
+      "Radical cystectomy (total cystectomy)",
+      "Radical cystoprostatectomy",
+      "Anterior pelvic exenteration",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Trigone",
+      "Right lateral wall",
+      "Left lateral wall",
+      "Anterior wall",
+      "Posterior wall",
+      "Dome",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Papillary urothelial carcinoma, noninvasive",
+      "Urothelial carcinoma in situ",
+      "Urothelial carcinoma, invasive (conventional)",
+      "Urothelial carcinoma, micropapillary",
+      "Urothelial carcinoma, nested",
+      "Urothelial carcinoma, tubular and microcystic",
+      "Urothelial carcinoma, lymphoepithelioma-like",
+      "Urothelial carcinoma, plasmacytoid",
+      "Urothelial carcinoma, sarcomatoid",
+      "Urothelial carcinoma, giant cell",
+      "Urothelial carcinoma, poorly differentiated",
+      "Urothelial carcinoma, lipid-rich",
+      "Urothelial carcinoma, clear cell (glycogen-rich)",
+      "Urothelial carcinoma with squamous differentiation",
+      "Urothelial carcinoma with glandular differentiation",
+      "Urothelial carcinoma with trophoblastic differentiation",
+      "Urothelial carcinoma with M\u00fcllerian differentiation",
+      "Squamous cell carcinoma",
+      "Verrucous carcinoma",
+      "Squamous cell carcinoma in situ (no invasive carcinoma identified)",
+      "Adenocarcinoma, NOS",
+      "Adenocarcinoma, enteric",
+      "Adenocarcinoma, mucinous",
+      "Adenocarcinoma, mixed",
+      "Adenocarcinoma, signet-ring cell",
+      "Adenocarcinoma in situ (no invasive carcinoma identified)",
+      "Clear cell adenocarcinoma",
+      "Endometrioid carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Well-differentiated neuroendocrine tumor",
+      "Other histologic type not listed",
+      "Carcinoma, type cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Subtypes and Divergent Differentiations Present": {
+    "caption": "Include only if applicable i.e. applicable for mixed subtypes, divergent differentiations, and other carcinomas.\n\nThis will serve as a subsection header. You may proceed to the other subsections below.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, invasive (conventional)": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, micropapillary": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, nested": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, large nested": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, tubular and microcystic": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, lymphoepithelioma-like": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, plasmacytoid": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, sarcomatoid": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, giant cell": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, poorly differentiated": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tUrothelial carcinoma, lipid-rich": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tClear cell (glycogen-rich)": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tSquamous differentiation": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tGlandular (adenocarcinoma) differentiation": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tTrophoblastic differentiation": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tM\u00fcllerian differentiation": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tSmall cell neuroendocrine carcinoma": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tLarger cell neuroendocrine carcinoma": {
+    "caption": "Specify percentage (%)",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "High grade vs Low Grade for urothelial carcinoma, other variants, or divergent differentiation.\n\nWell to Poorly Differentiated for squamous cell carcinoma or adenocarcinoma",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Low-grade",
+      "High-grade",
+      "G1, well-differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "GX, cannot be assessed",
+      "Other (Please specify)",
+      "Cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Noninvasive papillary carcinoma",
+      "Urothelial carcinoma in situ",
+      "Invades lamina propria (subepithelial connective tissue)",
+      "Invades superficial muscularis propria (inner half)",
+      "Invades deep muscularis propria (outer half)",
+      "Invades perivesical soft tissue microscopically",
+      "Invades perivesical soft tissue macroscopically (extravesical mass)",
+      "Invades adjacent structure(s) (Choose further)",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": "",
+    "further": {
+      "caption": "Please select all adjacent structures invaded by tumor",
+      "type": "multiselect",
+      "suffix": "",
+      "options": [
+        "Prostatic stroma (transmural invasion from the bladder tumor)",
+        "Seminal vesicles",
+        "Uterus",
+        "Vagina",
+        "Adnexa",
+        "Pelvic wall",
+        "Abdominal wall",
+        "Rectum",
+        "Other (Please specify)"
+      ],
+      "additional caption": "Please specify"
+    }
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Configuration": {
+    "caption": "Select all that amy apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Papillary",
+      "Solid / nodule",
+      "Flat",
+      "Ulcerated",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Treatment Effect Post Neoadjuvant Chemotherapy": {
+    "caption": "BCG not included",
+    "type": "",
+    "suffix": "dropdown",
+    "options": [
+      "No known presurgical neoadjuvant therapy",
+      "Complete response: the absence of histologically identifiable residual cancer cells and extensive fibrosis of the tumor bed after presurgical neoadjuvant therapy (TRG1)",
+      "Strong response: predominant fibrosis of the tumor bed with residual cancer cells occupying less than 50% of this area (TRG2)",
+      "Weak and no response: residual cancer cells occupying greater than or equal to 50% of the tumor bed or absence of regressive changes (TRG3)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive tumor",
+      "Invasive tumor present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive tumor": {
+    "caption": "Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right ureteral",
+      "Left ureteral",
+      "Urethral",
+      "Soft tissue",
+      "Other margin(s) (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Tumor to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Margin(s) Involved by Invasive Tumor": {
+    "caption": "Include only if applicable i.e. Margins are positive for tumor. Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right ureteral",
+      "Left ureteral",
+      "Urethral",
+      "Soft tissue",
+      "Other margin(s) (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Carcinoma in Situ / Noninvasive Papillary Urothelial Carcinoma": {
+    "caption": "Non-invasive tumors include flat urothelial carcinoma in situ and non-invasive papillary urothelial carcinoma",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for carcinoma in situ / noninvasive papillary urothelial carcinoma",
+      "Carcinoma in situ / noninvasive papillary urothelial carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Carcinoma in Situ / Noninvasive Papillary Urothelial Carcinoma": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right Ureteral",
+      "Left Ureteral",
+      "UrethralOther (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "Include only if applicable, i.e. there are lymph node(s) positive for tumor",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "At least",
+      "Less than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Nodal Site with Largest Metastatic Deposit": {
+    "caption": "Specify Site",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Lymph Node with Tumor": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Less than",
+      "At least",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "\t+Largest Lymph Node with Tumor": {
+    "caption": "Specify site.",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Extranodal Extension (ENE)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Specify Location of Involved Lymph Nodes": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Include only if applicable i.e. metastatic disease",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Other site(s), excluding non-regional lymph nodes (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

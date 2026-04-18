@@ -69,6 +69,7 @@
         showToolbar={mode === 'finalize'}
         showStatusBar={false}
         minHeight="300px"
+        autosave={false}
       />
     </div>
 

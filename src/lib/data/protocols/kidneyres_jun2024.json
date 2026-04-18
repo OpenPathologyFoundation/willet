@@ -1,0 +1,345 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Partial nephrectomy",
+      "Total (simple) nephrectomy",
+      "Radical nephrectomy",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Unifocal",
+      "Multifocal (Specify number of tumor(s))"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Site": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "Pole(s)",
+    "options": [
+      "Upper",
+      "Middle",
+      "Lower",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "If multiple tumors are present, document the size of the largest tumor.\n\nGreatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Clear cell renal cell carcinoma",
+      "Multilocular cystic renal neoplasm of low malignant potential",
+      "Papillary renal cell carcinoma",
+      "Chromophobe renal cell carcinoma",
+      "Collecting duct carcinoma",
+      "Clear cell papillary renal cell tumor",
+      "Mucinous tubular and spindle renal cell carcinoma",
+      "Tubulocystic renal cell carcinoma",
+      "Acquired cystic disease-associated renal cell carcinoma",
+      "Eosinophilic solid and cystic renal cell carcinoma",
+      "Renal cell carcinoma, NOS (unclassified)",
+      "TFE3-rearranged renal cell carcinoma",
+      "TFEB-altered renal cell carcinoma",
+      "ELOC (formerly TCEB1)-mutated renal cell carcinoma",
+      "Fumarate hydratase-deficient renal cell carcinoma",
+      "Succinate dehydrogenase-deficient (SDH) renal cell carcinoma",
+      "ALK-rearranged renal cell carcinoma",
+      "SMARCB1-deficient renal medullary carcinoma",
+      "Renal cell carcinoma, subtype pending additional studies",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade (WHO / ISUP)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, nucleoli absent or inconspicuous at 400x magnification",
+      "G2, nucleoli conspicuous and visible at 400x magnification, not prominent at 100x magnification",
+      "G3, nucleoli conspicuous at 100x magnification",
+      "G4, extreme nuclear pleomorphism and/or multinucleated giant cells and/or rhabdoid and/or sarcomatoid differentiation (specify)",
+      "GX, cannot be assessed",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Grade Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Limited to kidney",
+      "Extends into perinephric tissue (beyond renal capsule)",
+      "Extends into renal sinus",
+      "Extends into pelvicalyceal system",
+      "Extends into renal vein or its segmental branches",
+      "Extends into inferior vena cava",
+      "Extends beyond renal Gerota's fascia (renal fascia)",
+      "Directly invades adrenal gland (T4)",
+      "Involves adrenal gland non-contiguously (M1)",
+      "Extends into other organ(s)/structure(s) (Please specify)",
+      "Cannot be determined (Explain)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Features": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Sarcomatoid or rhabdoid features not identified",
+      "Sarcomatoid features present",
+      "Rhabdoid features present",
+      "Sarcomatoid and rhabdoid features present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Sarcomatoid Element": {
+    "caption": "Add only if applicable i.e. Sarcomatoid elements are present in the tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": "Specify percentage (%)"
+  },
+  "\t+Percentage of Rhabdoid Element": {
+    "caption": "Add only if applicable i.e. Rhabdoid elements are present in the tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": "Specify percentage (%)"
+  },
+  "Tumor Necrosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Tumor Necrosis": {
+    "caption": "Add only if applicable i.e. Tumor Necrosis identified in the tumor.",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": "Specify percentage (%)"
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "Excluding renal vein and its segmental branches and inferior vena cava",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Invasive Carcinoma": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "margin(s)",
+    "options": [
+      "Renal parenchymal",
+      "Renal capsular",
+      "Renal sinus soft tissue",
+      "Renal hilar soft tissue",
+      "Renal vein (tumor invades or is adherent to vein wall at margin)",
+      "Ureteral",
+      "Perinephric fat",
+      "Gerota's fascia",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Hilar",
+      "Precaval",
+      "Interaortocaval",
+      "Paracaval",
+      "Retrocaval",
+      "Preaortic",
+      "Paraaortic",
+      "Retroaortic",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Size of Largest Nodal Metastatic Deposit": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "At leastLess than",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Centimeters (cm)"
+  },
+  "+Specify Nodal Site with Largest Metastatic Deposit": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Extranodal Extension (ENE)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Location of Involved Lymph Node(s)": {
+    "caption": "Add only if applicable i.e. extranodal extension is identified in at least one of the lymph node(s) present.",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Add only if applicable.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Specify individually (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

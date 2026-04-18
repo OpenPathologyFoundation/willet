@@ -1,0 +1,284 @@
+{
+  "+Patient Age Group": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adult (older than 18 years)",
+      "Pediatric (18 years old or younger)"
+    ],
+    "additional caption": ""
+  },
+  "+Clinical History": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Functional Status": {
+    "caption": "Select all that may apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Urinary 17-ketosteroids increased (10 mg / g creatinine / 24 hours)",
+      "Cushing syndrome",
+      "Conn syndrome",
+      "Virilization",
+      "Feminization",
+      "Weight loss",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adrenalectomy, total",
+      "Adrenalectomy, partial",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Bilateral",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Subtype": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Conventional adrenal cortical carcinoma",
+      "Oncocytic adrenal cortical carcinoma",
+      "Myxoid adrenal cortical carcinoma",
+      "Sarcomatoid adrenal cortical carcinoma",
+      "Other histologic subtype not listed (Please specify)",
+      "Carcinoma, subtype cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Subtype Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Mitotic Tumor Grade": {
+    "caption": "Required for adult patients only. Difficulty in assessment may be generally due to core needle biopsy, with insufficient viable tumor to count 10 mm2.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Low grade (less than or equal to 20 mitoses per 10 mm\u00b2)",
+      "High grade (greater than 20 mitoses per 10 mm\u00b2)",
+      "Cannot be assessed (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "Adrenal Gland Weight": {
+    "caption": "",
+    "type": "dropdown-size",
+    "suffix": "Grams (g)",
+    "options": [
+      "Specify exact weight",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": "Specify in Millimeters (mm)"
+  },
+  "Site(s) Involved by Direct Tumor Extension": {
+    "caption": "Select all that may apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Confined to adrenal cortex without invasion into or through the adrenal capsule (if present)",
+      "Invades into or through the adrenal capsule, with no peri-adrenal adipose tissue invasion",
+      "Kidney",
+      "Pancreas",
+      "Liver",
+      "Spleen",
+      "Diaphragm",
+      "Stomach",
+      "Peri-adrenal adipose tissue",
+      "Large blood vessels",
+      "Other adjacent organs and structures (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable (no evidence of primary tumor)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Large vessel invasion, renal vein",
+      "Large vessel invasion, vena cava",
+      "Large vessel invasion, not otherwise specified",
+      "Microscopic angioinvasion",
+      "Lymphatic invasion",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Description": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Hemorrhagic",
+      "Necrotic",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for carcinoma",
+      "Carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tClosest Margin(s) to Carcinoma": {
+    "caption": "",
+    "type": "text",
+    "suffix": "margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Distance from Carcinoma to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than 1 mm",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Carcinoma": {
+    "caption": "",
+    "type": "text",
+    "suffix": "margin(s)",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Extranodal Extension": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select only if applicable",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Liver",
+      "Lung",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

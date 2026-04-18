@@ -1,0 +1,357 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Total hysterectomy and bilateral salpingo-oophorectomy",
+      "Radical hysterectomy",
+      "Simple hysterectomy",
+      "Supracervical hysterectomy",
+      "Bilateral salpingo-oophorectomy",
+      "Right salpingo-oophorectomy",
+      "Left salpingo-oophorectomy",
+      "Salpingo-oophorectomy, side not specified",
+      "Right oophorectomy",
+      "Left oophorectomy",
+      "Oophorectomy, side not specified",
+      "Bilateral salpingectomy",
+      "Right salpingectomy",
+      "Left salpingectomy",
+      "Salpingectomy, side not specified",
+      "Omentectomy",
+      "Bilateral Lymph Node Dissection",
+      "Para-aortic Lymph Node Sampling",
+      "Multiple Peritoneal biopsies",
+      "Peritoneal washing",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Hysterectomy Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Abdominal",
+      "Vaginal",
+      "Vaginal, laparoscopic-assisted",
+      "Laparoscopic",
+      "Laparoscopic, robotic-assisted",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intact",
+      "Opened",
+      "Morcellated",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Uterine corpus",
+      "Uterine cervix",
+      "Uterus, not otherwise specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "Low-grade endometrial stromal sarcoma is distinguished from benign endometrial stromal nodule by depth of myometrial invasion greater than or equal to 3 mm, lymphovascular invasion, or greater than or equal to 3 foci of myometrial invasion of any depth. Minor marginal irregularity in the form of tongues less than 3 mm is allowable for an endometrial stromal nodule. This checklist does not apply to endometrial stromal nodules.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Leiomyosarcoma NOS",
+      "Spindle (conventional) leiomyosarcoma",
+      "Epithelioid leiomyosarcoma",
+      "Myxoid leiomyosarcoma",
+      "Endometrial stromal sarcoma, low-grade",
+      "Endometrial stromal sarcoma, high-grade",
+      "Undifferentiated sarcoma",
+      "Adenosarcoma, NOS",
+      "Adenosarcoma with sarcomatous overgrowth",
+      "Rhabdomyosarcoma",
+      "Malignant perivascular epithelioid cell tumor",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "Required only for adenosarcoma. Adenosarcoma with sarcomatous overgrowth is usually high grade and should be considered high grade because of a poorer prognosis.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Low grade",
+      "High grade",
+      "Cannot be assessed"
+    ],
+    "additional caption": ""
+  },
+  "Myometrial Invasion": {
+    "caption": "Required only for adenosarcoma",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tDepth of Myometrial Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify in Millimeters (mm) (Please specify)",
+      "Other (Please specify)",
+      "Cannot be deteremined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMyometrial Thickness": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify in Millimeters (mm) (Please specify)",
+      "Other (Please specify)",
+      "Cannot be deteremined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Myometrial Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage (Please specify)",
+      "Estimated to be less than 50%",
+      "Estimated to be 50% or greater",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Other Tissue / Organ Involvement": {
+    "caption": "Any organ not selected is either not involved or was not submitted.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Specify individually",
+      "Adnexa",
+      "Other pelvic tissue (Please specify)",
+      "Abdominal tissue in one site (Please specify)",
+      "Abdominal tissue in multiple sites (Please specify)",
+      "Bladder mucosa",
+      "Rectal mucosa",
+      "Other organs / tissue (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Peritoneal / Ascitic Fluid Involvement": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not submitted / unknown",
+      "Malignant cells not identified",
+      "Atypical cells present",
+      "Suspicious (Explain)",
+      "Malignant cells present",
+      "Cannot be determined",
+      "Results pending"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margins Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for sarcoma",
+      "Sarcoma present at margin",
+      "Not applicable",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Sarcoma to Closest Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Sarcoma": {
+    "caption": "Specify closest margin(s)",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin(s) Involved by Sarcoma": {
+    "caption": "Specify involved margin(s)",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor cells",
+      "All regional lymph nodes negative for tumor cells (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Isolated Tumor Cells": {
+    "caption": "Isolated Tumor Cells measure 0.2 mm or less in size.\n\nReporting the number of lymph nodes with isolated tumor cells is required only in the absence of macrometastasis or micrometastasis in other lymph nodes",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) with Tumor": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right pelvic",
+      "Left pelvic",
+      "Pelvic, NOS",
+      "Right para-aortic",
+      "Left para-aortic",
+      "Para-aortic, NOS",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Number of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Nodal Site(s) Examined": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Right pelvic",
+      "Left pelvic",
+      "Pelvic, NOS",
+      "Right para-aortic",
+      "Left para-aortic",
+      "Para-aortic, NOS",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select only if applicable",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Lung",
+      "Liver",
+      "Bone",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

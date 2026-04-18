@@ -1,0 +1,576 @@
+{
+  "Synchronous Tumors": {
+    "caption": "Required if morphologically distinct unrelated multiple primary tumors are present. Morphologically distinct tumors that are considered to represent separate primary lung cancers should have separate synoptic reports.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tTotal Number of Primary Tumors": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Wedge resection",
+      "Segmentectomy",
+      "Lobectomy",
+      "Completion lobectomy",
+      "Sleeve lobectomy",
+      "Bilobectomy",
+      "Pneumonectomy",
+      "Major airway resection",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Laterality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Right",
+      "Left",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Focality": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Single focus",
+      "Separate tumor nodules (metastases) in same lobe",
+      "Separate tumor nodules (metastases) in different ipsilateral lobe",
+      "Separate tumor nodules (metastases) in a contralateral lobe",
+      "Multifocal tumor nodules of similar histology type not considered intrapulmonary metastases or too numerous for separate synoptic reports",
+      "Pneumonic-type adenocarcinoma",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Number of Intrapulmonary Metastases": {
+    "caption": "Required only if applicable, i.e. with separate tumor nodules in the same lobe",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Number of Distant Metastases": {
+    "caption": "Required only if applicable, i.e. with separate tumor nodules in the contralateral lobe",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Number of Tumor Nodules": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Upper lobe of lung",
+      "Middle lobe of lung",
+      "Lower lobe of lung",
+      "Bronchus, main",
+      "Bronchus intermedius",
+      "Bronchus, lobar",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Total Tumor Size": {
+    "caption": "The size of the entire tumor (total tumor size) applies to all tumors and includes the invasive component and the nonmucinous lepidic component of adenocarcinomas.",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Size of Invasive Component": {
+    "caption": "Rrequired only if invasive nonmucinous adenocarcinomas with lepidic component is present. The size of the invasive component applies only to invasive nonmucinous adenocarcinomas with lepidic component. For all tumor types other than invasive nonmucinous adenocarcinoma with lepidic component, invasive tumor size equals total tumor size.",
+    "type": "dropdown-size",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Not applicable",
+      "Specify exact size",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Total Tumor Size": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma in situ (AIS), nonmucinous",
+      "Adenocarcinoma in situ (AIS), mucinous",
+      "Minimally invasive adenocarcinoma, nonmucinous",
+      "Minimally invasive adenocarcinoma, mucinous",
+      "Invasive lepidic adenocarcinoma",
+      "Invasive acinar adenocarcinoma",
+      "Invasive papillary adenocarcinoma",
+      "Invasive micropapillary adenocarcinoma",
+      "Invasive solid adenocarcinoma",
+      "Invasive mucinous adenocarcinoma",
+      "Mixed invasive mucinous and non-mucinous adenocarcinoma",
+      "Colloid adenocarcinoma",
+      "Fetal adenocarcinoma",
+      "Enteric-type adenocarcinoma",
+      "Squamous cell carcinoma in situ (SCIS)",
+      "Invasive squamous cell carcinoma, keratinizing",
+      "Invasive squamous cell carcinoma, non-keratinizing",
+      "Invasive squamous cell carcinoma, basaloid",
+      "Lymphoepithelial carcinoma",
+      "Large cell carcinoma",
+      "Adenosquamous carcinoma",
+      "Pleomorphic carcinoma",
+      "Pulmonary blastoma",
+      "Carcinosarcoma",
+      "NUT carcinoma",
+      "Thoracic SMARCA4-deficient undifferentiated tumor",
+      "Adenoid cystic carcinoma",
+      "Epithelial-myoepithelial carcinoma",
+      "Mucoepidermoid carcinoma",
+      "Hyalinizing clear cell carcinoma",
+      "Myoepithelial carcinoma",
+      "Typical carcinoid / Neuroendocrine tumor, grade 1",
+      "Atypical carcinoid / Neuroendocrine tumor, grade 2",
+      "Carcinoid tumor, NOS / Neuroendocrine tumor, NOS",
+      "Small cell carcinoma",
+      "Combined small cell carcinoma (Please specify type of non-small cell component)",
+      "Large cell neuroendocrine carcinoma",
+      "Combined large cell neuroendocrine carcinoma (LCNEC and other non-small cell component)",
+      "Carcinoma, type cannot be determined",
+      "Non-small cell carcinoma, subtype cannot be determined",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tHistologic Component(s) Present": {
+    "caption": "This is for pleomorphic carcinoma. Specify percentages.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Spindle cell carcinoma (Specify percentage)",
+      "Giant cell carcinoma (Specify percentage)",
+      "Adenocarcinoma (Specify percentage)",
+      "Squamous cell carcinoma (Specify percentage)",
+      "Large cell carcinoma (Specify percentage)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\tHistologic Patterns Present": {
+    "caption": "May include percentages in 5-10% increments totaling 100%",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Acinar",
+      "Papillary",
+      "Lepidic",
+      "Solid",
+      "Micropapillary",
+      "Complex glands (cribriform and fused glands)",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "G4, undifferentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Spread Through Air Spaces (STAS) ": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  },
+  "Visceral Pleura Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Direct Invasion of Adjacent Structures": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no adjacent structures present)",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tInvolved Adjacent Structures": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Main bronchus",
+      "Hilar soft tissues",
+      "Carina",
+      "Parietal pleura",
+      "Chest wall (Please specify involved structures(s), if plossible.",
+      "Phrenic nerve",
+      "Parietal pericardium",
+      "Diaphragm",
+      "Mediastinum (Please specify involved structures(s), if plossible.",
+      "Heart",
+      "Great vessels",
+      "Trachea",
+      "Recurrent laryngeal nerve",
+      "Esophagus",
+      "Vertebral body",
+      "Other"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Residual Viable Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Necrosis": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Stroma": {
+    "caption": "Includes fibrosis and inflammation",
+    "type": "dropdown",
+    "suffix": "%",
+    "options": [
+      "Specify percentage",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Lymphovascular Invasion": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present (not otherwise specified)",
+      "Lymphatic invasion present",
+      "Arterial invasion present",
+      "Venous invasion present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Include if only applicable (i.e. tumor present at margins). Select all that apply.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Bronchial",
+      "Vascular",
+      "Parenchymal",
+      "Other attached tissue margin(s) (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Non-Invasive Tumor": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for non-invasive tumor",
+      "Carcinoma in situ present at bronchial margin",
+      "Carcinoma in situ present at parenchymal margin",
+      "Lepidic component of invasive carcinoma present at parenchymal margin",
+      "Other (PLese specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Lymph Node(s) from Prior Procedures": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known prior lymph node sampling performed",
+      "Not included",
+      "Included"
+    ],
+    "additional caption": ""
+  },
+  "\tPrior Lymph Node Procedure(s) Included": {
+    "caption": "Describe and specify case ID",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNodal Site(s) with Tumor": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "1R: Low cervical, supraclavicular, scalene and sternal notch",
+      "2R: Upper paratracheal",
+      "4R: Lower paratracheal",
+      "8R: Para-esophageal (below carina)",
+      "9R: Pulmonary ligament",
+      "10R: Hilar",
+      "11R: Interlobar",
+      "12R: Lobar",
+      "13R: Segmental",
+      "14R: Subsegmental",
+      "Other right nodes",
+      "3a: Pre-vascular",
+      "3p: Retrotracheal",
+      "7: Subcarinal",
+      "Other central nodes",
+      "1L: Low cervical, supraclavicular, scalene and sternal notch",
+      "2L: Upper paratracheal",
+      "4L: Lower paratracheal",
+      "5: Subaortic / aortopulmonary (AP) / AP window",
+      "6: Para-aortic (ascending aorta or phrenic)",
+      "8L: Para-esophageal",
+      "9L: Pulmonary ligament",
+      "10L: Hilar",
+      "11L: Interlobar",
+      "12L: Lobar",
+      "13L: Segmental",
+      "14L: Subsegmental",
+      "Other left nodes",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\t+Extranodal Extension": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t\tNodal Site(s) Examined": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "1R: Low cervical, supraclavicular, scalene and sternal notch",
+      "2R: Upper paratracheal",
+      "4R: Lower paratracheal",
+      "8R: Para-esophageal (below carina)",
+      "9R: Pulmonary ligament",
+      "10R: Hilar",
+      "11R: Interlobar",
+      "12R: Lobar",
+      "13R: Segmental",
+      "14R: Subsegmental",
+      "Other right nodes",
+      "3a: Pre-vascular",
+      "3p: Retrotracheal",
+      "7: Subcarinal",
+      "Other central nodes",
+      "1L: Low cervical, supraclavicular, scalene and sternal notch",
+      "2L: Upper paratracheal",
+      "4L: Lower paratracheal",
+      "5: Subaortic / aortopulmonary (AP) / AP window",
+      "6: Para-aortic (ascending aorta or phrenic)",
+      "8L: Para-esophageal",
+      "9L: Pulmonary ligament",
+      "10L: Hilar",
+      "11L: Interlobar",
+      "12L: Lobar",
+      "13L: Segmental",
+      "14L: Subsegmental",
+      "Other left nodes",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select all that apply",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Separate tumor nodule(s) in contralateral lobe",
+      "Pleural nodules",
+      "Pericardial nodules",
+      "Malignant pleural effusion",
+      "Malignant pericardial effusion",
+      "Single extrathoracic metastasis in one organ (including a single nonregional lymph node)",
+      "Multiple extrathoracic metastases in a single organ",
+      "Multiple extrathoracic metastasis in multiple organs",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

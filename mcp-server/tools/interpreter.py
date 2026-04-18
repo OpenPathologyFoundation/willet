@@ -206,6 +206,7 @@ def interpret_instruction(
 ) -> dict:
     """
     Interpret an instruction using the configured LLM provider.
+    Falls back to the other provider on transient errors (overloaded, rate limit).
 
     Args:
         instruction: The pathologist's natural language instruction
@@ -215,17 +216,30 @@ def interpret_instruction(
 
     Returns:
         {
-            "intents": [{"type": str, "params": dict, "confidence": float}],
-            "summary": str,
-            "provider": str
+            "actions": [...], "clarifications": [...],
+            "confidence": float, "summary": str, "provider": str
         }
     """
-    provider = provider or os.environ.get("LLM_PROVIDER", "anthropic")
+    primary = provider or os.environ.get("LLM_PROVIDER", "anthropic")
+    fallback = "openai" if primary == "anthropic" else "anthropic"
 
-    if provider == "openai":
-        result = interpret_with_openai(instruction, case_context, conversation_history)
-    else:
-        result = interpret_with_anthropic(instruction, case_context, conversation_history)
+    providers = [
+        (primary, interpret_with_anthropic if primary == "anthropic" else interpret_with_openai),
+        (fallback, interpret_with_anthropic if fallback == "anthropic" else interpret_with_openai),
+    ]
 
-    result["provider"] = provider
-    return result
+    last_error = None
+    for name, fn in providers:
+        try:
+            result = fn(instruction, case_context, conversation_history)
+            result["provider"] = name
+            return result
+        except Exception as e:
+            last_error = e
+            error_str = str(e).lower()
+            # Only fall back on transient errors; raise immediately on auth/validation errors
+            if "overloaded" in error_str or "rate" in error_str or "529" in error_str or "503" in error_str:
+                continue
+            raise
+
+    raise last_error or RuntimeError("All LLM providers failed")

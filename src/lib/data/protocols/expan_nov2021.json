@@ -1,0 +1,326 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Excisional biopsy (enucleation)",
+      "Pancreaticoduodenectomy (Whipple resection), partial pancreatectomy",
+      "Total pancreatectomy",
+      "Partial pancreatectomy, pancreatic body",
+      "Partial pancreatectomy, pancreatic tail",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Pancreatic head",
+      "Uncinate process",
+      "Pancreatic body",
+      "Pancreatic tail",
+      "Other (Please specify)",
+      "Cannot be determined",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Ductal adenocarcinoma (NOS)",
+      "Colloid carcinoma (mucinous noncystic carcinoma)",
+      "Signet-ring cell carcinoma (poorly cohesive carcinoma)",
+      "Intraductal papillary-mucinous neoplasm with an associated invasive carcinoma",
+      "Intraductal oncocytic papillary neoplasm with associated invasive carcinoma",
+      "Intraductal papillary neoplasm with an associated invasive carcinoma",
+      "Mucinous cystic neoplasm with an associated invasive carcinoma",
+      "Medullary carcinoma",
+      "Adenosquamous carcinoma",
+      "Hepatoid carcinoma",
+      "Large cell carcinoma with rhabdoid phenotype",
+      "Undifferentiated carcinoma",
+      "Undifferentiated carcinoma with osteoclast-like giant cells",
+      "Acinar cell carcinoma (NOS)",
+      "Acinar cell cystadenocarcinoma",
+      "Mixed acinar-neuroendocrine carcinoma",
+      "Mixed ductal-neuroendocrine carcinoma",
+      "Mixed acinar-endocrine-ductal carcinoma",
+      "Mixed acinar-ductal carcinoma",
+      "Pancreatoblastoma",
+      "Solid-pseudopapillary neoplasm",
+      "Solid-pseudopapillary neoplasm with high grade carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine neoplasm",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "For ductal carcinomas only.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Site(s) Involved by Direct Tumor Extension": {
+    "caption": "Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "No invasion (carcinoma in situ / high-grade dysplasia, including pancreatic intraepithelial neoplasia III)",
+      "Confined to pancreas",
+      "Posterior pancreatic surface",
+      "Anterior pancreatic surface",
+      "Vascular bed / groove (corresponding to superior mesenteric vein / portal vein)",
+      "Ampulla of Vater or sphincter of Oddi",
+      "Duodenal wall",
+      "Retroperitoneal soft tissue",
+      "Mesenteric adipose tissue",
+      "Mesocolon",
+      "Extrapancreatic common bile duct",
+      "Stomach",
+      "Superior mesenteric vein",
+      "Portal vein",
+      "Celiac axis",
+      "Superior mesenteric artery",
+      "Common hepatic artery",
+      "Other adjacent organ(s) or structure(s) (Please specify)",
+      "Cannot be determined",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Present, with no viable cancer cells (complete response, score 0)",
+      "Present, with single cells or rare small groups of cancer cells (near complete response, score 1)",
+      "Present, with residual cancer showing evident tumor regression, but more than single cells or rare small groups of cancer cells (partial response, score 2)",
+      "Present (not otherwise specified)",
+      "Absent, with extensive residual cancer and no evident tumor regression (poor or no response, score 3)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal pancreatic parenchymal",
+      "Distal pancreatic parenchymal",
+      "Pancreatic neck / parenchymal",
+      "Uncinate (retroperitoneal / superior mesenteric artery)",
+      "Bile duct",
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal pancreatic parenchymal",
+      "Distal pancreatic parenchymal",
+      "Pancreatic neck / parenchymal",
+      "Uncinate (retroperitoneal / superior mesenteric artery)",
+      "Bile duct",
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Dysplasia and Intraepithelial Neoplasia": {
+    "caption": "Select all that apply",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for dysplasia and intraepithelial neoplasia",
+      "Pancreatic high-grade intraepithelial neoplasia present at margin",
+      "High-grade intraepithelial neoplasia present at bile duct margin",
+      "High-grade dysplasia present at margin"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Pancreatic High-Grade Intraepithelial Neoplasia": {
+    "caption": "Add only if applicable. Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal pancreatic parenchymal",
+      "Distal pancreatic parenchymal",
+      "Pancreatic neck / parenchymal",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by High-Grade Dysplasia": {
+    "caption": "Add only if applicable. Select all that apply.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal (gastric or duodenal)",
+      "Distal (duodenal or jejunal)",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Add only if applicable. Select all that apply.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Liver",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  }
+}

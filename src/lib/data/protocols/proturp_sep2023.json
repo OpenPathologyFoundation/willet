@@ -1,0 +1,222 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "dropdown",
+    "options": [
+      "Transurethral resection of the prostate (TURP)",
+      "Enucleation (simple or subtotal prostatectomy)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Acinar adenocarcinoma, conventional (usual)",
+      "Acinar adenocarcinoma, signet-ring-like cell",
+      "Acinar adenocarcinoma, pleomorphic giant cell",
+      "Acinar adenocarcinoma, sarcomatoid",
+      "Acinar adenocarcinoma, prostatic intraepithelial neoplasia-like",
+      "Isolated intraductal carcinoma",
+      "Ductal adenocarcinoma",
+      "Adenosquamous carcinoma",
+      "Squamous cell carcinoma",
+      "Basal cell (adenoid cystic) carcinoma",
+      "Adenocarcinoma with neuroendocrine differentiation",
+      "Well-differentiated neuroendocrine tumor",
+      "Small cell neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Cannot be assessed",
+      "Grade group 1 (Gleason Score 3 + 3 = 6)",
+      "Grade group 2 (Gleason Score 3 + 4 = 7)",
+      "Grade group 3 (Gleason Score 4 + 3 = 7)",
+      "Grade group 4 (Gleason Score 4 + 4 = 8)",
+      "Grade group 4 (Gleason Score 3 + 5 = 8)",
+      "Grade group 4 (Gleason Score 5 + 3 = 8)",
+      "Grade group 5 (Gleason Score 4 + 5 = 9)",
+      "Grade group 5 (Gleason Score 5 + 4 = 9)",
+      "Grade group 5 (Gleason Score 5 + 5 = 10)"
+    ],
+    "additional caption": ""
+  },
+  "\tPercentage of Pattern 4": {
+    "caption": "Required only if applicable (i.e. Grade group 2 (Gleason Score 3 + 4 = 7), Grade group 3 (Gleason Score 4 + 3 = 7), Grade group 5 (Gleason Score 4 + 5 = 9), or Grade group 5 (Gleason Score 5 + 4 = 9))",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than or equal to 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%"
+    ],
+    "additional caption": ""
+  },
+  "\t+Percentage of Pattern 5": {
+    "caption": "Required only if applicable (i.e. Grade group 2 (Gleason Score 3 + 4 = 7), Grade group 3 (Gleason Score 4 + 3 = 7), Grade group 5 (Gleason Score 4 + 5 = 9), or Grade group 5 (Gleason Score 5 + 4 = 9))",
+    "type": "text",
+    "suffix": "%",
+    "options": [],
+    "additional caption": ""
+  },
+  "Intraductal Carcinoma (IDC)": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "\tIDC Incorporated into Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Yes",
+      "No"
+    ],
+    "additional caption": ""
+  },
+  "Cribriform Glands": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "If treatment effect is present, you may specify the type of treatment effect present",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Not identified",
+      "Radiation therapy effect present",
+      "Hormonal therapy effect present",
+      "Other therapy effect(s) present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Quantitation": {
+    "caption": "This will serve as a subsection header. You may proceed to the other subsections below.\n\nIf pelvic and / or para-aortic lymph nodes are submitted and positive for tumor cells, reporting the number of nodes with or without macrometastases and micrometastases is required. Reporting isolated tumor cells is required only in the absence of macrometastasis or micrometastasis.\n\nReport only if applicable.",
+    "type": "blank",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tEstimated Percentage of Prostate Involved by Tumor": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Less than 1%",
+      "1 - 5%",
+      "6 - 10%",
+      "11 - 20%",
+      "21 - 30%",
+      "31 - 40%",
+      "41 - 50%",
+      "51 - 60%",
+      "61 - 70%",
+      "71 - 80%",
+      "81 - 90%",
+      "Greater than 90%",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Number of Positive Chips": {
+    "caption": "Specify number of chips positive for tumor",
+    "type": "text",
+    "suffix": "Chips",
+    "options": [],
+    "additional caption": ""
+  },
+  "\t+Total Number of Chips": {
+    "caption": "Specify number of chips positive for tumor",
+    "type": "text",
+    "suffix": "Chips",
+    "options": [],
+    "additional caption": ""
+  },
+  "Periprostatic Fat Invasion": {
+    "caption": "Report if identified in specimen",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Seminal Vesicle Invasion": {
+    "caption": "Report if identified in specimen",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Lymphatic and / or Vascular Invasion": {
+    "caption": "Report if identified in specimen",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "Report if identified in specimen",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present"
+    ],
+    "additional caption": ""
+  }
+}

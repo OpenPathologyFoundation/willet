@@ -1,0 +1,286 @@
+{
+  "Procedure": {
+    "caption": "Right colectomy or cecectomy often includes appendectomy but sometimes follows appendectomy and may need staging",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Appendectomy",
+      "Right colectomy",
+      "Cecectomy",
+      "Other"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Proximal half of appendix",
+      "Distal half of appendix",
+      "Diffusely involving appendix",
+      "Appendix, not otherwise specified",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Base of Appendix Involvement": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Adenocarcinoma",
+      "Mucinous adenocarcinoma",
+      "Low-grade appendiceal mucinous neoplasm",
+      "High-grade appendiceal mucinous neoplasm",
+      "Signet-ring cell carcinoma",
+      "Goblet cell adenocarcinoma",
+      "Neuroendocrine carcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine neoplasm",
+      "Medullary carcinoma",
+      "Squamous cell carcinoma",
+      "Adenosquamous carcinoma",
+      "Undifferentiated carcinoma",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "The grade of the appendiceal and peritoneal tumors is concordant in most instances but can be discordant in some cases. In case of discordance of grades, the final grade should be assigned based on the peritoneal metastasis.",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Deposits": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Deposits": {
+    "caption": "Required only if applicable i.e. presence of tumor deposits",
+    "type": "dropdown-count",
+    "suffix": "",
+    "options": [
+      "Exact number",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Tumor invades lamina propria or muscularis mucosa",
+      "Acellular mucin invades submucosa",
+      "Tumor invades submucosa",
+      "Acellular mucin invades muscularis propria",
+      "Tumor invades muscularis propria",
+      "Acellular mucin invades subserosa or mesoappendix but does not extend to serosal surface",
+      "Tumor invades through muscularis propria into subserosa or mesoappendix but does not extend to serosal surface",
+      "Acellular mucin invades visceral peritoneum (serosa)",
+      "Tumor invades visceral peritoneum (serosa)",
+      "Tumor directly invades adjacent organ(s) or structure(s)",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Perineural Invasion": {
+    "caption": "",
+    "type": "",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Invasive Carcinoma to Closest Mesenteric Margin": {
+    "caption": "Specify in Centimeters (cm)",
+    "type": "dropdown-distance",
+    "suffix": "Centimeters (cm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Proximal",
+      "Mesenteric",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for Non-Invasive Tumor": {
+    "caption": "Including LAMN and HAMN.\n\nPresence of acellular mucin is not considered a positive margin in the context of LAMN or HAMN but should be recorded in a comment or note.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "All margins negative for non-invasive tumor",
+      "Low-grade dysplasia present at proximal margin",
+      "High-grade dysplasia present at proximal margin",
+      "High-grade appendiceal mucinous neoplasm present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Regional Lymph Node Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not applicable (no regional lymph nodes submitted or found)",
+      "All regional lymph nodes negative for tumor",
+      "All regional lymph nodes negative for tumor (Specify individually)",
+      "Tumor present in regional lymph node(s)",
+      "Tumor present in regional lymph node(s) (Specify individually)",
+      "Other (Please specify)",
+      "Cannot be deteremined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes with Tumor": {
+    "caption": "Include only if applicable i.e. lymph node(s) positive for tumor",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tNumber of Lymph Nodes Examined": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "lymph node(s)",
+    "options": [
+      "Exact number",
+      "At least",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Regional Lymph Node Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "For specimens containing acellular mucin without identifiable tumor cells, efforts should be made to obtain additional tissue for thorough histologic examination to evaluate for cellularity.\n\nInvolvement of organs such as ovary, fallopian tube or spleen underlying involved peritoneum is still considered intraperitoneal metastasis. Involvement of lung or hepatic parenchyma distinct from peritoneal involvement is considered extraperitoneal distant metastasis.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Non-regional lymph node(s)",
+      "Intraperitoneal acellular mucin without identifiable tumor cells in the disseminated peritoneal mucinous deposits",
+      "Intraperitoneal metastasis only (including peritoneal mucinous deposits containing tumor cells)",
+      "Ovary",
+      "Fallopian tube",
+      "Spleen",
+      "Other intraperitoneal metastasis, including peritoneal mucinous deposits containing tumor cells (Please specify)",
+      "Liver",
+      "Lung",
+      "Site(s) other than peritoneum (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  }
+}

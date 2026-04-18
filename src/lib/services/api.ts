@@ -6,12 +6,16 @@ import type {
   ReportScaffold,
   SavePartRequest,
   SavePartResponse,
+  SaveCaseCommentRequest,
+  SaveCaseCommentResponse,
   FinalizeRequest,
   TransmissionRecord,
   LlmInstructionRequest,
   LlmInstructionResponse,
   ClinicalContextBundle,
   ClauseType,
+  MnemonicHit,
+  MnemonicSearchResponse,
 } from '$lib/types';
 import type { ReportTemplate } from '../../mocks/fixtures/templates';
 import type { UserPreferences } from '$lib/stores/preferences.svelte';
@@ -19,6 +23,7 @@ import type { UserPreferences } from '$lib/stores/preferences.svelte';
 export interface ApiClient {
   fetchScaffold(caseId: string): Promise<ReportScaffold>;
   savePart(caseId: string, partId: string, body: SavePartRequest): Promise<SavePartResponse>;
+  saveCaseComment(caseId: string, body: SaveCaseCommentRequest): Promise<SaveCaseCommentResponse>;
   updateAuthoredLabel(caseId: string, partId: string, authoredLabel: string): Promise<void>;
   finalize(caseId: string, body: FinalizeRequest): Promise<TransmissionRecord>;
   getTransmission(caseId: string): Promise<TransmissionRecord>;
@@ -27,9 +32,24 @@ export interface ApiClient {
   fetchTemplate(specimenType: string): Promise<ReportTemplate>;
   fetchPreferences(): Promise<Partial<UserPreferences>>;
   savePreferences(prefs: Partial<UserPreferences>): Promise<void>;
+  searchMnemonics(query: string, texttype?: string, limit?: number): Promise<MnemonicSearchResponse>;
+  recordMnemonicUsage(mnemonicId: string): Promise<void>;
+  getTopMnemonics(limit?: number): Promise<MnemonicHit[]>;
   normalizeDictation(text: string, clauseType: ClauseType, specimenType: string | null): Promise<{ text: string; normalized: boolean }>;
   correctTranscription(text: string, specimenType: string | null): Promise<{ corrected: string; changes: Array<{ original: string; corrected: string; type: string; position: number }>; raw: string }>;
   interpretInstruction(instruction: string, caseContext: LlmInstructionRequest['caseContext'], conversationHistory?: LlmInstructionRequest['conversationHistory']): Promise<LlmInstructionResponse & { provider?: string }>;
+}
+
+/** Typed API error with HTTP status and optional response body. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly body?: Record<string, unknown>,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
 }
 
 export function createApiClient(apiBase: string, getJwt: () => string): ApiClient {
@@ -44,14 +64,13 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     });
 
     if (!res.ok) {
-      const error = new Error(`API ${method} ${path}: ${res.status}`);
-      (error as any).status = res.status;
+      let responseBody: Record<string, unknown> | undefined;
       try {
-        (error as any).body = await res.json();
+        responseBody = await res.json();
       } catch {
         // no JSON body
       }
-      throw error;
+      throw new ApiError(`API ${method} ${path}: ${res.status}`, res.status, responseBody);
     }
 
     return res.json() as Promise<T>;
@@ -63,6 +82,9 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     },
     savePart(caseId, partId, body) {
       return request<SavePartResponse>('PUT', `/api/report/${caseId}/parts/${partId}`, body);
+    },
+    saveCaseComment(caseId, body) {
+      return request<SaveCaseCommentResponse>('PUT', `/api/report/${caseId}/comment`, body);
     },
     async updateAuthoredLabel(caseId, partId, authoredLabel) {
       await request<unknown>('PATCH', `/api/report/${caseId}/parts/${partId}/header`, {
@@ -89,6 +111,17 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     },
     async savePreferences(prefs) {
       await request<unknown>('PUT', '/api/user/preferences', prefs);
+    },
+    searchMnemonics(query, texttype, limit = 20) {
+      const params = new URLSearchParams({ q: query, limit: String(limit) });
+      if (texttype) params.set('texttype', texttype);
+      return request<MnemonicSearchResponse>('GET', `/api/mnemonics/search?${params}`);
+    },
+    async recordMnemonicUsage(mnemonicId) {
+      await request<void>('POST', `/api/mnemonics/${mnemonicId}/use`);
+    },
+    getTopMnemonics(limit = 10) {
+      return request<MnemonicHit[]>('GET', `/api/mnemonics/top?limit=${limit}`);
     },
     normalizeDictation(text, clauseType, specimenType) {
       return request<{ text: string; normalized: boolean }>('POST', '/api/dictation/normalize', {

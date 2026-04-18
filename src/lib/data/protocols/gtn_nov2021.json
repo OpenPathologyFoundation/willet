@@ -1,0 +1,188 @@
+{
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Dilation and curettage",
+      "Total hysterectomy with bilateral salpingo-oophorectomy",
+      "Simple hysterectomy",
+      "Supracervical hysterectomy",
+      "Radical hysterectomy",
+      "Pelvic exenteration",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Hysterectomy Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Abdominal",
+      "Vaginal",
+      "Vaginal, laparoscopic-assisted",
+      "Laparoscopic",
+      "Laparoscopic, robotic-assisted",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "+Specimen Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intact",
+      "Opened",
+      "Morcellated",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Uterine corpus",
+      "Uterine cervix",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Hydatidiform mole, invasive",
+      "Gestational choriocarcinoma, NOS",
+      "Placental site trophoblastic tumor",
+      "Epithelioid trophoblastic tumor",
+      "Malignant trophoblastic tumor, type cannot be determined",
+      "Other histologic type not listed (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Other Tissue / Organ Involvement": {
+    "caption": "Any organ not selected is either not involved or was not submitted.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Specify individually",
+      "Ovary",
+      "Fallopian tube",
+      "Broad ligament",
+      "Vagina",
+      "Other organs / tissue (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Lymphovascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Equivocal (Explain)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for tumor",
+      "Not applicableOther (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Distance from Tumor to Closest Margin": {
+    "caption": "",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "At least",
+      "Less than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Closest Margin(s) to Tumor": {
+    "caption": "Specify closest margins",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Tumor": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Distant Site(s) Involved": {
+    "caption": "Select all that apply only if applicable.\n\nAny lymph node metastasis should be classified as metastatic (M1b) disease.",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Not applicable",
+      "Lung",
+      "Spleen",
+      "Kidney",
+      "Gastrointestinal tract",
+      "Liver",
+      "Brain",
+      "Lymph node(s) (Please specify)",
+      "Other (Please specify)",
+      "Cannot be determined"
+    ],
+    "additional caption": ""
+  },
+  "+Number of Distant Metastases": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "1 to 4",
+      "5 to 8",
+      "Greater than 8"
+    ],
+    "additional caption": ""
+  }
+}

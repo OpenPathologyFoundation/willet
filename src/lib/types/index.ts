@@ -151,6 +151,7 @@ export interface ReportScaffold {
   pathologists: PathologistAssignment[];
   reportState: ReportState;
   transmission: TransmissionRecord | null;
+  caseComment?: string | null;
 }
 
 export interface TransmissionRecord {
@@ -172,6 +173,14 @@ export interface SavePartRequest {
 }
 
 export interface SavePartResponse {
+  savedAt: string;
+}
+
+export interface SaveCaseCommentRequest {
+  caseComment: string;
+}
+
+export interface SaveCaseCommentResponse {
   savedAt: string;
 }
 
@@ -302,4 +311,31 @@ export interface ClinicalContextBundle {
   surgicalNotes: ClinicalReport[];    // Operative notes, procedure notes
   radiologyReports: ClinicalReport[]; // Imaging studies
   priorPathology: PriorPathologyCase[];
+}
+
+// ---------------------------------------------------------------------------
+// Report Edit Mode (Quick Entry vs Structured)
+// ---------------------------------------------------------------------------
+
+export type ReportEditMode = 'structured' | 'quick-entry';
+
+// ---------------------------------------------------------------------------
+// Mnemonic Search (MeiliSearch-backed, SRS §3.27+)
+// ---------------------------------------------------------------------------
+
+export interface MnemonicHit {
+  mnemonicId: string;
+  abbr: string;
+  mnemonic: string;
+  description: string | null;
+  lookupDisplay: string | null;
+  commentText: string;            // RTF content
+  texttypeId: string;
+  userUseCount?: number;
+}
+
+export interface MnemonicSearchResponse {
+  hits: MnemonicHit[];
+  totalHits: number;
+  processingTimeMs: number;
 }

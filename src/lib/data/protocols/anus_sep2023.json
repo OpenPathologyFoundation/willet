@@ -1,0 +1,237 @@
+{
+  "Specimen": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Anal canal",
+      "Anorectal junction",
+      "Rectum",
+      "Perianal skin",
+      "Other (Please specify)",
+      "Not specified (Others)"
+    ],
+    "additional caption": ""
+  },
+  "Procedure": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Excisional biopsy (polypectomy)",
+      "Local excision (transanal disk excision)",
+      "Other (Please specify)",
+      "Not specified"
+    ],
+    "additional caption": ""
+  },
+  "Specimen Integrity": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Intact",
+      "Fragmented",
+      "Other (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "+Number of Fragments": {
+    "caption": "",
+    "type": "dropdown-count",
+    "suffix": "fragments",
+    "options": [
+      "Exact number",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Site": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Anal canal",
+      "Perianal region",
+      "Anus, not otherwise specified",
+      "Other (Please specify)",
+      "Unknown (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "Histologic Type": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Squamous cell carcinoma",
+      "Verrucous squamous cell carcinoma",
+      "Adenocarcinoma",
+      "Large cell neuroendocrine carcinoma",
+      "Small cell neuroendocrine carcinoma",
+      "Mixed neuroendocrine-non-neuroendocrine neoplasm",
+      "Other histologic type not listed (Please specify)",
+      "Carcinoma, type cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\t+Histologic Type Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Histologic Grade": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "G1, well differentiated",
+      "G2, moderately differentiated",
+      "G3, poorly differentiated",
+      "G4, undifferentiated",
+      "Other (Please specify)",
+      "GX, cannot be assessed (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "Tumor Size": {
+    "caption": "Greatest dimension in Centimeters (cm)",
+    "type": "text",
+    "suffix": "Centimeters (cm)",
+    "options": [],
+    "additional caption": ""
+  },
+  "Tumor Extent": {
+    "caption": "",
+    "type": "multiselect",
+    "suffix": "",
+    "options": [
+      "Carcinoma in situ",
+      "Invades lamina propria",
+      "Invades muscularis mucosae",
+      "Invades submucosa",
+      "Invades sphincter muscle",
+      "Invades perianal skin",
+      "Cannot be determined (Explain)",
+      "No evidence of primary tumor"
+    ],
+    "additional caption": ""
+  },
+  "Treatment Effect": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "No known presurgical therapy",
+      "Present, with no viable cancer cells (complete response, score 0)",
+      "Present, with single cells or rare small groups of cancer cells (near complete response, score 1)",
+      "Present, with residual cancer showing evident tumor regression, but more than single cells or rare small groups of cancer cells (partial response, score 2)",
+      "Present (not otherwise specified)",
+      "Absent, with extensive residual cancer and no evident tumor regression (poor or no response, score 3)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Lymphatic and / or Vascular Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Perineural Invasion": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Not identified",
+      "Present",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "+Tumor Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  },
+  "Margin Status for Invasive Carcinoma": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for invasive carcinoma",
+      "Invasive carcinoma present at margin",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "\tDistance from Invasive Carcinoma to Closest Deep Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tDistance from Invasive Carcinoma to Closest Mucosal Margin": {
+    "caption": "Specify in Millimeters (mm)",
+    "type": "dropdown-distance",
+    "suffix": "Millimeters (mm)",
+    "options": [
+      "Specify exact distance",
+      "Greater than",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)"
+    ],
+    "additional caption": ""
+  },
+  "\tMargin(s) Involved by Invasive Carcinoma": {
+    "caption": "Include only if applicable i.e. Tumor seen at margin of resection",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "Deep",
+      "Mucosal",
+      "Other (Please specify)",
+      "Cannot be determined (Please specify)"
+    ],
+    "additional caption": ""
+  },
+  "Margin Status for High-Grade Dysplasia": {
+    "caption": "",
+    "type": "dropdown",
+    "suffix": "",
+    "options": [
+      "All margins negative for high-grade dysplasia",
+      "High-grade dysplasia present at mucosal margin (Specify location / clock position, if possible)",
+      "Other (Please specify)",
+      "Cannot be determined (Explain)",
+      "Not applicable"
+    ],
+    "additional caption": ""
+  },
+  "+Margin Comment": {
+    "caption": "",
+    "type": "text",
+    "suffix": "",
+    "options": [],
+    "additional caption": ""
+  }
+}
