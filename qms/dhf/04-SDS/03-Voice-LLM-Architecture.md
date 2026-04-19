@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-03 |
-| **Version** | 2.3 |
-| **Date** | April 18, 2026 |
+| **Version** | 2.3.1 |
+| **Date** | April 19, 2026 |
 | **Stage** | 3A (Voice), 3C (LLM Assist) |
 | **Status** | Active |
 
@@ -743,6 +743,18 @@ $effect(() => {
 - **Screen reader and assistive-technology shortcuts** may conflict with some `code` values. Institutions deploying WILLET with accessibility tooling should select hotkey codes from the dedicated function-key range (`F13`–`F24`) to minimize collisions.
 
 URS trace: UN-063 through UN-066. SRS trace: SRS-180 through SRS-184.
+
+### 14.4 Recording Duration Limit (Added v2.3.1)
+
+Single dictation sessions have a **maximum duration of 5 minutes** (SRS-281). The bound exists to prevent runaway sessions from consuming STT quotas and memory; it is not a clinical constraint on dictation content. Pathologists who need continued dictation can immediately begin a new recording.
+
+- At 4:30 (30 seconds remaining): the `DictationIndicator` surfaces a visible warning — countdown timer becomes yellow and shows remaining seconds.
+- At 5:00: recording auto-stops. Audio captured so far is submitted through the active Layer 0/1 pipeline. The indicator clears to "Ready to record" state.
+- The user's focus is preserved across auto-stop so immediately clicking the mic or pressing the hotkey resumes recording into the same clause target.
+
+The 5-minute value is a constant in the voice-store configuration and is not user-tunable; raising it requires a design change.
+
+Closes URS §6 Q8.
 
 ---
 

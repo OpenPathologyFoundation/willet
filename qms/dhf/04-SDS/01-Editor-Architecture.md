@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-01 |
-| **Version** | 2.0 |
-| **Date** | March 13, 2026 |
+| **Version** | 2.1 |
+| **Date** | April 19, 2026 |
 | **Stage** | 1 — Editor Core |
 | **Status** | Active |
 
@@ -174,14 +174,15 @@ This array is the editor's working model. On every change:
 
 ## 5. Autosave
 
-### 5.1 Design Principles
+### 5.1 Design Principles (Revised v2.6 per URS Q6 resolution)
 
-- **No "Save" button.** Every edit is persisted automatically. The user never needs to explicitly save.
-- **No "unsaved changes" state** under normal operation. The save indicator shows `Saved` within 500ms of the last keystroke.
-- **Debounced, not throttled.** The save fires 300ms after the last keystroke. Rapid typing produces one save, not many.
+- **Autosave is default-on.** Every edit is persisted automatically within the debounce window. The save indicator shows `Saved` within 500ms of the last keystroke. This is the preferred workflow — pathologists never lose work due to forgetting to save.
+- **A manual Save button is additionally available.** The button is visible in both autosave-on and autosave-off modes. In autosave-on mode, clicking Save forces an immediate flush of any pending debounced save (useful before closing the tab or switching cases under time pressure). In autosave-off mode, the Save button is the authoritative save gesture.
+- **Autosave behavior is user-toggleable.** The `autosave: boolean` preference (SRS-280) defaults to `true`. Users who prefer explicit control can disable autosave; edits then accumulate as DIRTY until the user clicks Save.
+- **Debounced, not throttled.** When autosave fires, it does so 300ms after the last keystroke. Rapid typing produces one save, not many.
 - **Per-part saves.** Each part saves independently. Editing Part A does not trigger a save for Part B.
 
-URS trace: UN-028, UN-030.
+URS trace: UN-028, UN-030, UN-067 (preferences). Closes URS §6 Q6.
 
 ### 5.2 State Machine
 

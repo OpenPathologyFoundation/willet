@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SEC-003 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | April 19, 2026 |
-| **Status** | Initial authoring complete |
+| **Status** | Active |
 | **IEC 62304 Reference** | §5.2.2 — Software Requirements (security-related); §5.8.4 — Anomaly resolution |
 | **Related** | FDA Premarket Cybersecurity Guidance (2023); NIST SP 800-53 Rev. 5 (AC, AU, IA, SC families); OWASP Top 10; HIPAA Security Rule 45 CFR §164.308–164.312; ISO 14971 §5 (risk linkage to hazard analysis) |
 
@@ -315,7 +315,14 @@ Vendors crossing the B5 boundary must meet all of the following before onboardin
 6. **Data-breach notification** — vendor commits to notifying the institution of any security incident affecting its data within 24 hours of discovery.
 7. **Termination data-handling** — on contract termination, vendor certifies deletion of any persisted data (zero-retention contracts should make this a no-op, but the certification is required anyway).
 
-Vendors in scope at v1.0: placeholder until institutional procurement selection; the requirements apply whichever specific vendors are chosen for STT and LLM services.
+Vendors in scope as of v1.1 (per URS Q2 resolution, 2026-04-19):
+
+- **Azure AI Studio** — approved for STT (Whisper-compatible endpoints) and LLM services. Preferred when the deploying institution is Azure-centric.
+- **AWS Bedrock** — approved as an alternative when the institution has an established Bedrock agreement.
+
+Both vendors are vetted to meet the requirements above (BAA / SOC 2 / zero-retention / region-pinning / DPA / vulnerability disclosure / breach notification / termination data-handling). The specific model endpoints selected within each vendor platform are a per-institution configuration decision; the model must be one that the vendor certifies under the institution's BAA.
+
+Development environments: contributors may use any provider of their own choice (OpenAI API keys, self-hosted Whisper, local Ollama, etc.) because no PHI flows through dev environments. Production switches to the approved-vendor set at deployment time; the STT and LLM client code respects the configured endpoint without a code change.
 
 ---
 
@@ -346,3 +353,4 @@ All security events are PHI-adjacent: the event metadata itself does not contain
 |---|---|---|
 | — | — | Stub listing topic scope (JWT handling, CSRF, lock service, PHI exposure, RTF integrity, audit tamper resistance). |
 | 1.0 | 2026-04-19 | Initial complete authoring. Scope and system overview with six trust boundaries (§2). Four data classifications (PHI, clinical, configuration, audit, authentication) and four principal data flows. STRIDE-based threat methodology (§3). Ten threats enumerated covering JWT compromise, postMessage injection, CSRF, lock bypass, vendor PHI exposure, LLM prompt injection, RTF tampering, audit tampering, resource exhaustion, and session fixation — each with STRIDE category, pre-mitigation risk, controls, residual risk, and verification. Control-to-threat-to-hazard traceability matrix linking to `05b-Hazard-Analysis.md`. Secure development lifecycle (SBOM, vulnerability scanning, secrets, secure coding, review). Monitoring and incident response playbooks with Level-1/Level-2 event catalog. Vendor security requirements for B5 boundary (BAA, SOC 2, zero-retention, region pinning). References to FDA, NIST, OWASP, HIPAA, ISO 14971, IEC 81001-5-1. |
+| 1.1 | 2026-04-19 | Pinned the approved vendor set in §8 (Azure AI Studio, AWS Bedrock) per URS v2.5 Q2 resolution. Added dev-vs-production distinction: dev is unconstrained (no PHI flows); production uses the approved-vendor set via institutional BAA. |

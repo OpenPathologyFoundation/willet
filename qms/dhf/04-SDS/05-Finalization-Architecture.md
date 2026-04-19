@@ -3,8 +3,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-05 |
-| **Version** | 1.0 |
-| **Date** | March 11, 2026 |
+| **Version** | 1.1 |
+| **Date** | April 19, 2026 |
 | **Stage** | 1 (model), 4 (integration) |
 | **Status** | Active |
 
@@ -273,6 +273,46 @@ POST /api/report/{caseId}/retry
 ```
 
 This creates a new `report_transmissions` record with a new `idempotency_key`, referencing the original in `metadata.finalization.previous_attempts[]`. The RTF payload is re-read from the original record (it is immutable once written).
+
+### 6.4 Orchestration Pipeline (Added v1.1 per URS Q4, Q5 resolutions)
+
+WILLET does **not** communicate with the LIS directly. The end-to-end pipeline is orchestrator-mediated:
+
+```
+Pathologist clicks Finalize in WILLET
+       │
+       ▼
+POST /api/report/{caseId}/finalize → LORIS API (orchestrator-owned endpoint)
+       │
+       ▼
+Hermes interface engine (orchestrator-owned)
+       │  — picks up the finalized payload
+       │  — emits HL7 message to the LIS
+       ▼
+LIS receives, validates, eventually signs out
+       │
+       ▼
+LIS emits sign-out event
+       │
+       ▼
+Orchestrator receives the event, updates case state
+       │
+       ▼
+WILLET observes on next sync: case state transitions to
+"signed out in LIS" / archived
+```
+
+**Scope of WILLET's RTF**: WILLET emits only the **formatted diagnosis component** (parts, clauses, synoptic output, case comment). The LIS assembles the ultimate patient record by combining WILLET's diagnosis RTF with other components it owns (gross description, accession header, patient demographics). WILLET does NOT render accession headers, patient identifiers, or collection metadata in the RTF body.
+
+### 6.5 Dialogue System and Pre-Sign-Out Re-Edit
+
+Between WILLET's finalize action and the LIS's ultimate sign-out, the orchestrator runs a separate clerical-validation layer known as the **Dialogue System** — it checks consistency between the finalized report and ancillary documents (requisitions, operative notes, prior-case cross-references). Any issues it flags appear in the pathologist's work list with an indication that attention is needed.
+
+During this window the report is in a "finalized, awaiting LIS sign-out" state. The pathologist can:
+- Walk away and continue clinical work (the preferred model — clean separation of clinical and clerical work).
+- Return to the case if the work list shows an issue, re-open and edit, then **re-finalize**. The re-finalize produces a new RTF with a new idempotency key; the Hermes engine forwards it as an amendment-style update before the LIS signs out.
+
+Once the LIS signs out, the report is legally final and any further change requires the formal amendment workflow (out of scope for this SDS; see `01-URS.md §5.14`).
 
 ---
 
