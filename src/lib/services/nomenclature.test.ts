@@ -1,0 +1,437 @@
+/**
+ * Tests for NomenclatureStore (SDS 04-04 §2.3, §3.1–§3.2).
+ *
+ * Covers the three lifecycle transitions in Phase 2A scope:
+ *   - Staging entry creation, including designator de-duplication and
+ *     source transition after a second distinct user confirms.
+ *   - Confirmation append with invariants (lastUsedAt, count, distinct users).
+ *   - Promotion to institutional (eligibility gate, transaction semantics,
+ *     staging retirement).
+ */
+
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  NomenclatureStore,
+  type CreateStagingInput,
+  type NomenclatureEvent,
+} from './nomenclature';
+import type { PolicyConfig } from './source-policy';
+import { DEFAULT_POLICY } from './source-policy';
+
+/** Fixture builder — minimal valid input for createStagingEntry. */
+function makeInput(overrides: Partial<CreateStagingInput> = {}): CreateStagingInput {
+  return {
+    designator: 'Polyp, ascending colon',
+    standardized: 'Colon, ascending, polypectomy',
+    userId: 'user-alice',
+    caseId: 'case-001',
+    timestamp: '2026-04-19T10:00:00Z',
+    ...overrides,
+  };
+}
+
+describe('NomenclatureStore — createStagingEntry (SDS 04-04 §3.1)', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  it('creates a staging entry with the expected initial shape', () => {
+    const result = store.createStagingEntry(makeInput());
+    expect(result.deduplicated).toBe(false);
+    expect(result.entry.tier).toBe('staging');
+    expect(result.entry.source).toBe('ai_suggested');
+    expect(result.entry.designator).toBe('Polyp, ascending colon');
+    expect(result.entry.standardized).toBe('Colon, ascending, polypectomy');
+    expect(result.entry.retired).toBe(false);
+    expect(result.entry.quarantined).toBe(false);
+    expect(result.entry.confirmations).toHaveLength(1);
+    expect(result.entry.confirmations?.[0]).toEqual({
+      userId: 'user-alice',
+      caseId: 'case-001',
+      timestamp: '2026-04-19T10:00:00Z',
+    });
+    expect(result.entry.createdBy).toBe('user-alice');
+    expect(result.entry.createdAt).toBe('2026-04-19T10:00:00Z');
+    expect(result.entry.lastUsedAt).toBe('2026-04-19T10:00:00Z');
+  });
+
+  it('emits a staging_created event', () => {
+    const result = store.createStagingEntry(makeInput());
+    expect(result.event.kind).toBe('staging_created');
+    if (result.event.kind === 'staging_created') {
+      expect(result.event.userId).toBe('user-alice');
+      expect(result.event.caseId).toBe('case-001');
+      expect(result.event.entry.id).toBe(result.entry.id);
+    }
+  });
+
+  it('defaults components to all nulls when not supplied', () => {
+    const result = store.createStagingEntry(makeInput());
+    expect(result.entry.components).toEqual({
+      organ: null,
+      site: null,
+      laterality: null,
+      specimenType: null,
+    });
+  });
+
+  it('accepts partial components', () => {
+    const result = store.createStagingEntry(
+      makeInput({ components: { organ: 'colon', laterality: 'right' } }),
+    );
+    expect(result.entry.components).toEqual({
+      organ: 'colon',
+      site: null,
+      laterality: 'right',
+      specimenType: null,
+    });
+  });
+
+  it('registers the entry in the store', () => {
+    const result = store.createStagingEntry(makeInput());
+    expect(store.size).toBe(1);
+    expect(store.getById(result.entry.id)).toEqual(result.entry);
+    expect(store.getByTier('staging')).toEqual([result.entry]);
+  });
+
+  it('generates distinct ids for distinct designators', () => {
+    const a = store.createStagingEntry(makeInput({ designator: 'first' }));
+    const b = store.createStagingEntry(makeInput({ designator: 'second' }));
+    expect(a.entry.id).not.toBe(b.entry.id);
+    expect(store.size).toBe(2);
+  });
+});
+
+describe('NomenclatureStore — de-duplication (SDS 04-04 §3.1)', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  it('appends a confirmation to an existing entry with the same designator', () => {
+    const first = store.createStagingEntry(makeInput({ userId: 'user-alice' }));
+    const second = store.createStagingEntry(
+      makeInput({
+        userId: 'user-bob',
+        caseId: 'case-002',
+        timestamp: '2026-04-19T11:00:00Z',
+      }),
+    );
+    expect(second.deduplicated).toBe(true);
+    expect(second.entry.id).toBe(first.entry.id);
+    expect(second.entry.confirmations).toHaveLength(2);
+    expect(store.size).toBe(1);
+  });
+
+  it('de-duplicates case-insensitively', () => {
+    const first = store.createStagingEntry(
+      makeInput({ designator: 'Polyp, Ascending Colon' }),
+    );
+    const second = store.createStagingEntry(
+      makeInput({ designator: 'polyp, ASCENDING colon', userId: 'user-bob' }),
+    );
+    expect(second.deduplicated).toBe(true);
+    expect(second.entry.id).toBe(first.entry.id);
+  });
+
+  it('de-duplicates across whitespace variants', () => {
+    const first = store.createStagingEntry(makeInput({ designator: 'A  B  C' }));
+    const second = store.createStagingEntry(
+      makeInput({ designator: ' A B C ', userId: 'user-bob' }),
+    );
+    expect(second.deduplicated).toBe(true);
+    expect(second.entry.id).toBe(first.entry.id);
+  });
+
+  it('does not de-duplicate across substantively different designators', () => {
+    store.createStagingEntry(makeInput({ designator: 'colon, left' }));
+    const second = store.createStagingEntry(
+      makeInput({ designator: 'left colon', userId: 'user-bob' }),
+    );
+    expect(second.deduplicated).toBe(false);
+    expect(store.size).toBe(2);
+  });
+
+  it('de-duplication path emits a staging_confirmed event (not staging_created)', () => {
+    store.createStagingEntry(makeInput({ userId: 'user-alice' }));
+    const second = store.createStagingEntry(makeInput({ userId: 'user-bob' }));
+    expect(second.event.kind).toBe('staging_confirmed');
+  });
+
+  it('de-duplication path transitions source to staged when a distinct user confirms', () => {
+    // Integration guard: the entry returned from the de-dup path must reflect the
+    // same source transition as a direct appendConfirmation call. Catches any
+    // future divergence between the two code paths.
+    store.createStagingEntry(makeInput({ userId: 'user-alice' }));
+    const second = store.createStagingEntry(makeInput({ userId: 'user-bob' }));
+    expect(second.entry.source).toBe('staged');
+  });
+});
+
+describe('NomenclatureStore — appendConfirmation', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  it('increases confirmation count and updates lastUsedAt', () => {
+    const { entry } = store.createStagingEntry(makeInput({ timestamp: '2026-04-19T10:00:00Z' }));
+    const result = store.appendConfirmation(entry.id, {
+      userId: 'user-bob',
+      caseId: 'case-002',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    expect(result.entry.confirmations).toHaveLength(2);
+    expect(result.entry.lastUsedAt).toBe('2026-04-19T11:00:00Z');
+  });
+
+  it('emits an event with the confirmationIndex pointing to the appended position', () => {
+    const { entry } = store.createStagingEntry(makeInput());
+    const result = store.appendConfirmation(entry.id, {
+      userId: 'user-bob',
+      caseId: 'case-002',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    expect(result.event.kind).toBe('staging_confirmed');
+    if (result.event.kind === 'staging_confirmed') {
+      expect(result.event.confirmationIndex).toBe(1);
+      expect(result.event.userId).toBe('user-bob');
+      expect(result.event.caseId).toBe('case-002');
+    }
+  });
+
+  it('transitions the surface source from ai_suggested to staged when a second distinct user confirms', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'user-alice' }));
+    expect(entry.source).toBe('ai_suggested');
+    const result = store.appendConfirmation(entry.id, {
+      userId: 'user-bob',
+      caseId: 'case-002',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    expect(result.entry.source).toBe('staged');
+  });
+
+  it('does not transition the source when the same user confirms again', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'user-alice' }));
+    const result = store.appendConfirmation(entry.id, {
+      userId: 'user-alice',
+      caseId: 'case-002',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    expect(result.entry.source).toBe('ai_suggested');
+  });
+
+  it('throws for an unknown id', () => {
+    expect(() =>
+      store.appendConfirmation('nope', {
+        userId: 'u',
+        caseId: 'c',
+        timestamp: '2026-04-19T11:00:00Z',
+      }),
+    ).toThrow(/No entry with id/);
+  });
+
+  it('throws for an entry that is not staging', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    // Promote the entry to institutional via a manual eligibility bypass (simulate admin curation).
+    // Here we just append confirmations until eligible, then promote.
+    store.appendConfirmation(entry.id, {
+      userId: 'bob',
+      caseId: 'c2',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'carol',
+      caseId: 'c3',
+      timestamp: '2026-04-19T12:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'dave',
+      caseId: 'c4',
+      timestamp: '2026-04-19T13:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'erin',
+      caseId: 'c5',
+      timestamp: '2026-04-19T14:00:00Z',
+    });
+    const promoted = store.promoteIfEligible(entry.id, DEFAULT_POLICY, '2026-04-19T15:00:00Z');
+    expect(promoted).not.toBeNull();
+
+    expect(() =>
+      store.appendConfirmation(promoted!.institutional.id, {
+        userId: 'u',
+        caseId: 'c',
+        timestamp: '2026-04-19T16:00:00Z',
+      }),
+    ).toThrow(/not 'staging'/);
+  });
+});
+
+describe('NomenclatureStore — promoteIfEligible (SDS 04-04 §3.2)', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  /**
+   * Helper: add confirmations to reach the default threshold (5 confirmations
+   * from ≥3 distinct users) in a single call sequence.
+   */
+  function reachEligibility(entryId: string): void {
+    const base = '2026-04-19T11:00:00Z';
+    const users = ['user-bob', 'user-carol', 'user-dave', 'user-erin'];
+    // Entry starts with 1 confirmation from user-alice; add 4 more.
+    users.forEach((userId, i) => {
+      store.appendConfirmation(entryId, {
+        userId,
+        caseId: `case-${i + 2}`,
+        timestamp: new Date(new Date(base).getTime() + i * 3600_000).toISOString(),
+      });
+    });
+  }
+
+  it('returns null when the staging entry has insufficient confirmations', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    // Only 1 confirmation — below threshold of 5.
+    const result = store.promoteIfEligible(entry.id);
+    expect(result).toBeNull();
+  });
+
+  it('returns null when confirmations are from too few distinct users', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    // 5 total, but only 2 distinct users (alice, bob).
+    store.appendConfirmation(entry.id, {
+      userId: 'bob',
+      caseId: 'c2',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'bob',
+      caseId: 'c3',
+      timestamp: '2026-04-19T12:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'bob',
+      caseId: 'c4',
+      timestamp: '2026-04-19T13:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'alice',
+      caseId: 'c5',
+      timestamp: '2026-04-19T14:00:00Z',
+    });
+    const result = store.promoteIfEligible(entry.id);
+    expect(result).toBeNull();
+  });
+
+  it('promotes when confirmations and distinct users both meet the threshold', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    const result = store.promoteIfEligible(entry.id, DEFAULT_POLICY, '2026-04-19T15:00:00Z');
+    expect(result).not.toBeNull();
+    expect(result!.institutional.tier).toBe('institutional');
+    expect(result!.institutional.source).toBe('institutional');
+    expect(result!.institutional.designator).toBe('Polyp, ascending colon');
+    expect(result!.institutional.standardized).toBe('Colon, ascending, polypectomy');
+    expect(result!.institutional.promotedFrom).toBe('staging');
+    expect(result!.institutional.promotedAt).toBe('2026-04-19T15:00:00Z');
+  });
+
+  it('retires the staging entry with retirementReason: superseded', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    const result = store.promoteIfEligible(entry.id, DEFAULT_POLICY, '2026-04-19T15:00:00Z');
+    expect(result!.staging.retired).toBe(true);
+    expect(result!.staging.retirementReason).toBe('superseded');
+    expect(result!.staging.retiredAt).toBe('2026-04-19T15:00:00Z');
+  });
+
+  it('removes the retired staging entry from getByTier("staging")', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    store.promoteIfEligible(entry.id);
+    expect(store.getByTier('staging')).toHaveLength(0);
+    expect(store.getByTier('institutional')).toHaveLength(1);
+  });
+
+  it('emits a promoted event with confirmationsSnapshot', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    const result = store.promoteIfEligible(entry.id);
+    const event: NomenclatureEvent = result!.event;
+    expect(event.kind).toBe('promoted');
+    if (event.kind === 'promoted') {
+      expect(event.confirmationsSnapshot).toHaveLength(5);
+      expect(event.stagingEntry.retired).toBe(true);
+      expect(event.institutionalEntry.tier).toBe('institutional');
+    }
+  });
+
+  it('accepts confirmations beyond the eligibility threshold without auto-promoting', () => {
+    // Callers may choose not to promote immediately on every append — e.g., a
+    // batch promotion job. The entry must accept further confirmations cleanly
+    // after hitting the threshold, and the eventual promoteIfEligible must use
+    // the full confirmations snapshot (not just the first N that met threshold).
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id); // 5 total (1 create + 4 appends)
+    // 6th confirmation from a distinct user.
+    store.appendConfirmation(entry.id, {
+      userId: 'user-frank',
+      caseId: 'case-6',
+      timestamp: '2026-04-19T15:30:00Z',
+    });
+    const updated = store.getById(entry.id);
+    expect(updated?.tier).toBe('staging');
+    expect(updated?.retired).toBe(false);
+    expect(updated?.confirmations).toHaveLength(6);
+
+    const result = store.promoteIfEligible(entry.id);
+    expect(result).not.toBeNull();
+    if (result!.event.kind === 'promoted') {
+      expect(result!.event.confirmationsSnapshot).toHaveLength(6);
+    }
+  });
+
+  it('is idempotent: promoting an already-retired staging entry returns null', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    const first = store.promoteIfEligible(entry.id);
+    expect(first).not.toBeNull();
+    const second = store.promoteIfEligible(entry.id);
+    expect(second).toBeNull();
+  });
+
+  it('respects a custom policy config', () => {
+    const relaxedConfig: PolicyConfig = {
+      ...DEFAULT_POLICY,
+      stagingPromotionConfirmations: 3,
+      stagingPromotionDistinctPathologists: 3,
+    };
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    store.appendConfirmation(entry.id, {
+      userId: 'bob',
+      caseId: 'c2',
+      timestamp: '2026-04-19T11:00:00Z',
+    });
+    store.appendConfirmation(entry.id, {
+      userId: 'carol',
+      caseId: 'c3',
+      timestamp: '2026-04-19T12:00:00Z',
+    });
+    const result = store.promoteIfEligible(entry.id, relaxedConfig);
+    expect(result).not.toBeNull();
+  });
+
+  it('throws for an unknown id', () => {
+    expect(() => store.promoteIfEligible('nope')).toThrow(/No entry with id/);
+  });
+
+  it('throws for an entry that is not staging', () => {
+    const { entry } = store.createStagingEntry(makeInput({ userId: 'alice' }));
+    reachEligibility(entry.id);
+    const result = store.promoteIfEligible(entry.id)!;
+    expect(() => store.promoteIfEligible(result.institutional.id)).toThrow(/not 'staging'/);
+  });
+});
