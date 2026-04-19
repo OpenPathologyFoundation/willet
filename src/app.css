@@ -103,7 +103,10 @@
  * Scoped selectors into the RTF editor. In `src/app.css` all selectors are
  * global by default (no :global() wrapper needed — this isn't a Svelte
  * component style block). The document body (`.ink-content`) keeps its
- * white background deliberately; we only dark-theme the editor chrome.
+ * white background deliberately (legal-document convention), but we must
+ * also force its text color BACK to dark — otherwise it inherits the
+ * container's light text color (set below for toolbar readability) and
+ * paragraph text becomes white-on-white.
  */
 :root.dark .ink-editor {
   background: var(--clinical-surface);
@@ -115,6 +118,28 @@
   background: var(--clinical-surface);
   border-color: var(--clinical-border);
   color: var(--clinical-text);
+}
+
+/*
+ * Document body — keep white-on-dark-text legibility explicitly. The package
+ * sets `color: var(--text, #2c2520)` on `.ink-content`, which resolves to the
+ * light `--text` override above in dark mode (intended for the toolbar) and
+ * would otherwise render paragraph text invisible on the body's white bg.
+ */
+:root.dark .ink-content {
+  color: #2c2520;                    /* main paragraph text */
+}
+:root.dark .ink-content :is(h1, h2, h3, h4, h5, h6) {
+  color: #1a1714;                    /* headings: slightly deeper */
+}
+:root.dark .ink-content :is(p, li, td, th, blockquote, span) {
+  color: #2c2520;                    /* explicit belt-and-suspenders */
+}
+:root.dark .ink-content :is(em, strong, b, i, u) {
+  color: inherit;                    /* preserve emphasis color chain */
+}
+:root.dark .ink-content a {
+  color: #1d4ed8;                    /* readable link blue on white paper */
 }
 
 @theme {
