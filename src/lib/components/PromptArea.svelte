@@ -15,6 +15,7 @@
   import { transcribe } from '$lib/services/whisper';
   import { correctTranscription, type CorrectionResult } from '$lib/services/transcription-correction';
   import { normalizeFindingSingular } from '$lib/services/instruction-classifier';
+  import { decidePolicy } from '$lib/services/source-policy';
   import PipelineProgress from './PipelineProgress.svelte';
   import type { PipelineStage } from './PipelineProgress.svelte';
 
@@ -123,7 +124,9 @@
     }
   }
 
-  // Pending confirmation for medium-confidence actions (SDS 04-03 §5.1)
+  // Pending confirmation surfaced for any non-`auto_apply` source decision (SDS 04-03
+  // §5.1, SRS-270). Primarily used for `'ai_suggested'` LLM actions which, per v2.3,
+  // never auto-apply regardless of confidence — judgment must stay in the loop.
   let pendingConfirmation = $state<{
     instruction: string;
     response: LlmInstructionResponse;
@@ -166,12 +169,19 @@
     };
 
     try {
-      let response = await services.api.sendInstruction(caseId, request);
+      let response: LlmInstructionResponse = await services.api.sendInstruction(caseId, request);
+      // Tag the rules-engine response as `source: 'rule'` so downstream automation
+      // decisions flow through the source-based policy (SDS §5.1, SRS-270) rather
+      // than a numeric threshold. If the LLM path takes over below, the response
+      // gets retagged `'ai_suggested'`.
+      response = { ...response, source: 'rule' };
 
-      // Escalation: when the rules engine isn't highly confident, try the real LLM (SDS §4)
-      // The LLM returns LlmAction[] directly — same format as the rules engine.
-      // No conversion needed, just use the actions.
-      const shouldEscalate = response.confidence < 0.8 || response.actions.length === 0;
+      // Escalation: when the rules engine returns no actions, try the real LLM (SDS §4).
+      // Under v2.3, routing-to-LLM is a structural decision (did the deterministic
+      // path find anything?), not a numeric-confidence decision. Whatever the LLM
+      // returns will be marked `'ai_suggested'` and therefore require confirmation;
+      // the rules engine's own confidence number no longer gates escalation.
+      const shouldEscalate = response.actions.length === 0;
       updateStage('rules', 'done');
       if (shouldEscalate) {
         updateStage('llm', 'active');
@@ -203,6 +213,7 @@
               clarifications: ((llmResult as Record<string, unknown>).clarifications as typeof response.clarifications) ?? [],
               confidence: Math.max(llmConfidence ?? 0.85, 0.85),
               summary: (llmSummary ?? 'LLM-assisted') + ' (LLM)',
+              source: 'ai_suggested',
             };
           } else {
             mcpAvailable = true; // Server responded, but no actions
@@ -220,8 +231,24 @@
         promptStore.setClarification(response.clarifications[0]);
       }
 
-      if (response.actions.length > 0 && response.confidence >= 0.8) {
-        // High confidence — apply automatically (SDS §5.1)
+      // Source-based policy gates (SDS 04-03 §5.1, SRS-270 — replaces the v2.2 numeric
+      // 0.8/0.5 thresholds). The outcome depends on provenance: `'rule'` → auto-apply,
+      // `'ai_suggested'` → always require confirmation (System 2 in the loop), per
+      // the v2.3 design principle that probabilistic sources never act without judgment.
+      const decision = decidePolicy(response.source ?? 'rule');
+
+      if (response.actions.length === 0) {
+        // No actions — entry records the instruction but nothing applies.
+        const entry: InstructionEntry = {
+          id: crypto.randomUUID(),
+          timestamp: new Date().toISOString(),
+          source: 'typed',
+          instruction,
+          response,
+          applied: false,
+        };
+        promptStore.addEntry(entry);
+      } else if (decision === 'auto_apply') {
         const entry: InstructionEntry = {
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
@@ -232,8 +259,8 @@
         };
         promptStore.addEntry(entry);
         onaction(response.actions);
-      } else if (response.actions.length > 0 && response.confidence >= 0.5) {
-        // Medium confidence — present for confirmation (SDS §5.1)
+      } else {
+        // `'confirm' | 'always_confirm' | 'clarify'` all require explicit confirmation.
         const entry: InstructionEntry = {
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
@@ -244,17 +271,6 @@
         };
         promptStore.addEntry(entry);
         pendingConfirmation = { instruction, response };
-      } else {
-        // Low confidence — suggestion only
-        const entry: InstructionEntry = {
-          id: crypto.randomUUID(),
-          timestamp: new Date().toISOString(),
-          source: 'typed',
-          instruction,
-          response,
-          applied: false,
-        };
-        promptStore.addEntry(entry);
       }
 
       updateStage('apply', 'done');
