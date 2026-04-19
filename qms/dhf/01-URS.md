@@ -6,7 +6,7 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-URS-001 |
-| **Version** | 2.5 |
+| **Version** | 2.6 |
 | **Date** | April 19, 2026 |
 | **Applies to Spec** | Working Specification v1.2 + Addendum v1.2-A1 + Design Dialogue 2026-03-13 |
 | **Software Safety Class** | IEC 62304 Class B (per `05a-Risk-Plan.md §3`) |
@@ -1343,39 +1343,77 @@ These requirements express the user-facing principles of the deterministic-first
 
 ---
 
-#### UN-093 · Phase 1 (Added v2.3)
+#### UN-093 · Phase 1 (Superseded v2.6 — cross-field consistency validation delegated to the orchestrator's Dialogue module; see UN-096)
 
-**Requirement:** Before transitioning a report to FINALIZED, the system shall run an AI-driven consistency review of the entire report. The review shall surface internal inconsistencies (specimen vs. part-label organ mismatches, laterality inconsistencies across parts, clause-type vs. content mismatches, synoptic vs. diagnosis disagreements, required-laterality missing, unresolved staged items). If discrepancies are found, the Finalize action shall be blocked; each discrepancy shall be resolved by the pathologist via an explicit gesture (edit, confirm as correct, or acknowledge as intentional) before Finalize proceeds.
+**Status:** Superseded. Previously required an in-module AI-driven consistency
+review before Finalize. Removed on 2026-04-19 to avoid alert-fatigue and
+blocking-dialog friction. Cross-field clinical-consistency validation is now a
+concern of the Starling orchestration platform's **Dialogue** module (see
+SDS 04-05 §6.5); WILLET's Finalize runs only essential integrity checks
+(SRS-080) and hands off.
 
-**Rationale:** Deterministic rules operate at field or clause level; they cannot detect cross-field inconsistencies that arise when one field is correct in isolation but wrong in the context of another. The AI review pass is the cross-validation mechanism — the "System 2 reviews System 1's output" check — that catches these context mismatches before sign-out.
+**Historical requirement text** (retained for audit traceability; no longer in effect):
 
-**Source:** Architectural discussion 2026-04-18 extending the enforced-oversight principle to the sign-out boundary.
-
-**Acceptance:** Attempting to finalize a report with a specimen-vs-part-label organ mismatch presents the discrepancy for resolution and blocks finalization until resolved. A report with no discrepancies finalizes without additional interaction. Each resolution gesture is audit-logged with the discrepancy class, the resolution type, and any rationale text.
-
----
-
-#### UN-094 · Phase 1 (Added v2.3)
-
-**Requirement:** The Final Review Pass (UN-093) shall offer an **acknowledge-as-intentional** resolution for discrepancies the pathologist recognizes as deliberate clinical choices (e.g., truly bilateral specimens with asymmetric laterality; non-standard part labels for unusual specimens; deferred diagnoses pending ancillary results). Choosing this option shall require a free-text rationale of at least 10 characters. The audit trail shall record the discrepancy class, the rationale, and the user identity.
-
-**Rationale:** Forced conformance to the most common pattern is not the clinical goal; forced confirmation of intentional deviations is. Without an intentional-override path, the Final Review Pass would block legitimate edge cases — a usability failure that would either prevent correct reports or train pathologists to ignore the review. The explicit, rationale-logged escape preserves oversight while admitting clinical judgment.
-
-**Source:** Advisor critique during v2.3 revision: blocking-save would trap pathologists on legitimately unusual cases without an escape path.
-
-**Acceptance:** On any flagged discrepancy, an "Acknowledge as intentional" option is available alongside Edit and Confirm. Selecting it requires a rationale text input before proceeding. Rationales under the minimum length reject the submission with a clear message. The audit record is retrievable by case ID for legal and regulatory review.
+> Before transitioning a report to FINALIZED, the system shall run an AI-driven consistency review of the entire report. The review shall surface internal inconsistencies … If discrepancies are found, the Finalize action shall be blocked; each discrepancy shall be resolved by the pathologist via an explicit gesture before Finalize proceeds.
 
 ---
 
-#### UN-095 · Phase 1 (Added v2.3)
+#### UN-094 · Phase 1 (Superseded v2.6 — intentional-override gesture is Dialogue-scope)
 
-**Requirement:** When an AI service is temporarily unavailable (HTTP 5xx, timeout, network partition) during authoring, the Finalize action shall not be blocked by the service outage alone. The Final Review Pass shall degrade to a manual self-review dialog listing items that would have been AI-reviewed (staged items requiring confirmation, detectable deterministic mismatches), and the pathologist shall have an explicit "Proceed without AI review" gesture. The audit trail shall record that sign-out occurred without AI review, with timestamp and service error code. Institutional policy may tighten this (an option to hard-block Finalize when the review service is unavailable), but the default is permissive.
+**Status:** Superseded. Previously required an "acknowledge as intentional"
+gesture on flagged discrepancies within the in-module review. Since the
+review itself moved to Dialogue (see UN-093 supersession), the
+acknowledge-as-intentional escape is also Dialogue-scope. WILLET no longer
+blocks on cross-field discrepancies, so the escape is not needed within
+this module.
 
-**Rationale:** A finalized report is a legal document; it cannot be held hostage to vendor uptime. Permissive degradation preserves the clinical workflow under realistic failure modes while the audit trail preserves the information needed for post-hoc review. Institutions with stricter risk tolerance can opt into blocking behavior.
+**Historical requirement text** (retained for audit traceability):
 
-**Source:** Advisor critique during v2.3 revision: service unavailability must not create an unrecoverable state.
+> The Final Review Pass (UN-093) shall offer an acknowledge-as-intentional resolution … Choosing this option shall require a free-text rationale of at least 10 characters.
 
-**Acceptance:** With the AI service unreachable, the pathologist can still complete Finalize through the manual self-review path. The audit record shows `final_review: skipped_unavailable` with timestamp and reason. Toggling the institutional setting `REQUIRE_AI_REVIEW_AT_SIGNOUT` to `true` makes Finalize block when the review service is unavailable; this is an institution-level choice.
+---
+
+#### UN-095 · Phase 1 (Superseded v2.6 — permissive-degradation concern is Dialogue-scope)
+
+**Status:** Superseded. Previously specified permissive degradation of
+the Final Review Pass under AI-service unavailability. With the review
+moved to Dialogue, the availability-and-degradation concern moves with
+it. WILLET's Finalize no longer depends on any AI service.
+
+**Historical requirement text** (retained for audit traceability):
+
+> When an AI service is temporarily unavailable … the Finalize action shall not be blocked by the service outage alone. The Final Review Pass shall degrade to a manual self-review dialog …
+
+---
+
+#### UN-096 · Phase 1 (Added v2.6)
+
+**Requirement:** On Finalize, the system shall emit a `REPORT_FINALIZED`
+audit event and hand off the finalized payload to the orchestrator (via
+the LORIS API). The system shall not, at the time of Finalize or prior,
+perform AI-driven cross-field consistency validation of the report.
+Post-finalize validation (specimen/part mismatches, laterality checks,
+clause-type vs. content, synoptic vs. diagnosis, required-field checks,
+clerical reconciliation against requisitions/operative notes) is
+performed by the orchestrator's Dialogue module asynchronously and
+surfaced to the pathologist through the work list.
+
+**Rationale:** Blocking the pathologist's Finalize on AI-driven checks
+creates **alert-fatigue** and trains reflex-dismissal, undermining the
+tool's credibility. Validation belongs in a dedicated workflow context
+(the work list) where the pathologist has time to triage clerical
+flags calmly, separate from clinical authoring. This is also the
+natural separation-of-concerns: WILLET authors, Dialogue validates.
+
+**Source:** User-SME decision 2026-04-19 retiring the in-module Final
+Review Pass in favor of orchestrator-level asynchronous validation.
+
+**Acceptance:** Clicking Finalize on a report with any cross-field
+inconsistency proceeds without in-module blocking (assuming SRS-080
+integrity checks pass). The work list surfaces any Dialogue-flagged
+issues; the pathologist can re-open the case and re-finalize. The audit
+trail contains `REPORT_FINALIZED`; Dialogue emits its own audit events in
+the orchestrator scope.
 
 ---
 
@@ -1423,6 +1461,7 @@ The following traceability matrix will be completed as Design Inputs are derived
 | 2.3 | 2026-04-09 | DRAFT | Added UN-089 (case-level comment field) in new §5.26 Case-Level Comments. Addresses the need for a whole-report free-text annotation distinct from part-level COMMENT clauses. Total requirements: 89 (80 Phase 1, 9 Phase 2). |
 | 2.4 | 2026-04-18 | DRAFT | Revised UN-086 (context-aware transcription correction) for clarity: correction applies to both voice paths; prompt constraints prevent paraphrasing drift. **Revised UN-087 (clause-type-driven normalization)** to reflect v2.3 architectural reconciliation: normalization lives in the conversational prompt-area path, not the direct-dictation path; direct dictation is verbatim per UN-092. Added new §5.27 Dual-System Architecture and Oversight with six new user needs: UN-090 (deterministic + AI under enforced oversight), UN-091 (self-maintaining nomenclature dictionary with staging promotion, retirement, and override quarantine), UN-092 (clause-direct dictation verbatim contract), UN-093 (AI Final Review Pass before sign-out, blocking on discrepancy), UN-094 (acknowledge-as-intentional escape for clinically unusual cases), UN-095 (permissive degradation when AI review service unavailable). Total requirements: 95 (86 Phase 1, 9 Phase 2). Header version bumped from 2.0 → 2.4 (document-control fix). |
 | 2.5 | 2026-04-19 | Active | §6 Open Questions closed via pathologist-SME review. Q2 (Whisper/STT deployment) resolved to dev-open + production-HIPAA via Azure AI Studio or AWS Bedrock. Q4 (LIS sign-out notification) resolved to orchestrator-mediated push via LORIS API + Hermes interface engine. Q5 (RTF header ownership) resolved to diagnosis-only RTF (LIS assembles). Q6 (autosave conflict resolution) resolved to autosave-default-on with manual Save button + user-preference toggle. Q8 (voice recording timeout) resolved to 5-minute maximum with 30-second warning. Q10 (preferences storage) resolved to hybrid per-module model (local in dev, orchestrator-surfaced in production). Q11 (template authoring) resolved-deferred (JSON files now, future Clinical Administration module). Q3, Q9, Q12 remain open but are not blockers for first-working-version. Decision record in `.dev-notes/2026-04-19-urs-open-questions-resolved.md`. No requirement content changed; this is a §6 closure. Total requirements still 95. |
+| 2.6 | 2026-04-19 | Active | **Retired the in-module Final Review Pass.** UN-093, UN-094, UN-095 marked Superseded with historical text retained for audit. Added UN-096 specifying the delegation of cross-field clinical-consistency validation to the orchestrator's Dialogue module (SDS 04-05 §6.5). WILLET's Finalize runs only essential integrity checks (SRS-080) and hands off; post-finalize validation is asynchronous and surfaced via the pathologist's work list. Driven by pathologist-SME decision 2026-04-19 to eliminate alert-fatigue risk from blocking in-module reviews. Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. Active-requirement count: 93 (95 total, 3 superseded, 1 added). |
 
 ---
 

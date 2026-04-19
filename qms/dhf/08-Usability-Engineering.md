@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-UEF-008 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | April 19, 2026 |
-| **Status** | Initial complete authoring |
+| **Status** | Active |
 | **IEC 62366-1 Reference** | §5.2 (Use specification) · §5.3 (User interface characteristics) · §5.4 (Known use errors) · §5.5 (Hazard-related use scenarios) · §5.6 (Summative evaluation selection) · §5.7 (User interface specification) · §5.8 (Evaluation plan) · §5.9 (Formative) · §5.10 (Summative) · §6 (Post-market) |
 | **Related** | `01-URS.md` v2.4 · `02-SRS.md` v2.5 · `05b-Hazard-Analysis.md` v1.0 · `06-VVP.md` v1.0 · `07-Trace-Matrix.md` v1.0 |
 
@@ -16,6 +16,8 @@
 This file is WILLET's usability engineering file per IEC 62366-1:2015. It documents the intended users, use environments, and tasks; the user-interface characteristics that carry safety implications; the hazard-related use scenarios derived from them; and the plan for formative and summative usability evaluation.
 
 This file complements — it does not duplicate — the hazard analysis (`05b-Hazard-Analysis.md`). The hazard analysis enumerates hazards and controls; this file traces back from hazards to the user interactions that produce them and plans the evaluation that confirms the interface is designed to prevent them.
+
+> **v1.1 note (2026-04-19)**: The in-module Final Review Pass has been retired in favor of orchestrator-level Dialogue validation (see `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`). Scenarios **S-03**, **S-05**, and **S-08** are marked Superseded — they targeted the in-module review's failure modes, which no longer exist in WILLET. Any equivalent Dialogue-scope usability scenarios are tracked in the Starling orchestrator DHF. WILLET's summative evaluation set reduces to S-01, S-02, S-04, S-06, S-07.
 
 ---
 
@@ -131,17 +133,17 @@ Pathologist is authoring a case with 4 colon biopsy parts. Mid-dictation, a coll
 
 The LLM suggests "Colon, ascending, polypectomy" for a part whose LIS designator is "Tumor, transverse colon." The suggestion is clinically wrong but reads correctly. Pathologist is time-pressured and clicks Apply. **Targets: HZ-002.**
 
-### S-03: Final Review false positive on intentional asymmetric bilateral specimen
+### S-03: ~~Final Review false positive on intentional asymmetric bilateral specimen~~ **Superseded 2026-04-19**
 
-Case involves truly bilateral adrenal specimens with asymmetric findings. Final Review flags laterality inconsistency. Under time pressure, pathologist dismisses without reading. **Targets: HZ-006, HZ-002.**
+This scenario exercised the in-module Final Review Pass forced-conformance failure mode, which no longer exists in WILLET. Retired along with HZ-006. Any Dialogue-scope analog is tracked in the Starling orchestrator DHF.
 
 ### S-04: Dictation STT swap between sound-alike terms
 
 Pathologist dictates "well differentiated adenocarcinoma." STT returns "well differentiated adenoma" (different diagnosis). Pathologist accepts without read-back. **Targets: HZ-007.**
 
-### S-05: AI-unavailable at sign-out; permissive degradation
+### S-05: ~~AI-unavailable at sign-out; permissive degradation~~ **Superseded 2026-04-19**
 
-AI service is unavailable. Pathologist clicks Finalize. Manual self-review dialog surfaces. Pathologist proceeds without carefully reviewing the listed staged items. **Targets: HZ-005.**
+This scenario exercised the in-module Final Review Pass's degraded-mode branch, which no longer exists in WILLET. HZ-005 was retired. Any Dialogue-scope availability scenario is tracked in the Starling orchestrator DHF.
 
 ### S-06: Lock force-takeover loses attending's in-progress edits
 
@@ -151,11 +153,11 @@ Attending is editing Part B. Resident opens the case, clicks force-takeover with
 
 Over the course of several weeks, pathologist manually corrects "Colon, ascending, polypectomy" to "Ascending colon polyp" on every case. Override quarantine is eventually triggered, but the pathologist is unaware of the institutional impact. **Targets: HZ-004.**
 
-### S-08: Finalize attempted with missing required-laterality on a breast case
+### S-08: ~~Finalize attempted with missing required-laterality on a breast case~~ **Superseded 2026-04-19**
 
-Pathologist drafts a breast biopsy report, forgets to include laterality. Clicks Finalize. Final Review surfaces the missing-laterality discrepancy. **Targets: HZ-012, HZ-008.**
+This scenario exercised the in-module Final Review Pass required-laterality detector, which no longer exists in WILLET. The equivalent Dialogue-scope scenario is tracked in the Starling orchestrator DHF. WILLET's pre-finalize integrity check (SRS-080) remains as a distinct (coarser) gate and is tested separately.
 
-Scenarios S-01 through S-08 are the **selected** hazard-related scenarios for summative evaluation (§7.2). Additional scenarios may be added post-market per §8.
+Scenarios **S-01, S-02, S-04, S-06, S-07** are the **selected** hazard-related scenarios for WILLET's summative evaluation (§7.2). Post-finalize validation scenarios (previously S-03, S-05, S-08) are orchestrator-scope.
 
 ---
 
@@ -197,7 +199,7 @@ Protocol:
 - **Participants**: 8–12 pathologists representative of the intended-user set (mix of Attending, Fellow, Resident; mix of experience levels; mix of institutional settings).
 - **Environment**: near-production integrated mode (orchestrator + auth-system + mocked LIS) on realistic workstation hardware; microphone and dictation enabled.
 - **Case corpus**: 12 case fixtures covering routine biopsy, complex resection, multi-part cases, cases with clinically unusual features (for HZ-006), and synoptic-protocol cases.
-- **Scenario execution**: each participant runs S-01 through S-08 (§5) from this file, in counterbalanced order to control for learning effects.
+- **Scenario execution**: each participant runs the active scenario set **S-01, S-02, S-04, S-06, S-07** (§5) from this file, in counterbalanced order to control for learning effects. S-03, S-05, S-08 were retired on 2026-04-19 along with the in-module Final Review Pass they targeted.
 - **Observation**: two observers per session — one watching interaction, one timing. Video and audit log captured with participant consent.
 - **Debrief**: post-session semi-structured interview on difficulties encountered and perceived risk of the observed interaction.
 
@@ -255,3 +257,4 @@ For regulatory release:
 | Version | Date | Changes |
 |---|---|---|
 | 1.0 | 2026-04-19 | Initial complete authoring per IEC 62366-1:2015. Use specification (§2), UI characteristics related to safety mapped to SRS and hazards (§3), known use errors with mitigations (§4), eight selected hazard-related scenarios for summative evaluation (§5), UI specification references into SRS/SDS (§6), formative and summative evaluation plans (§7), acceptance criteria (§8), post-market usability monitoring (§7.3). |
+| 1.1 | 2026-04-19 | Scoped out the in-module Final Review Pass scenarios following its retirement (see Hazard Analysis v1.1 and `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`). S-03, S-05, S-08 marked Superseded — they targeted in-module review failure modes that no longer exist. Active summative scenario set reduces to S-01, S-02, S-04, S-06, S-07. Orchestrator-scope Dialogue validation scenarios are tracked in the Starling DHF, not here. |

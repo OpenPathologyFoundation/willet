@@ -100,8 +100,8 @@ The following artifacts constitute the DHF for WILLET.
 
 | ID | Artifact | Version | Purpose | Path | Status |
 |---|---|---|---|---|---|
-| 01 | URS | 2.5 (2026-04-19) | User Requirements Specification — 95 user needs (UN-001..UN-095). §6 open questions closed (7 resolved, 3 low-priority remaining) | qms/dhf/01-URS.md | Active |
-| 02 | SRS | 2.6 (2026-04-19) | System Requirements Specification — 126 testable "shall" statements (SRS-001..SRS-281 with reserved-ID gaps) including SRS-280 autosave-toggle preference and SRS-281 voice-recording 5-minute timeout | qms/dhf/02-SRS.md | Active |
+| 01 | URS | 2.6 (2026-04-19) | User Requirements Specification — 95 user needs (UN-001..UN-096). UN-093/094/095 Superseded (Final Review Pass retired); UN-096 added (Dialogue delegation) | qms/dhf/01-URS.md | Active |
+| 02 | SRS | 2.7 (2026-04-19) | System Requirements Specification — 127 testable "shall" statements (SRS-001..SRS-282 with reserved-ID gaps). SRS-275/276/277/279 Superseded (Final Review Pass retired); SRS-282 added (finalize delegation) | qms/dhf/02-SRS.md | Active |
 
 ### 5.3 ARCHITECTURE (The "How")
 
@@ -112,9 +112,9 @@ The following artifacts constitute the DHF for WILLET.
 | 04-00 | SDS Overview | 2.1 (2026-04-19) | High-level architecture, component boundaries, integration contract | qms/dhf/04-SDS/00-SDS-Overview.md | Active |
 | 04-01 | Editor Architecture | 2.1 (2026-04-19) | Editor core, scaffold, autosave default-on + manual Save button + preference toggle, clause editor, context dock, templates, layout, accessibility | qms/dhf/04-SDS/01-Editor-Architecture.md | Active |
 | 04-02 | Concurrency Architecture | 1.0 (2026-04-19) | Optimistic locking, lock service contract, multi-tab behavior, session timeout, save state machine references | qms/dhf/04-SDS/02-Concurrency-Architecture.md | Active |
-| 04-03 | Voice & LLM Architecture | 2.3.1 (2026-04-19) | Design principles, source-based automation, verbatim contract, Final Review Pass, PHI posture, 5-min voice recording cap | qms/dhf/04-SDS/03-Voice-LLM-Architecture.md | Active |
+| 04-03 | Voice & LLM Architecture | 2.4 (2026-04-19) | Design principles, source-based automation, verbatim contract, PHI posture, 5-min voice recording cap; §5.4 delegates post-finalize validation to Dialogue (orchestrator) | qms/dhf/04-SDS/03-Voice-LLM-Architecture.md | Active |
 | 04-04 | Nomenclature Architecture | 1.0 (2026-04-18) | Four-tier dictionary, lookup order, staging promotion, retirement, override quarantine | qms/dhf/04-SDS/04-Nomenclature-Architecture.md | Active |
-| 04-05 | Finalization & Transmission | 1.1 (2026-04-19) | Two-layer authoring model, RTF generation, transmission record, orchestration pipeline (LORIS API → Hermes → LIS), Dialogue System and pre-sign-out re-edit | qms/dhf/04-SDS/05-Finalization-Architecture.md | Active |
+| 04-05 | Finalization & Transmission | 1.2 (2026-04-19) | Two-layer authoring model, RTF generation, orchestration pipeline (LORIS API → Hermes → LIS), **Dialogue canonical description** (§6.5) as post-finalize validation layer | qms/dhf/04-SDS/05-Finalization-Architecture.md | Active |
 | 04-06 | Data Model | 2.0-era | Database schema, JSONB conventions, API shapes, audit events, DB roles | qms/dhf/04-SDS/06-Data-Model.md | Active |
 | 04-07 | Synoptic Architecture | — | CAP protocol forms, auto-population, provenance model, batch confirmation (content currently lives in SDS 04-05 §Synoptic and code in `src/lib/components/synoptic/`) | qms/dhf/04-SDS/07-Synoptic-Architecture.md | Deferred — in-code only |
 | 04-08 | Template Architecture | — | Three-tier resolution, specimen matching, template data model (content currently in SDS 04-01 §13 and fixtures) | qms/dhf/04-SDS/08-Template-Architecture.md | Deferred — in-code only |
@@ -124,21 +124,21 @@ The following artifacts constitute the DHF for WILLET.
 | ID | Artifact | Version | Purpose | Path | Status |
 |---|---|---|---|---|---|
 | 05a | Risk Plan | 1.0 (2026-04-19) | Risk management plan — severity/probability tables, acceptability matrix, Class B classification, ALARP criteria (ISO 14971 §4.4) | qms/dhf/05a-Risk-Plan.md | Active |
-| 05b | Hazard Analysis | 1.0 (2026-04-19) | 12 hazards (HZ-001..HZ-012) with risk controls, residual risk, verification | qms/dhf/05b-Hazard-Analysis.md | Active |
-| 06 | VVP | 1.0 (2026-04-19) | Verification and Validation Plan — 4 test levels, tooling (Vitest/Playwright/MSW), coverage thresholds, release criteria | qms/dhf/06-VVP.md | Active |
+| 05b | Hazard Analysis | 1.1 (2026-04-19) | 10 active hazards (HZ-001..004, HZ-007..012). HZ-005 and HZ-006 retired 2026-04-19 with Final Review Pass removal | qms/dhf/05b-Hazard-Analysis.md | Active |
+| 06 | VVP | 1.1 (2026-04-19) | Verification and Validation Plan — 4 test levels, tooling, coverage thresholds, release criteria; Final Review test references retired | qms/dhf/06-VVP.md | Active |
 
 ### 5.5 TRACEABILITY
 
 | ID | Artifact | Version | Purpose | Path | Status |
 |---|---|---|---|---|---|
-| 07 | Trace Matrix | 1.0 (2026-04-19) | Forward trace by functional area; reverse trace from hazards and threats; v2.3 delta; test coverage summary; gap catalog | qms/dhf/07-Trace-Matrix.md | Active |
+| 07 | Trace Matrix | 1.1 (2026-04-19) | Forward trace by functional area; reverse trace from hazards and threats; v2.3 delta refreshed post-Final-Review retirement; test coverage summary | qms/dhf/07-Trace-Matrix.md | Active |
 
 ### 5.6 USABILITY AND STAGE-5 VERIFICATION
 
 | ID | Artifact | Version | Purpose | Path | Status |
 |---|---|---|---|---|---|
-| 08 | Usability Engineering File | 1.0 (2026-04-19) | IEC 62366-1 use specification, known use errors, hazard-related scenarios, formative + summative evaluation plans | qms/dhf/08-Usability-Engineering.md | Active |
-| 09 | Stage-5 Test Protocols | 1.0 (2026-04-19) | Protocols for adversarial STT corpus, LLM prompt-injection and hallucination corpora, pen-test engagement, load/performance, accessibility, summative usability — with acceptance criteria and record outputs | qms/dhf/09-Stage5-Test-Protocols.md | Active |
+| 08 | Usability Engineering File | 1.1 (2026-04-19) | IEC 62366-1 use specification, 5 active hazard-related scenarios (S-01, S-02, S-04, S-06, S-07), formative + summative plans | qms/dhf/08-Usability-Engineering.md | Active |
+| 09 | Stage-5 Test Protocols | 1.1 (2026-04-19) | Seven protocols (STT corpus, LLM injection, hallucination, pen-test, load, a11y, summative usability); P3 and P7 refreshed post-Final-Review retirement | qms/dhf/09-Stage5-Test-Protocols.md | Active |
 
 ## 6. Generated Artifacts (The Robot Zone)
 
@@ -287,3 +287,4 @@ The following documents are the source specifications from which DHF artifacts a
 | v1.1 | 2026-04-19 | Regulated DHF catch-up after the v2.3 architecture cascade. Artifact status table (§5) refreshed to reflect actual document versions: URS v2.4 (95 UN), SRS v2.5 (~124 SRS), SDS 04-03 v2.3, SDS 04-04 v1.0, Cybersecurity v1.0, Risk Plan v1.0, Hazard Analysis v1.0, VVP v1.0, Trace Matrix v1.0. §9 replaced "Open items" with the current state summary and a known-gaps list scheduled for Stage 5 and beyond. SDS 04-07 (Synoptic) and 04-08 (Template) reclassified from "Planned" to "Deferred — in-code only" because the design content exists elsewhere (synoptic in code + 04-05; templates in 04-01 §13). IEC 62304 Class B classification formally called out. |
 | v1.2 | 2026-04-19 | Closed all DHF documentation stubs. Authored the seven SOPs (§7.1–§7.2) to v1.0 Active: SOP-DHF-001, SOP-DC, SOP-CC, SOP-SDLC, SOP-RISK, SOP-VULN, SOP-CAPA. Added two new DHF artifacts to §5.6 — Usability Engineering File (08-Usability-Engineering.md) per IEC 62366-1, and Stage-5 Test Protocols (09-Stage5-Test-Protocols.md) covering seven execution protocols with acceptance criteria and record outputs. Refreshed §9.3 to distinguish documentation completeness (now done) from execution activities (Stage 5 scheduled) and code work in progress. |
 | v1.3 | 2026-04-19 | URS §6 open-questions closure pass. URS v2.4 → v2.5 (Q2 Whisper/STT, Q4 LIS sign-out, Q5 RTF header ownership, Q6 autosave model, Q8 voice timeout, Q10 preferences storage, Q11 template authoring resolved; Q3, Q9, Q12 remain open as non-blockers). SRS v2.5 → v2.6 with SRS-280 autosave-toggle preference and SRS-281 voice recording 5-minute maximum. SDS 04-01 v2.0 → v2.1 with revised §5.1 autosave principles (default-on + manual button + preference toggle). SDS 04-03 v2.3 → v2.3.1 with new §14.4 recording duration limit. SDS 04-05 v1.0 → v1.1 with new §6.4 orchestration pipeline (WILLET → LORIS API → Hermes → LIS) and §6.5 Dialogue System / pre-sign-out re-edit workflow. Cybersecurity v1.0 → v1.1 with approved vendor set pinned (Azure AI Studio, AWS Bedrock) and dev-vs-production vendor policy. Decision log: `.dev-notes/2026-04-19-urs-open-questions-resolved.md`. |
+| v1.4 | 2026-04-19 | **Retired the in-module Final Review Pass; delegated cross-field clinical-consistency validation to the orchestrator's Dialogue module.** Code removals: `final-review.ts`, `FinalReviewDialog.svelte`, `final-review-pass.test.ts` (9 E2E tests) and the corresponding wiring in `ReportModule.svelte`. DHF: URS v2.5 → v2.6 (UN-093/094/095 Superseded, UN-096 added). SRS v2.6 → v2.7 (SRS-275/276/277/279 Superseded, SRS-282 added). Hazard Analysis v1.0 → v1.1 (HZ-005 and HZ-006 Retired; HZ-001/002/007/008/012 controls repointed to Dialogue). SDS 04-03 v2.3.1 → v2.4 (§5.4 rewritten as delegation note). SDS 04-05 v1.1 → v1.2 (§6.5 becomes canonical Dialogue description). Trace Matrix v1.0 → v1.1. VVP v1.0 → v1.1. UEF v1.0 → v1.1 (S-03, S-05, S-08 Superseded). Stage-5 Protocols v1.0 → v1.1 (P3 and P7 refreshed). Decision log: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. Tests: 525 unit pass (was 544; −19 from removed final-review.test.ts); 0 TS errors. |

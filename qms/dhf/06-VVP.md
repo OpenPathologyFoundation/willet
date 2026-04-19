@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-VVP-006 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | April 19, 2026 |
-| **Status** | Initial complete authoring |
+| **Status** | Active |
 | **IEC 62304 Reference** | §5.5 — Software integration and integration testing; §5.6 — Software system testing; §5.7 — Software release; §7.3 — Verification of risk control measures |
 | **IEC 62366-1 Reference** | §6.5 — Usability evaluation (summative) |
 | **Related** | `01-URS.md` v2.4 · `02-SRS.md` v2.5 · `05b-Hazard-Analysis.md` v1.0 · `03-Cybersecurity.md` v1.0 · `07-Trace-Matrix.md` v1.0 |
@@ -127,7 +127,7 @@ The following modules implement risk controls listed in `05b-Hazard-Analysis.md`
 
 - `src/lib/services/source-policy.ts` (RC-001a, RC-002a)
 - `src/lib/services/nomenclature.ts` (RC-004, RC-011)
-- `src/lib/services/final-review.ts` (RC-001b, RC-002c, RC-005a, RC-006, RC-008c, RC-012c)
+<!-- `src/lib/services/final-review.ts` removed 2026-04-19 with the in-module Final Review Pass retirement; controls RC-001b/002c/008c/012c repoint to orchestrator-scope Dialogue -->
 - `src/lib/services/transcription-correction.ts` (RC-007a)
 - `src/lib/services/clause-ordering.ts` (HZ-012 clause integrity)
 
@@ -179,7 +179,7 @@ Cybersecurity controls are verified per `03-Cybersecurity.md`. CI integration of
 
 ### 6.1 Usability (IEC 62366-1)
 
-Full specification lives in `08-Usability-Engineering.md`. Summative evaluation per IEC 62366-1 §5.10 covers the eight hazard-related scenarios enumerated there (S-01 through S-08), conducted with 8–12 pathologists across the intended-user set per the protocol in `09-Stage5-Test-Protocols.md §P7`.
+Full specification lives in `08-Usability-Engineering.md`. Summative evaluation per IEC 62366-1 §5.10 covers the active WILLET-scope hazard-related scenarios **S-01, S-02, S-04, S-06, S-07** (§5 of the UEF); S-03, S-05, S-08 were retired on 2026-04-19 with the in-module Final Review Pass. Conducted with 8–12 pathologists across the intended-user set per the protocol in `09-Stage5-Test-Protocols.md §P7`.
 
 Pass criterion (from `08-Usability-Engineering.md §7.2`): the participant completes each scenario without a critical task failure; any critical task failure is a defect requiring remediation before release.
 
@@ -205,7 +205,7 @@ Because the v2.3 cascade is the largest recent work, this plan carries an explic
 - **UN-090 / SRS-270 (source-based policy)**: verified by 34 unit tests in `source-policy.test.ts` and behavioral E2E via the source-tagged flow in `PromptArea.svelte` (no numeric threshold path remains). **Status: complete.**
 - **UN-091 / SRS-271..273 (self-maintaining dictionary)**: verified at the service level (29 tests) and store level (12 tests) and one full-loop E2E (`nomenclature-staging.test.ts`). **Status: partial.** Retirement batch job (SRS-272) and override-quarantine pipeline (SRS-273) are design-tested via `source-policy.shouldQuarantine` and `isPromotionEligible` but not yet wired into a runtime path. Tracked for Phase 2 continuation.
 - **UN-092 / SRS-187 revised, SRS-188 revised, SRS-278 (verbatim contract, two-level undo)**: verified by 7 E2E tests in `v23-verbatim-contract.test.ts` and the correction unit tests. **Status: complete.**
-- **UN-093 / SRS-275, SRS-279 (Final Review Pass)**: verified by 19 service-level tests and 9 E2E tests including audit-event assertions. **Status: complete** for deterministic detectors. LLM-backed detectors deferred to Stage 3C.
+- **UN-093 / SRS-275, SRS-279 (Final Review Pass)**: **Superseded 2026-04-19** — in-module Final Review Pass retired in favor of orchestrator-scope Dialogue validation (see `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`). **UN-096 / SRS-282** now specifies the delegation: WILLET's Finalize runs only essential integrity checks and hands off; Dialogue validates post-finalize.
 - **UN-094 / SRS-276 (acknowledge-as-intentional)**: verified by E2E tests on rationale length and audit-event emission. **Status: complete.**
 - **UN-095 / SRS-277 (permissive degradation)**: UI exists; cannot be E2E-tested until LLM-backed detectors are wired. Unit-level `degraded` flag handling is tested. **Status: partial.**
 
@@ -219,11 +219,11 @@ Full protocols live in `09-Stage5-Test-Protocols.md`. Summary:
 |---|---|---|---|
 | 8.1 | Adversarial STT corpus | P1 | ≥95% records match expected; zero regressions |
 | 8.2 | LLM prompt-injection corpus | P2 | 100% records in expected response class; zero unstructured exfiltration |
-| 8.3 | LLM hallucination corpus | P3 | Per-category hallucination rate ≤5%; Final Review catch ≥80% for expected-catch subset |
+| 8.3 | LLM hallucination corpus | P3 | Per-category hallucination rate ≤5%. (The former "Final Review catch ≥80%" criterion is retired; hallucination catch in the broader system is now a Dialogue-scope activity tracked in the Starling DHF.) |
 | 8.4 | External penetration test | P4 | Zero Critical, zero unresolved High |
 | 8.5 | Load and performance | P5 | SRS-150–154 NFR targets met at 2× peak; 8-hour soak stable |
 | 8.6 | Accessibility | P6 | Zero Critical/Serious automated findings; manual modality sessions pass every authoring task |
-| 8.7 | Summative usability | P7 + `08-Usability-Engineering.md §7.2` | Zero critical task failures across S-01..S-08 scenarios |
+| 8.7 | Summative usability | P7 + `08-Usability-Engineering.md §7.2` | Zero critical task failures across the active scenario set (S-01, S-02, S-04, S-06, S-07) |
 
 Stage-5 activities are scheduled per the ownership table in `09-Stage5-Test-Protocols.md §8`.
 
@@ -265,3 +265,4 @@ Releases that do not meet all criteria require an explicit waiver at the Quality
 |---|---|---|
 | — | — | Stub listing the intended scope: test levels, tooling, fixture strategy, adversarial testing, acceptance mapping, performance verification. |
 | 1.0 | 2026-04-19 | Initial complete authoring. V&V definitions and scope (§1). Strategy with four test levels, data strategy, reproducibility (§2). Tooling — Vitest, Playwright, MSW, CI pipeline (§3). Coverage thresholds with stricter targets for safety-relevant modules, flakiness policy, test execution telemetry (§4). Verification activities per DHF artifact (§5) anchored to `07-Trace-Matrix.md`. Validation via IEC 62366 usability engineering, clinical walkthroughs, site acceptance (§6). v2.3-specific verification status (§7). Adversarial, security, load, and accessibility (§8) with Stage-5 scoping. Release criteria (§9). Roles and responsibilities (§10). |
+| 1.1 | 2026-04-19 | Updated to reflect the retirement of the in-module Final Review Pass. §4.2 safety-relevant module list no longer names `final-review.ts` (file deleted). §6.1 summative scenario set reduced to S-01, S-02, S-04, S-06, S-07. §7 Final Review status updated to Superseded; UN-096/SRS-282 named as current delegation. §8.3 hallucination-catch criterion updated (WILLET scope only). §8.7 active scenario set updated. Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. |

@@ -1,10 +1,25 @@
 // Voice Store — focus tracking, recording state, dictation routing
-// SDS 04-03 §14, SRS-180 through SRS-184
+// SDS 04-03 §14, §14.4, SRS-180 through SRS-184, SRS-281
 //
 // Dictation target model: instead of scattered boolean flags, a single
 // typed target describes WHERE dictated text should be inserted.
 
 import type { ClauseType } from '$lib/types';
+
+/**
+ * Maximum single-dictation duration (SRS-281 / SDS 04-03 §14.4).
+ * Caller (PromptArea) auto-stops the MediaRecorder when this elapses so
+ * runaway sessions don't exhaust STT quotas or memory. 5 minutes covers
+ * any realistic single dictation; pathologists who need more can
+ * immediately begin another recording.
+ */
+export const MAX_RECORDING_MS = 5 * 60 * 1000;
+
+/**
+ * Time before the cap at which the warning state activates, giving the
+ * pathologist a chance to wrap up the current thought.
+ */
+export const RECORDING_WARNING_MS = 30 * 1000;
 
 // ---------------------------------------------------------------------------
 // Dictation Target — a discriminated union describing the active input target
@@ -51,6 +66,13 @@ class VoiceStore {
   // Recording state
   isRecording = $state(false);
   isTranscribing = $state(false);
+
+  /**
+   * True during the final 30 s of a recording (SRS-281). Consumers (e.g.,
+   * `DictationIndicator`) surface a visible warning so the pathologist knows
+   * auto-stop is imminent. Cleared on recording stop.
+   */
+  recordingWarning = $state(false);
 
   // Snapshot: locked-in target captured synchronously at mic press,
   // preserved across the entire recording + transcription duration.
@@ -168,6 +190,15 @@ class VoiceStore {
 
   setRecording(recording: boolean): void {
     this.isRecording = recording;
+    if (!recording) {
+      // Clear the SRS-281 warning state on any transition to not-recording
+      // (explicit stop, auto-stop, or error).
+      this.recordingWarning = false;
+    }
+  }
+
+  setRecordingWarning(active: boolean): void {
+    this.recordingWarning = active;
   }
 
   setTranscribing(transcribing: boolean): void {
@@ -184,6 +215,7 @@ class VoiceStore {
     this._snapshot = null;
     this.isRecording = false;
     this.isTranscribing = false;
+    this.recordingWarning = false;
   }
 
   private cancelPendingBlur(): void {

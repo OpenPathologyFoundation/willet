@@ -12,6 +12,13 @@ export interface UserPreferences {
   voiceTarget: 'clause' | 'prompt';       // default routing when no focus context
   clauseTypeSuggestion: boolean;          // enable/disable clause type suggestions (SRS-232)
   editMode: ReportEditMode;              // 'structured' or 'quick-entry'
+  /**
+   * Autosave behavior (SRS-280, SDS 04-01 §5.1 revised v2.6).
+   * `true` (default): edits auto-persist within the 300ms debounce window.
+   * `false`: edits accumulate as DIRTY until the user clicks the Save button.
+   * The Save button remains visible in both modes.
+   */
+  autosave: boolean;
 }
 
 const DEFAULTS: UserPreferences = {
@@ -23,6 +30,7 @@ const DEFAULTS: UserPreferences = {
   voiceTarget: 'clause',
   clauseTypeSuggestion: true,
   editMode: 'structured',
+  autosave: true,
 };
 
 const STORAGE_KEY = 'willet-preferences';
@@ -40,6 +48,7 @@ class PreferencesStore {
   get voiceTarget() { return this.preferences.voiceTarget; }
   get clauseTypeSuggestion() { return this.preferences.clauseTypeSuggestion; }
   get editMode() { return this.preferences.editMode; }
+  get autosave() { return this.preferences.autosave; }
 
   /**
    * Load preferences from API (with localStorage fallback).

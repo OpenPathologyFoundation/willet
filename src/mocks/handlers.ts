@@ -1,4 +1,4 @@
-import { http, HttpResponse, delay } from 'msw';
+import { http, HttpResponse, delay, passthrough } from 'msw';
 import { fixtureIndex } from './fixtures/cases';
 import { clinicalFixtureIndex } from './fixtures/clinical-context';
 import { findTemplate } from './fixtures/templates';
@@ -297,13 +297,13 @@ export const handlers = [
     const body = (await request.clone().json()) as LlmInstructionRequest;
     const match = body.instruction.match(DEV_HARNESS_STANDARDIZE_PATTERN);
     if (!match) {
-      return HttpResponse.passthrough();
+      return passthrough();
     }
     const partLabel = match[1].toUpperCase();
     const newLabel = match[2].trim();
     const targetPart = body.caseContext.parts.find((p) => p.partLabel === partLabel);
     if (!targetPart) {
-      return HttpResponse.passthrough();
+      return passthrough();
     }
     await delay(100);
     return HttpResponse.json({

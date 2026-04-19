@@ -12,12 +12,19 @@
   const pathologists = $derived(reportStore.pathologists);
   const reportState = $derived(reportStore.reportState);
   const editMode = $derived(preferencesStore.editMode);
+  const autosave = $derived(preferencesStore.autosave);
   const isReadOnly = $derived(reportStore.isReadOnly);
 
   function setEditMode(mode: ReportEditMode) {
     preferencesStore.update({ editMode: mode });
     // Persist preference (fire-and-forget)
     services.api.savePreferences({ editMode: mode }).catch(() => {});
+  }
+
+  function toggleAutosave() {
+    const next = !autosave;
+    preferencesStore.update({ autosave: next });
+    services.api.savePreferences({ autosave: next }).catch(() => {});
   }
 </script>
 
@@ -77,6 +84,23 @@
             Quick Entry
           </button>
         </div>
+      {/if}
+
+      {#if !isReadOnly}
+        <button
+          type="button"
+          class="rounded border px-2 py-0.5 text-[11px] font-medium transition-colors
+            {autosave
+              ? 'border-clinical-primary bg-clinical-primary/10 text-clinical-primary'
+              : 'border-clinical-border text-clinical-muted hover:text-clinical-text'}"
+          onclick={toggleAutosave}
+          title={autosave
+            ? 'Autosave is on — edits persist automatically. Click to turn off.'
+            : 'Autosave is off — you must click Save to persist edits. Click to turn on.'}
+          aria-pressed={autosave}
+        >
+          Autosave: {autosave ? 'on' : 'off'}
+        </button>
       {/if}
 
       <SaveIndicator />

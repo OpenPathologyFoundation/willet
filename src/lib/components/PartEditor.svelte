@@ -7,8 +7,10 @@
   import { getServices } from '$lib/services/context';
   import { voiceStore } from '$lib/stores/voice.svelte';
   import { moveClause, insertClauseAt, insertClauseAfter, deleteClause } from '$lib/services/clause-operations';
+  import { nomenclatureStore } from '$lib/stores/nomenclature.svelte';
   import ClauseEditor from './ClauseEditor.svelte';
   import TemplateBar from './TemplateBar.svelte';
+  import ProvenanceBadge from './ProvenanceBadge.svelte';
   import type { ReportTemplate } from '../../mocks/fixtures/templates';
 
   interface Props {
@@ -51,6 +53,13 @@
   // Derived header display (Addendum §8.1.2)
   const authoredLabel = $derived(part.metadata.authored_label);
   const displayLabel = $derived(authoredLabel ?? part.partDesignator ?? '');
+
+  // Source-based visual provenance for the authored label (SRS-274, SDS 04-04 §4.1).
+  // Looks up the current label against loaded staging + institutional entries;
+  // `undefined` when the label is LIS-native or user-authored (no badge rendered).
+  const labelProvenance = $derived(
+    displayLabel ? nomenclatureStore.findProvenance(displayLabel) : undefined,
+  );
   const showReceivedAs = $derived(
     authoredLabel != null &&
     authoredLabel !== '' &&
@@ -363,6 +372,12 @@
         />
       {:else}
         <span class="text-sm text-clinical-text-secondary">{displayLabel}</span>
+        {#if labelProvenance}
+          <ProvenanceBadge
+            source={labelProvenance.source}
+            confirmationCount={labelProvenance.confirmations?.length}
+          />
+        {/if}
         {#if !readOnly}
           <button
             type="button"

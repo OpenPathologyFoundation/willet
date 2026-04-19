@@ -10,6 +10,7 @@
   import type { CorrectionResult } from '$lib/services/transcription-correction';
   import { preferencesStore } from '$lib/stores/preferences.svelte';
   import { synopticStore } from '$lib/stores/synoptic.svelte';
+  import { nomenclatureStore } from '$lib/stores/nomenclature.svelte';
   import { applyFinalizationTemplate, hashRtf } from '$lib/rtf/template';
   import { findTemplate, getTemplateForPart, type ReportTemplate } from '../mocks/fixtures/templates';
   import { findProtocolForSpecimen, loadProtocol } from '$lib/data/protocols';
@@ -20,10 +21,7 @@
   import CaseCommentEditor from '$lib/components/CaseCommentEditor.svelte';
   import QuickEntryEditor from '$lib/components/QuickEntryEditor.svelte';
   import FinalizeDialog from '$lib/components/FinalizeDialog.svelte';
-  import FinalReviewDialog from '$lib/components/FinalReviewDialog.svelte';
-  import type { Resolution } from '$lib/components/FinalReviewDialog.svelte';
   import DictationIndicator from '$lib/components/DictationIndicator.svelte';
-  import { runFinalReview, type FinalReviewResult } from '$lib/services/final-review';
   import MnemonicPopover from '$lib/components/MnemonicPopover.svelte';
   import type { MnemonicHit } from '$lib/types';
   import { rtfToHtml } from 'svelte-rtf-editor';
@@ -36,17 +34,13 @@
 
   const isReadOnly = $derived(reportStore.isReadOnly);
 
-  // Finalization state (SDS 04-05 §3)
+  // Finalization state (SDS 04-05 §3). Cross-field clinical-consistency
+  // validation is orchestrator-delegated to the Dialogue module (SDS 04-05 §6.5);
+  // WILLET's finalize flow runs only essential integrity checks (SRS-080)
+  // before opening the confirm dialog — no in-module AI review.
   let showFinalizeDialog = $state(false);
   let finalizeHtml = $state('');
   let finalizeError = $state<string | null>(null);
-
-  // Final Review Pass state (SDS 04-03 §5.4, SRS-275 – SRS-279).
-  // `pendingFinalizeHtml` buffers the formatted RTF while the review dialog is open so
-  // that resolving all discrepancies can proceed straight to the existing FinalizeDialog.
-  let showFinalReviewDialog = $state(false);
-  let finalReviewResult = $state<FinalReviewResult | null>(null);
-  let pendingFinalizeHtml = $state('');
 
   // Synoptic protocol state
   let hasSynoptic = $state(false);
@@ -324,96 +318,14 @@
       return;
     }
 
-    const html = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
-
-    // Final Review Pass (SDS 04-03 §5.4, SRS-275). Run before presenting the formatted
-    // RTF so the pathologist resolves any cross-field inconsistencies before finalization.
-    // `llmAvailable` is determined by the mcp-status probe in PromptArea; for now we treat
-    // it as available-by-default and let SRS-277 degradation kick in if the §4 LLM-backed
-    // detectors are wired later and their service call fails.
-    const review = runFinalReview({
-      specimenType: reportStore.caseData?.specimenType ?? null,
-      parts: reportStore.parts,
-    });
-
-    if (review.discrepancies.length === 0 && !review.degraded) {
-      // Clean report — proceed directly to the existing finalize dialog (no change from prior behavior).
-      finalizeHtml = html;
-      showFinalizeDialog = true;
-      return;
-    }
-
-    // Surface the review dialog. Hold the formatted HTML so we can proceed without
-    // re-running the template assembly once all discrepancies are resolved.
-    pendingFinalizeHtml = html;
-    finalReviewResult = review;
-    showFinalReviewDialog = true;
-  }
-
-  // Final Review resolution handlers (SRS-279, SRS-276, SRS-277).
-  // Each resolution emits a REPORT_SAVED audit event with action=FINAL_REVIEW_DISCREPANCY_RESOLVED
-  // so downstream audit consumers can reconstruct the resolution history per case.
-  function handleReviewResolve(r: Resolution) {
-    services.emitEvent({
-      type: 'REPORT_SAVED',
-      caseId,
-      timestamp: new Date().toISOString(),
-      payload: {
-        action: 'FINAL_REVIEW_DISCREPANCY_RESOLVED',
-        discrepancyClass: r.class,
-        discrepancyId: r.id,
-        partIds: r.partIds,
-        resolution: r.resolution,
-        // Rationale is only included when the pathologist chose acknowledge_as_intentional.
-        rationale: r.rationale,
-      },
-    });
-  }
-
-  function handleReviewProceed() {
-    showFinalReviewDialog = false;
-    finalReviewResult = null;
-    finalizeHtml = pendingFinalizeHtml;
-    pendingFinalizeHtml = '';
+    // Cross-field clinical-consistency validation is delegated to the
+    // Dialogue module in the orchestration platform (SDS 04-05 §6.5).
+    // WILLET's finalize flow runs only essential integrity checks
+    // (validateForFinalization above, per SRS-080), then opens the
+    // confirm dialog. Dialogue runs asynchronously post-finalize and
+    // surfaces any flags on the pathologist's work list.
+    finalizeHtml = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
     showFinalizeDialog = true;
-  }
-
-  function handleReviewEdit(discrepancyId: string, partIds: string[]) {
-    services.emitEvent({
-      type: 'REPORT_SAVED',
-      caseId,
-      timestamp: new Date().toISOString(),
-      payload: {
-        action: 'FINAL_REVIEW_EDIT_REQUESTED',
-        discrepancyId,
-        partIds,
-      },
-    });
-    // Close the review dialog so the pathologist can edit. The review re-runs automatically
-    // the next time they click Finalize (SRS-275).
-    showFinalReviewDialog = false;
-    finalReviewResult = null;
-    pendingFinalizeHtml = '';
-  }
-
-  function handleReviewCancel() {
-    showFinalReviewDialog = false;
-    finalReviewResult = null;
-    pendingFinalizeHtml = '';
-  }
-
-  function handleReviewProceedWithoutReview() {
-    // SRS-277: permissive degradation path. Audit the skipped review, then proceed.
-    services.emitEvent({
-      type: 'REPORT_SAVED',
-      caseId,
-      timestamp: new Date().toISOString(),
-      payload: {
-        action: 'FINAL_REVIEW_SKIPPED_UNAVAILABLE',
-        reason: 'ai_service_unavailable',
-      },
-    });
-    handleReviewProceed();
   }
 
   async function handleFinalizeConfirm(rtf: string) {
@@ -665,6 +577,11 @@
       const scaffold = await services.api.fetchScaffold(caseId);
       reportStore.loadFromScaffold(scaffold);
 
+      // Load nomenclature dictionary state so part labels can render with
+      // source-based visual provenance (SRS-274, SDS 04-04 §4.1). Fire-and-
+      // forget: badge rendering is best-effort; failure leaves badges absent.
+      nomenclatureStore.loadAll(services.api).catch(() => {});
+
       // Check template applicability after scaffold (SDS 04-01 §13.1)
       if (scaffold.reportState !== 'FINALIZED' && scaffold.case.status !== 'archived') {
         const allEmpty = scaffold.parts.every(p => !p.finalDiagnosis || p.finalDiagnosis.trim() === '');
@@ -859,21 +776,11 @@
     <!-- Dictation indicator overlay (SRS-184) -->
     <DictationIndicator />
 
-    <!-- Finalize dialog modal -->
-    <!-- Final Review Pass dialog (SDS 04-03 §5.4, SRS-275). Opens before FinalizeDialog
-         when discrepancies are detected or the review is degraded. Pathologist must
-         resolve each discrepancy (Edit / Confirm / Acknowledge) before Finalize proceeds. -->
-    {#if showFinalReviewDialog && finalReviewResult}
-      <FinalReviewDialog
-        result={finalReviewResult}
-        onresolve={handleReviewResolve}
-        onproceed={handleReviewProceed}
-        onedit={handleReviewEdit}
-        onproceedwithoutreview={handleReviewProceedWithoutReview}
-        oncancel={handleReviewCancel}
-      />
-    {/if}
-
+    <!-- Finalize dialog modal. Cross-field consistency validation is
+         orchestrator-delegated to the Dialogue module (SDS 04-05 §6.5) — there is
+         no in-module review blocking this dialog; the pathologist's clinical
+         judgment on finalize is authoritative here, and clerical flags are
+         surfaced on the work list post-finalize. -->
     {#if showFinalizeDialog}
       <FinalizeDialog
         mode="finalize"

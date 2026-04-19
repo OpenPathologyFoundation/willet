@@ -196,3 +196,41 @@ describe('voiceStore', () => {
     expect(voiceStore.dictationSnapshot).toBeNull();
   });
 });
+
+describe('voiceStore — recording duration cap (SRS-281)', () => {
+  beforeEach(() => {
+    voiceStore.reset();
+  });
+
+  it('exposes MAX_RECORDING_MS = 5 minutes and RECORDING_WARNING_MS = 30 s', async () => {
+    const { MAX_RECORDING_MS, RECORDING_WARNING_MS } = await import('./voice.svelte');
+    expect(MAX_RECORDING_MS).toBe(5 * 60 * 1000);
+    expect(RECORDING_WARNING_MS).toBe(30 * 1000);
+    expect(MAX_RECORDING_MS - RECORDING_WARNING_MS).toBeGreaterThan(0);
+  });
+
+  it('recordingWarning defaults to false', () => {
+    expect(voiceStore.recordingWarning).toBe(false);
+  });
+
+  it('setRecordingWarning toggles the flag', () => {
+    voiceStore.setRecordingWarning(true);
+    expect(voiceStore.recordingWarning).toBe(true);
+    voiceStore.setRecordingWarning(false);
+    expect(voiceStore.recordingWarning).toBe(false);
+  });
+
+  it('setRecording(false) clears the warning flag', () => {
+    voiceStore.setRecording(true);
+    voiceStore.setRecordingWarning(true);
+    expect(voiceStore.recordingWarning).toBe(true);
+    voiceStore.setRecording(false);
+    expect(voiceStore.recordingWarning).toBe(false);
+  });
+
+  it('reset() clears the warning flag', () => {
+    voiceStore.setRecordingWarning(true);
+    voiceStore.reset();
+    expect(voiceStore.recordingWarning).toBe(false);
+  });
+});

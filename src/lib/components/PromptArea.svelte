@@ -10,7 +10,14 @@
   } from '$lib/types';
   import { reportStore, parseClauses } from '$lib/stores/report.svelte';
   import { promptStore } from '$lib/stores/prompt.svelte';
-  import { voiceStore, type FocusedClause, type DictationTarget, type ClauseTarget } from '$lib/stores/voice.svelte';
+  import {
+    voiceStore,
+    MAX_RECORDING_MS,
+    RECORDING_WARNING_MS,
+    type FocusedClause,
+    type DictationTarget,
+    type ClauseTarget,
+  } from '$lib/stores/voice.svelte';
   import { getServices } from '$lib/services/context';
   import { transcribe } from '$lib/services/whisper';
   import { correctTranscription, type CorrectionResult } from '$lib/services/transcription-correction';
@@ -92,6 +99,10 @@
   let animationFrameId = 0;
   let audioLevels = $state<number[]>(new Array(5).fill(4));
   let voiceError = $state<string | null>(null);
+  // Recording duration cap (SRS-281). Auto-stop + warning are scheduled at
+  // recording start; timers are cleared on explicit stop and on auto-stop.
+  let recordingStopTimer: ReturnType<typeof setTimeout> | null = null;
+  let recordingWarningTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Track the element that had focus when recording started (for focus restoration)
   let preDictationFocusEl = $state<HTMLElement | null>(null);
@@ -191,9 +202,9 @@
             instruction, request.caseContext, promptStore.history,
           );
           // The LLM returns actions directly — use them if available
-          const llmActions = (llmResult as Record<string, unknown>).actions as LlmAction[] | undefined;
-          const llmConfidence = (llmResult as Record<string, unknown>).confidence as number | undefined;
-          const llmSummary = (llmResult as Record<string, unknown>).summary as string | undefined;
+          const llmActions = llmResult.actions as LlmAction[] | undefined;
+          const llmConfidence = llmResult.confidence as number | undefined;
+          const llmSummary = llmResult.summary as string | undefined;
 
           if (llmActions && llmActions.length > 0) {
             mcpAvailable = true;
@@ -211,7 +222,7 @@
             }
             response = {
               actions: llmActions,
-              clarifications: ((llmResult as Record<string, unknown>).clarifications as typeof response.clarifications) ?? [],
+              clarifications: llmResult.clarifications ?? [],
               confidence: Math.max(llmConfidence ?? 0.85, 0.85),
               summary: (llmSummary ?? 'LLM-assisted') + ' (LLM)',
               source: 'ai_suggested',
@@ -505,13 +516,35 @@
       isRecording = true;
       voiceStore.setRecording(true);
       updateVisualizer();
+
+      // SRS-281 recording duration cap: auto-stop at MAX_RECORDING_MS,
+      // surface warning at (MAX - WARNING_MS) so the user sees 30 s remaining.
+      clearRecordingTimers();
+      recordingWarningTimer = setTimeout(() => {
+        voiceStore.setRecordingWarning(true);
+      }, MAX_RECORDING_MS - RECORDING_WARNING_MS);
+      recordingStopTimer = setTimeout(() => {
+        stopRecording();
+      }, MAX_RECORDING_MS);
     } catch {
       voiceError = 'Microphone access denied';
     }
   }
 
+  function clearRecordingTimers() {
+    if (recordingStopTimer) {
+      clearTimeout(recordingStopTimer);
+      recordingStopTimer = null;
+    }
+    if (recordingWarningTimer) {
+      clearTimeout(recordingWarningTimer);
+      recordingWarningTimer = null;
+    }
+  }
+
   function stopRecording() {
     if (!isRecording || !mediaRecorder) return;
+    clearRecordingTimers();
     mediaRecorder.stop();
     isRecording = false;
     voiceStore.setRecording(false);

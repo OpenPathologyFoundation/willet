@@ -24,6 +24,11 @@ import type {
   PromotionResult,
 } from '$lib/services/nomenclature';
 
+/** Case- and whitespace-insensitive normalization (mirrors the server-side rule). */
+function normalize(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
 class NomenclatureSvelteStore {
   /** All non-retired staging entries as last known from the server. */
   staging = $state<NomenclatureEntry[]>([]);
@@ -106,9 +111,42 @@ class NomenclatureSvelteStore {
    * if no match (the caller would then create a new entry via `submitAcceptance`).
    */
   findStagingByDesignator(designator: string): NomenclatureEntry | undefined {
-    const normalized = designator.trim().toLowerCase().replace(/\s+/g, ' ');
-    return this.staging.find(
-      (e) => e.designator.trim().toLowerCase().replace(/\s+/g, ' ') === normalized,
+    const normalized = normalize(designator);
+    return this.staging.find((e) => normalize(e.designator) === normalized);
+  }
+
+  /**
+   * Look up a staging entry whose `standardized` output matches `text`. Used
+   * by UI components rendering a current authored_label to show provenance:
+   * the rendered text is the standardized output, so this reverse-lookup
+   * finds the entry that produced it. Case- and whitespace-insensitive.
+   * (SRS-274 visual provenance — SDS 04-04 §4.1.)
+   */
+  findStagingByStandardized(text: string): NomenclatureEntry | undefined {
+    const normalized = normalize(text);
+    return this.staging.find((e) => normalize(e.standardized) === normalized);
+  }
+
+  /**
+   * Look up an institutional entry whose `standardized` output matches
+   * `text`. Same reverse-lookup semantics as findStagingByStandardized.
+   */
+  findInstitutionalByStandardized(text: string): NomenclatureEntry | undefined {
+    const normalized = normalize(text);
+    return this.institutional.find((e) => normalize(e.standardized) === normalized);
+  }
+
+  /**
+   * Composite provenance lookup. Returns the entry whose standardized
+   * output matches `text`, walking the tiers in priority order per SDS
+   * 04-04 §2.2 (institutional before staging). Returns undefined when no
+   * entry matches — callers treat absence as "user-authored / LIS-native /
+   * no provenance to show."
+   */
+  findProvenance(text: string): NomenclatureEntry | undefined {
+    return (
+      this.findInstitutionalByStandardized(text)
+      ?? this.findStagingByStandardized(text)
     );
   }
 
