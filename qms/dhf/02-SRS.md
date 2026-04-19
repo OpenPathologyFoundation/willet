@@ -6,8 +6,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SRS-002 |
-| **Version** | 2.5 |
-| **Date** | April 18, 2026 |
+| **Version** | 2.6 |
+| **Date** | April 19, 2026 |
 | **Derived From** | URS v2.4 (WILLET-DHF-URS-001), Design Dialogue v2.0, v2.3 architecture cascade |
 | **Software Safety Class** | IEC 62304 Class B (per `05a-Risk-Plan.md §3`) |
 | **IEC 62304 Reference** | §5.2.2 — Software Requirements |
@@ -1001,6 +1001,18 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
+#### SRS-281 · Phase 1 (Added v2.6)
+
+**Voice recording shall have a maximum duration of 5 minutes per single dictation session. At 30 seconds remaining, the system shall surface a visible warning (countdown or color change on the recording indicator). At the 5-minute mark, recording shall auto-stop and the current transcript shall be submitted through the active Layer 0/1 pipeline. The user may immediately begin a new recording to continue. The timeout bounds memory use and STT quota consumption for runaway sessions; it is not a clinical constraint on dictation content.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-008 (voice dictation), resolves Open Question #8 |
+| SDS trace | 04-03 §14 (voice pipeline) |
+| Verification | Functional test: start recording → at 4:30 mark, warning visible → at 5:00 mark, recording stops and transcript submits. Functional test: immediately start another recording → new 5-minute window. Load/quota test: STT usage is bounded by the per-session cap. |
+
+---
+
 #### SRS-194 · Phase 1
 
 **When voice dictation begins, the system shall build a vocabulary prompt string from the case specimen type and pass it as the `prompt` parameter to the transcription API. The vocabulary shall be derived from an organ-specific terminology map (keyed by organ system extracted from the specimen type) merged with a general pathology vocabulary list. The combined prompt shall not exceed 800 characters. Organ-specific terms shall be prioritized over general terms when truncation is required.**
@@ -1084,6 +1096,18 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 | URS trace | UN-068 |
 | SDS trace | 04-01 §10 (to be updated) |
 | Verification | Functional test: each preference change → immediate visual/behavioral effect; no page reload required |
+
+---
+
+#### SRS-280 · Phase 1 (Added v2.6)
+
+**The system shall provide an `autosave: boolean` user preference, default `true`. When `autosave` is `true`, edits are saved continuously without an explicit user gesture (debounced per SDS 04-01 §5.2). When `autosave` is `false`, edits accumulate as DIRTY until the user clicks the manual Save button. The Save button shall be visible in both modes so that users who prefer explicit control retain that affordance. Preference changes shall take effect at the next save cycle without requiring module reload.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-067 (preferences), resolves Open Question #6 |
+| SDS trace | 04-00 §4.3 (save state machine), 04-01 §5.2 (autosave), 04-02 §6 (conflict UI — unchanged by toggle state) |
+| Verification | Functional test: toggle `autosave` off → edits remain DIRTY until Save click → click Save → persisted. Functional test: toggle `autosave` on → edits auto-persist within the debounce window. Integration test: conflict UI behavior is identical in both modes. |
 
 ---
 
@@ -1736,6 +1760,7 @@ Every URS user need traces to at least one SRS requirement:
 | 2.3 | 2026-03-14 | DRAFT | Added SRS-196 (keyboard shortcut Ctrl+Alt+Space for hands-free dictation toggle, foot pedal compatible). Updated Direct Dictation count to 13 (SRS-180–196). Updated UN-086 traceability. Total: 110 requirements (104 Phase 1, 6 Phase 2). |
 | 2.4 | 2026-04-09 | DRAFT | Added §3.27 Case-Level Comments (SRS-260–263). SRS-260: case-level comment UI input. SRS-261: persistence in cases.metadata.case_comment + autosave. SRS-262: finalization rendering as Comment section in RTF. SRS-263: audit trail for comment changes. Traceable to UN-089. Updated requirements summary table and traceability index. Total: 114 requirements (108 Phase 1, 6 Phase 2). |
 | 2.5 | 2026-04-18 | DRAFT | **Revised SRS-187** to reflect v2.3 architectural reconciliation: semantic normalization is an intrinsic operation of the §4 LLM interpreter in the conversational path, not a clause-direct pipeline stage. **Revised SRS-188** to correct undo-order specification: first Ctrl+Z reveals raw STT transcript (peeling back Layer 1 correction), second Ctrl+Z reverts entire dictation — aligned with SDS 04-03 §16.5 "peel back processing in reverse order of application." **Revised SRS-189** graceful-degradation behavior to reflect two-layer transcription pipeline and conversational-path disablement under LLM outage. **Added §3.28 Dual-System Architecture and Oversight** with ten new requirements: SRS-270 source-based automation policy, SRS-271 staging promotion ≥5 confirmations from ≥3 pathologists, SRS-272 12-month retirement, SRS-273 override quarantine at 3 overrides in 30 days, SRS-274 visual provenance display, SRS-275 Final Review Pass behavior, SRS-276 acknowledge-as-intentional audit requirement, SRS-277 graceful degradation of Final Review Pass, SRS-278 verbatim-contract enforcement on clause-direct path, SRS-279 audit logging of all three resolution gestures (edit/confirm/acknowledge). Traceable to UN-090–UN-095 (new URS entries). Header version bumped from 2.0 → 2.5 (document-control fix). Total: 124 requirements (118 Phase 1, 6 Phase 2). |
+| 2.6 | 2026-04-19 | Active | Added SRS-280 (autosave preference toggle) and SRS-281 (voice recording 5-minute maximum duration) per URS v2.5 §6 open-question resolutions (Q6 autosave, Q8 voice timeout). SRS-280 specifies the `autosave: boolean` preference with default `true`, co-existing with a manual Save button. SRS-281 specifies the 5-minute recording limit with a 30-second-remaining warning and auto-submit at cutoff. Revised SRS-187 trace-note (no content change) to acknowledge resolution Q6. Total: 126 requirements (120 Phase 1, 6 Phase 2). |
 
 ---
 
