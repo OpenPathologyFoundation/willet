@@ -1,4 +1,4 @@
-import { http, HttpResponse, delay, passthrough } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { fixtureIndex } from './fixtures/cases';
 import { clinicalFixtureIndex } from './fixtures/clinical-context';
 import { findTemplate } from './fixtures/templates';
@@ -291,36 +291,55 @@ export const handlers = [
   }),
 
   // NOTE: /api/interpret is normally passed through to the MCP server. The handler
-  // below only intercepts a specific dev-harness pattern that simulates an LLM
-  // producing a `set_authored_label` action, so the nomenclature staging lifecycle
-  // (SDS 04-04 §3.1) can be exercised in standalone mode without a running MCP.
-  // All other requests passthrough to let real MCP inference do its thing.
+  // below handles the dev-harness standardize pattern with a set_authored_label
+  // action, AND — for any other instruction — delegates to the rules-engine
+  // mock (mockInterpretInstruction). This keeps the "Ask AI" button and the
+  // `ai:` / `@ai` / `use ai` keyword prefixes functional in standalone mode
+  // without a running MCP. In production, both paths hit the real LLM; the
+  // dev-harness returns rules-engine-equivalent results tagged `ai_suggested`
+  // at the caller, which demonstrates the SDS §5.5 confirmation flow honestly.
+  //
+  // Real MCP is still reachable when running alongside the dev server — this
+  // handler returns a concrete response rather than passthrough so the LLM
+  // UI paths always produce visible results. A production deployment replaces
+  // the entire handler with a real-LLM endpoint.
   http.post('/api/interpret', async ({ request }) => {
     const body = (await request.clone().json()) as LlmInstructionRequest;
     const match = body.instruction.match(DEV_HARNESS_STANDARDIZE_PATTERN);
-    if (!match) {
-      return passthrough();
-    }
-    const partLabel = match[1].toUpperCase();
-    const newLabel = match[2].trim();
-    const targetPart = body.caseContext.parts.find((p) => p.partLabel === partLabel);
-    if (!targetPart) {
-      return passthrough();
-    }
-    await delay(100);
-    return HttpResponse.json({
-      actions: [
-        {
-          type: 'set_authored_label',
-          partLabel,
-          payload: { label: newLabel },
+
+    if (match) {
+      const partLabel = match[1].toUpperCase();
+      const newLabel = match[2].trim();
+      const targetPart = body.caseContext.parts.find((p) => p.partLabel === partLabel);
+      if (targetPart) {
+        await delay(100);
+        return HttpResponse.json({
+          actions: [
+            {
+              type: 'set_authored_label',
+              partLabel,
+              payload: { label: newLabel },
+              confidence: 0.85,
+            },
+          ],
+          clarifications: [],
           confidence: 0.85,
-        },
-      ],
-      clarifications: [],
-      confidence: 0.85,
-      summary: `Standardize Part ${partLabel} label to "${newLabel}"`,
-      provider: 'mock-dev-harness',
+          summary: `Standardize Part ${partLabel} label to "${newLabel}"`,
+          provider: 'mock-dev-harness',
+        });
+      }
+    }
+
+    // Fallback: delegate to the rules-engine mock so Ask-AI and keyword-prefix
+    // routes produce meaningful responses in the dev harness. PromptArea tags
+    // this response as `source: 'ai_suggested'`, which drives the v2.3
+    // confirmation flow regardless of the dev-harness source of the actions.
+    await delay(150);
+    const response = mockInterpretInstruction(body);
+    return HttpResponse.json({
+      ...response,
+      summary: `${response.summary} (dev-harness LLM)`,
+      provider: 'mock-dev-harness-fallback',
     });
   }),
 
