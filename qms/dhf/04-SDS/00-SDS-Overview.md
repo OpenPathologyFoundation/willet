@@ -378,8 +378,8 @@ willet/
 |---|---|---|---|
 | 04-01 | Editor Architecture | Scaffold rendering, autosave, session recovery, layout, context dock, templates, accessibility | 1 |
 | 04-02 | Concurrency Architecture | Lock service, takeover, timeout, multi-tab behavior | 2 |
-| 04-03 | Voice & LLM Architecture | Transcription pipeline, focus-based routing, direct dictation, LLM structuring, clause type classifier | 3A, 3C |
-| 04-04 | Nomenclature Architecture | Dictionary tiers, conflict detection, arbitration queue | 3B |
+| 04-03 | Voice & LLM Architecture | Design principles (deterministic-first precedence §1.5), transcription pipeline, focus-based routing, direct-dictation verbatim contract, LLM structuring, clause type classifier, source-based automation policy, Final Review Pass, PHI posture | 3A, 3C |
+| 04-04 | Nomenclature Architecture | Four-tier dictionary (seed/institutional/staging/personal), lookup order, lifecycle (staging promotion, retirement, override quarantine), UI affordances, admin operations, audit | 3B |
 | 04-05 | Finalization Architecture | Two-layer authoring model, RTF generation (svelte-rtf-editor), transmission record, HL7/FHIR handoff | 1 (model), 4 (integration) |
 | 04-06 | Data Model | Database schema, JSONB conventions, audit events, DB roles | 1 |
 | 04-07 | Synoptic Architecture | CAP protocol forms, auto-population, provenance model, batch confirmation | Phase 2 (planned) |
