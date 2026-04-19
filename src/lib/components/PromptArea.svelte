@@ -146,20 +146,50 @@
 
   // --- Text input ---
 
-  async function handleSubmit() {
-    const instruction = inputText.trim();
-    if (!instruction || promptStore.isProcessing) return;
+  /**
+   * Explicit LLM invocation — keyword prefix detection (Option C-lite).
+   * When an instruction begins with one of these markers, it routes directly
+   * to the §4 LLM interpreter, bypassing the rules engine. The response is
+   * tagged `source: 'ai_suggested'` per the v2.3 source-based policy and
+   * surfaces for confirmation. Long-term (production) this is replaced by a
+   * cheap-classifier-first intent router — see SDS 04-03 §5.
+   */
+  const FORCE_LLM_PREFIX_RE = /^\s*(?:@ai|ai|ask\s+ai|use\s+ai|use\s+llm)[:,\s]+(.+)$/i;
 
+  function stripForceLlmPrefix(instruction: string): string | null {
+    const m = instruction.match(FORCE_LLM_PREFIX_RE);
+    return m ? m[1].trim() : null;
+  }
+
+  async function handleSubmit() {
+    const raw = inputText.trim();
+    if (!raw || promptStore.isProcessing) return;
+    const forced = stripForceLlmPrefix(raw);
+    await runInstruction(forced ?? raw, forced !== null);
+  }
+
+  async function handleAskAi() {
+    const raw = inputText.trim();
+    if (!raw || promptStore.isProcessing) return;
+    // Ask-AI button deliberately forces LLM; keyword prefix (if present) is
+    // stripped because it would be redundant with the gesture.
+    const stripped = stripForceLlmPrefix(raw);
+    await runInstruction(stripped ?? raw, true);
+  }
+
+  async function runInstruction(instruction: string, forceLlm: boolean) {
     inputText = '';
     if (textareaEl) {
       textareaEl.style.height = 'auto';
     }
     promptStore.setProcessing();
 
-    // Initialize instruction pipeline progress
+    // Initialize instruction pipeline progress. When forcing LLM, the rules
+    // stage is skipped — mark it `done` with no fanfare and activate the LLM
+    // stage immediately.
     setPipeline([
-      { id: 'rules', label: 'Rules engine', icon: 'pencil', status: 'active' },
-      { id: 'llm', label: 'AI model', icon: 'brain', status: 'pending' },
+      { id: 'rules', label: 'Rules engine', icon: 'pencil', status: forceLlm ? 'done' : 'active' },
+      { id: 'llm', label: 'AI model', icon: 'brain', status: forceLlm ? 'active' : 'pending' },
       { id: 'apply', label: 'Applying', icon: 'check', status: 'pending' },
     ]);
 
@@ -181,19 +211,35 @@
     };
 
     try {
-      let response: LlmInstructionResponse = await services.api.sendInstruction(caseId, request);
-      // Tag the rules-engine response as `source: 'rule'` so downstream automation
-      // decisions flow through the source-based policy (SDS §5.1, SRS-270) rather
-      // than a numeric threshold. If the LLM path takes over below, the response
-      // gets retagged `'ai_suggested'`.
-      response = { ...response, source: 'rule' };
+      // Rules-engine step: skipped entirely when the pathologist explicitly
+      // forced LLM routing (button or keyword prefix). Otherwise the rules
+      // engine runs first and may auto-escalate if it returns no actions.
+      let response: LlmInstructionResponse;
+      if (forceLlm) {
+        // Synthetic empty rules-engine response so the existing escalation
+        // branch below runs unchanged. Source is set to 'ai_suggested' by
+        // the LLM branch on success.
+        response = {
+          actions: [],
+          clarifications: [],
+          confidence: 0,
+          summary: 'LLM explicitly invoked by pathologist',
+          source: 'ai_suggested',
+        };
+      } else {
+        response = await services.api.sendInstruction(caseId, request);
+        // Tag the rules-engine response as `source: 'rule'` so downstream automation
+        // decisions flow through the source-based policy (SDS §5.1, SRS-270) rather
+        // than a numeric threshold. If the LLM path takes over below, the response
+        // gets retagged `'ai_suggested'`.
+        response = { ...response, source: 'rule' };
+      }
 
-      // Escalation: when the rules engine returns no actions, try the real LLM (SDS §4).
-      // Under v2.3, routing-to-LLM is a structural decision (did the deterministic
-      // path find anything?), not a numeric-confidence decision. Whatever the LLM
-      // returns will be marked `'ai_suggested'` and therefore require confirmation;
-      // the rules engine's own confidence number no longer gates escalation.
-      const shouldEscalate = response.actions.length === 0;
+      // Escalation: forced-LLM always; otherwise when the rules engine returns
+      // no actions. Under v2.3, routing-to-LLM is a structural decision, not a
+      // numeric-confidence decision. Whatever the LLM returns will be marked
+      // `'ai_suggested'` and therefore require confirmation.
+      const shouldEscalate = forceLlm || response.actions.length === 0;
       updateStage('rules', 'done');
       if (shouldEscalate) {
         updateStage('llm', 'active');
@@ -818,13 +864,35 @@
           {/if}
         </button>
 
+        <!-- Ask AI button — explicit LLM invocation per SDS 04-03 §5.
+             Bypasses the rules engine and routes the instruction directly
+             to the §4 LLM interpreter. The response is tagged
+             `source: 'ai_suggested'` and always requires confirmation. -->
+        <button
+          type="button"
+          class="shrink-0 rounded px-2 py-1 text-[11px] font-medium
+                 text-clinical-muted hover:text-clinical-primary hover:bg-clinical-primary/10
+                 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+          onclick={handleAskAi}
+          disabled={!inputText.trim() || promptStore.isProcessing}
+          title="Ask AI — route to the LLM instead of the rules engine (or prefix the instruction with 'ai:' / 'use ai' / '@ai')"
+          aria-label="Ask AI — route this instruction to the LLM"
+        >
+          <span class="inline-flex items-center gap-1">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.378-1.066 3.711a48.525 48.525 0 01-16.272 0c-1.716-.333-2.298-2.48-1.066-3.71L5 14.5" />
+            </svg>
+            AI
+          </span>
+        </button>
+
         <!-- Send button (inside field) -->
         <button
           type="button"
           class="shrink-0 p-1.5 text-clinical-primary hover:text-clinical-primary/80 transition-colors disabled:opacity-30"
           onclick={handleSubmit}
           disabled={!inputText.trim() || promptStore.isProcessing}
-          title="Send (Enter)"
+          title="Send (Enter) — uses the rules engine first, escalates to AI if needed"
         >
           {#if promptStore.isProcessing}
             <span class="block h-4 w-4 animate-spin rounded-full border-2 border-clinical-primary/30 border-t-clinical-primary"></span>

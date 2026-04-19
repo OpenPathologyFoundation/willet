@@ -195,7 +195,7 @@ function executeIntent(intent: InstructionIntent, req: LlmInstructionRequest): I
     case 'remove_clause':
       return executeRemoveClause(intent, parts);
     case 'populate_benign':
-      return executeBenign(intent, parts);
+      return executeBenign(intent, parts, req.caseContext.specimenType);
     case 'add_margin':
       return executeMargin(intent, parts);
     case 'add_finding_to_part':
@@ -680,9 +680,10 @@ function executeRemoveClause(
 function executeBenign(
   intent: InstructionIntent,
   parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
 ): IntentResult {
   const rawText = intent.params.rawText as string;
-  const diagnosis = extractBenignDiagnosis(rawText);
+  const diagnosis = extractBenignDiagnosis(rawText, specimenType);
   return populateAllPartsWithDiagnosis(parts, diagnosis);
 }
 
@@ -908,12 +909,72 @@ function handleMarginInstruction(
   };
 }
 
-function extractBenignDiagnosis(instruction: string): string {
+/**
+ * Organ keywords used to extract a clinical organ system from a free-text
+ * specimen type. Deliberately conservative — we only recognize common
+ * pathology organ systems, not every specimen variety. Used by the
+ * specimen-aware "benign" expansion and extendable to other bare-finding
+ * expansions (negative, reactive, etc.) as the rules engine grows.
+ */
+const ORGAN_KEYWORDS: Record<string, string[]> = {
+  prostate: ['prostate'],
+  breast: ['breast'],
+  colon: ['colon', 'cecum', 'cecal', 'rectum', 'rectal', 'sigmoid', 'hemicolectomy', 'colectomy'],
+  lung: ['lung', 'pulmonary', 'lobectomy'],
+  thyroid: ['thyroid'],
+  kidney: ['kidney', 'renal', 'nephrectomy'],
+  skin: ['skin', 'cutaneous', 'shave', 'punch'],
+  liver: ['liver', 'hepatic', 'hepatectomy'],
+  bladder: ['bladder', 'cystoscopy'],
+};
+
+/**
+ * Institutional/specimen-aware canonical form for a bare "benign" finding,
+ * keyed by organ system. Entries are deliberately concise and should be
+ * reviewed and adjusted per institution — pathologist/institution phrasing
+ * varies. A future iteration will move this into the personal/institutional
+ * nomenclature dictionary so it's editable without a code change (SDS 04-04
+ * §2.1). Until then, extending this table is a one-line PR.
+ */
+const BENIGN_BY_ORGAN: Record<string, string> = {
+  prostate: 'Benign prostatic tissue',
+  breast: 'Benign breast tissue',
+  colon: 'Colonic mucosa, benign',
+  lung: 'Benign pulmonary parenchyma',
+  thyroid: 'Benign thyroid parenchyma',
+  kidney: 'Benign renal parenchyma',
+  skin: 'Skin, benign',
+  liver: 'Benign hepatic tissue',
+  bladder: 'Bladder mucosa, benign',
+};
+
+function extractOrganSystem(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const [system, keywords] of Object.entries(ORGAN_KEYWORDS)) {
+    for (const kw of keywords) {
+      if (lower.includes(kw)) return system;
+    }
+  }
+  return null;
+}
+
+function extractBenignDiagnosis(instruction: string, specimenType: string | null): string {
+  // "benign <entity>" — pathologist explicitly named the tissue/finding.
+  // Respect their wording (capitalize the first letter, append ", benign").
   const match = instruction.match(/\bbenign\s+(\w[\w\s]*?)(?:\.|,|$)/i);
   if (match) {
     const entity = match[1].trim();
     return entity.charAt(0).toUpperCase() + entity.slice(1) + ', benign';
   }
+
+  // Bare "benign" — consult the specimen-aware expert-system table.
+  // Institutional preferred form wins over the generic "Benign" fallback.
+  const organ = extractOrganSystem(specimenType);
+  if (organ && BENIGN_BY_ORGAN[organ]) {
+    return BENIGN_BY_ORGAN[organ];
+  }
+
   return 'Benign';
 }
 

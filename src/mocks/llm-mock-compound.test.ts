@@ -240,13 +240,16 @@ describe('Benign pattern population', () => {
     expect(labels).toEqual(['A', 'B', 'C']);
   });
 
-  it('"benign" without qualifier produces generic "Benign"', () => {
+  it('"benign" without qualifier expands to the specimen-aware institutional form', () => {
+    // makeRequest here uses specimenType='Colon, right hemicolectomy', so the
+    // specimen-aware expansion table maps bare "benign" to the colon form
+    // rather than the generic "Benign" fallback. See SDS 04-03 §5.5.
     const parts = [makePart('A')];
     const result = mockInterpretInstruction(
       makeRequest('benign', parts),
     );
     const payload = result.actions[0].payload as { clauses: Clause[] };
-    expect(payload.clauses[0].text).toBe('Benign');
+    expect(payload.clauses[0].text).toBe('Colonic mucosa, benign');
   });
 
   it('"benign" is not triggered by "benign adenoma" (contains adenoma)', () => {

@@ -6,13 +6,14 @@ function makeRequest(
   instruction: string,
   parts: LlmInstructionRequest['caseContext']['parts'] = [],
   conversationHistory?: InstructionEntry[],
+  specimenType: string | null = 'Colon, right hemicolectomy',
 ): LlmInstructionRequest {
   return {
     instruction,
     caseContext: {
       caseId: 'test-case',
       parts,
-      specimenType: 'Colon, right hemicolectomy',
+      specimenType,
       clinicalHistory: null,
     },
     conversationHistory,
@@ -65,6 +66,61 @@ describe('mockInterpretInstruction', () => {
       );
       expect(result.actions.length).toBeGreaterThan(0);
       expect(result.confidence).toBeGreaterThanOrEqual(0.5);
+    });
+
+    it('bare "benign" on a prostate needle biopsy expands to institutional form', () => {
+      const result = mockInterpretInstruction(
+        makeRequest(
+          'all parts are benign',
+          [makePart('A'), makePart('B'), makePart('C')],
+          undefined,
+          'Prostate, needle biopsy',
+        ),
+      );
+      expect(result.actions.length).toBeGreaterThan(0);
+      const firstAction = result.actions[0];
+      const payload = firstAction.payload as { clauses: Clause[] };
+      const diagnosisClause = payload.clauses.find((c) => c.type === 'DIAGNOSIS');
+      expect(diagnosisClause?.text).toBe('Benign prostatic tissue');
+    });
+
+    it('bare "benign" on a breast specimen expands to the breast form', () => {
+      const result = mockInterpretInstruction(
+        makeRequest(
+          'benign',
+          [makePart('A')],
+          undefined,
+          'Breast, left, lumpectomy',
+        ),
+      );
+      const payload = result.actions[0].payload as { clauses: Clause[] };
+      expect(payload.clauses.find((c) => c.type === 'DIAGNOSIS')?.text).toBe(
+        'Benign breast tissue',
+      );
+    });
+
+    it('bare "benign" with no specimen context falls back to plain "Benign"', () => {
+      const result = mockInterpretInstruction(
+        makeRequest('benign', [makePart('A')], undefined, null),
+      );
+      const payload = result.actions[0].payload as { clauses: Clause[] };
+      expect(payload.clauses.find((c) => c.type === 'DIAGNOSIS')?.text).toBe('Benign');
+    });
+
+    it('"benign <entity>" retains the explicit form regardless of specimen', () => {
+      // Pathologist said "benign polyp" — respect their wording.
+      const result = mockInterpretInstruction(
+        makeRequest(
+          'benign polyp',
+          [makePart('A')],
+          undefined,
+          'Prostate, needle biopsy',
+        ),
+      );
+      const payload = result.actions[0].payload as { clauses: Clause[] };
+      expect(payload.clauses.find((c) => c.type === 'DIAGNOSIS')?.text).toBe(
+        'Polyp, benign',
+      );
     });
 
     it('handles part-specific instruction', () => {
