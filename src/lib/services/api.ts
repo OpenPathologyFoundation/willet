@@ -19,6 +19,14 @@ import type {
 } from '$lib/types';
 import type { ReportTemplate } from '../../mocks/fixtures/templates';
 import type { UserPreferences } from '$lib/stores/preferences.svelte';
+import type {
+  NomenclatureEntry,
+  CreateStagingInput,
+  CreateStagingResult,
+  ConfirmationResult,
+  PromotionResult,
+  Confirmation,
+} from './nomenclature';
 
 export interface ApiClient {
   fetchScaffold(caseId: string): Promise<ReportScaffold>;
@@ -38,6 +46,13 @@ export interface ApiClient {
   normalizeDictation(text: string, clauseType: ClauseType, specimenType: string | null): Promise<{ text: string; normalized: boolean }>;
   correctTranscription(text: string, specimenType: string | null): Promise<{ corrected: string; changes: Array<{ original: string; corrected: string; type: string; position: number }>; raw: string }>;
   interpretInstruction(instruction: string, caseContext: LlmInstructionRequest['caseContext'], conversationHistory?: LlmInstructionRequest['conversationHistory']): Promise<LlmInstructionResponse & { provider?: string }>;
+
+  // Nomenclature staging (SDS 04-04 §3.1–§3.2)
+  createNomenclatureStaging(input: CreateStagingInput): Promise<CreateStagingResult>;
+  confirmNomenclatureStaging(entryId: string, confirmation: Confirmation): Promise<ConfirmationResult>;
+  promoteNomenclatureStaging(entryId: string): Promise<PromotionResult | null>;
+  listNomenclatureStaging(): Promise<NomenclatureEntry[]>;
+  listNomenclatureInstitutional(): Promise<NomenclatureEntry[]>;
 }
 
 /** Typed API error with HTTP status and optional response body. */
@@ -139,6 +154,28 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
       return request<LlmInstructionResponse & { provider?: string }>(
         'POST', '/api/interpret', { instruction, caseContext, conversationHistory },
       );
+    },
+    createNomenclatureStaging(input) {
+      return request<CreateStagingResult>('POST', '/api/nomenclature/staging', input);
+    },
+    confirmNomenclatureStaging(entryId, confirmation) {
+      return request<ConfirmationResult>(
+        'POST',
+        `/api/nomenclature/staging/${encodeURIComponent(entryId)}/confirm`,
+        confirmation,
+      );
+    },
+    promoteNomenclatureStaging(entryId) {
+      return request<PromotionResult | null>(
+        'POST',
+        `/api/nomenclature/staging/${encodeURIComponent(entryId)}/promote`,
+      );
+    },
+    listNomenclatureStaging() {
+      return request<NomenclatureEntry[]>('GET', '/api/nomenclature/staging');
+    },
+    listNomenclatureInstitutional() {
+      return request<NomenclatureEntry[]>('GET', '/api/nomenclature/institutional');
     },
   };
 }

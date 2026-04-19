@@ -3,28 +3,17 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-RISK-005b |
-| **Version** | 0.2 DRAFT (initial entries only; full authoring pending Stage 5) |
-| **Date** | April 18, 2026 |
+| **Version** | 1.0 |
+| **Date** | April 19, 2026 |
 | **ISO 14971 Reference** | §5 — Risk Analysis, §6 — Risk Evaluation, §7 — Risk Control |
 
 ---
 
 ## 1. Scope
 
-This document contains the hazard analysis matrix — the living list of identified hazards, risk ratings, controls, and residual risk. Full Stage 5 authoring is pending; the entries below are the initial set captured during v2.3 architectural revisions so that the new behaviors in SDS 04-03 §1.5, §5.4, and SDS 04-04 have traceable risk controls.
+This document contains the hazard analysis matrix — the living list of identified hazards, risk ratings, controls, and residual risk. The v1.0 set below covers the twelve hazard categories identified for WILLET's v2.3 feature scope. The hazards span two dimensions: risks intrinsic to any clinical authoring system (voice misinterpretation, cross-part contamination, transmission failures, concurrent-edit corruption, terminology conflicts, incomplete finalization) and risks introduced specifically by WILLET's deterministic-first + probabilistic-assistance architecture (context-mismatched rules, LLM hallucination acceptance, PHI vendor leakage, rule drift, AI-unavailable degradation, forced-conformance trap on unusual cases).
 
-Key hazard categories for WILLET include:
-
-- Voice command misinterpretation leading to incorrect diagnostic content
-- Content assigned to wrong part (cross-part contamination)
-- LIS transmission failure or duplicate transmission
-- Lock bypass resulting in concurrent edits
-- Nomenclature conflict resulting in inconsistent terminology
-- Report finalized with incomplete or incorrect content
-- **Context-mismatched deterministic rule output (new, HZ-001)**
-- **PHI leakage through vendor API calls (new, HZ-003)**
-- **Undetected rule drift (new, HZ-004)**
-- **Forced-conformance trap on clinically unusual cases (new, HZ-006)**
+Residual risks are accepted only where the alternative is a worse outcome (e.g., blocking finalization under vendor outage creates worse downstream consequences than permitting a logged manual self-review). Controls are either design-level (policy, architecture, schema validation) or runtime (detection, confirmation gates, audit). All hazards trace to at least one URS/SRS and at least one verification activity.
 
 ## 2. Hazard Entries
 
@@ -106,6 +95,84 @@ Key hazard categories for WILLET include:
 
 ---
 
+### HZ-007 — Voice command misinterpretation produces wrong dictated content
+
+| Field | Value |
+|---|---|
+| **Hazard** | Speech-to-text produces a transcript that diverges from what the pathologist actually dictated (mishearing, domain vocabulary miss, accent handling). The incorrect content enters the report through the verbatim direct-dictation path (§2.2, SRS-187 revised) before the pathologist notices — or is normalized further by the conversational-prompt LLM path and accepted. |
+| **Harm** | Wrong clinical content (wrong diagnosis word, wrong measurement, wrong margin description) enters the report. Patient safety impact depends on the specific error; a "left" vs "right" flip or a diagnosis substitution is high-severity. |
+| **Pre-mitigation risk** | High — STT error is inherent to the technology, and pathology vocabulary is unusually dense with sound-alike terms (e.g., "ductal" vs "lobular"; "sigmoid" vs "signet"). |
+| **Risk Controls** | RC-007a: Transcription correction layer (Layer 1, SDS 04-03 §16) — deterministic confusion-pair table corrects known STT mishearings for pathology terminology (SRS-185). RC-007b: Specimen-type-keyed correction context — pathology-specific corrections are scoped to the clinical context (e.g., prostate-case corrections). RC-007c: Verbatim contract for direct dictation (SRS-187 revised) — dictated content is NOT silently rewritten by LLM normalization, so the pathologist can see what was transcribed and identify errors before they're hidden by a "polished" form. RC-007d: Two-level undo (SRS-188 revised) — first Ctrl+Z reveals the raw STT text (before Layer 1 correction) so the pathologist can diagnose whether a correction introduced the error; second Ctrl+Z reverts the entire dictation. RC-007e: Pathologist read-back and sign-out review (SRS-275 Final Review Pass) as a last-line catch for cross-field inconsistencies. |
+| **Residual risk** | Moderate — the controls reduce frequency and increase detectability but do not eliminate STT error. Accepted because dictation is a central authoring modality and alternative modalities (typed entry) are slower. The residual risk is actively monitored via override statistics on clauses produced from dictation. |
+| **Verification** | Unit tests for confusion-pair corrections (`src/lib/services/transcription-correction.test.ts`). E2E tests for the verbatim contract and two-level undo (`e2e/v23-verbatim-contract.test.ts`). Regression corpus of adversarial STT outputs to be maintained in Stage 5. |
+
+---
+
+### HZ-008 — Dictation content routed to wrong part (cross-part contamination)
+
+| Field | Value |
+|---|---|
+| **Hazard** | A multi-part case is being authored; the pathologist dictates intending Part A, but the dictation is routed to Part B (or to the prompt area, or to the case comment) because focus was on the wrong field. The content attaches to the wrong specimen. This is the HZ-001 organ-mismatch hazard's "content" sibling — wrong part instead of wrong organ. |
+| **Harm** | Clinical content attributed to the wrong specimen. In a multi-part case (e.g., multiple biopsy cores, multiple specimens in a resection), this can result in a diagnosis being recorded against an incorrect tissue, with potential downstream clinical-decision impact. |
+| **Pre-mitigation risk** | Moderate-to-high — occurs when the pathologist mentally switches parts faster than the focus-tracking can resolve, or when focus bounces between parts due to tab-key behavior. |
+| **Risk Controls** | RC-008a: Focus-based dictation target resolution with 150 ms debounce (SDS 04-03 §2.2) — the dictation target is the last-focused clause field, not a guessed part from content. RC-008b: Dictation indicator (SRS-185) — before recording starts, the UI displays the target ("dictating into Part A, DIAGNOSIS") so the pathologist sees where speech will land. RC-008c: Final Review Pass (SRS-275) — cross-part content vs. specimen organ is detected at sign-out as a specimen_part_organ_mismatch discrepancy. RC-008d: Part header editing has explicit affordances — changing a part label requires a gesture (edit button or dictation to a header draft), not an unintentional focus transition. |
+| **Residual risk** | Low-to-moderate — controls reduce the failure mode by making the target visible before speech is recorded. The Final Review Pass catches the organ-system-level version of the error at sign-out. Content-within-same-organ cross-part errors (e.g., two colon biopsies) may not be caught by cross-field detection and are residual. |
+| **Verification** | E2E: dictation indicator shows target label before recording (`e2e/v23-verbatim-contract.test.ts`). E2E: focus on clause → dictation lands there. Final Review Pass tests for specimen-part mismatch (`e2e/final-review-pass.test.ts`). |
+
+---
+
+### HZ-009 — LIS transmission failure or duplicate transmission
+
+| Field | Value |
+|---|---|
+| **Hazard** | After the pathologist finalizes, the HL7 transmission to the LIS either fails silently (no acknowledgment) or succeeds multiple times (the same report posted twice). The report state in WILLET and the report state in the LIS diverge. |
+| **Harm** | Divergent state between WILLET and LIS — clinicians downstream may see an old version, no version, or duplicate entries. Patient safety impact depends on duplicate/missing records. Audit trail integrity is compromised. |
+| **Pre-mitigation risk** | Moderate — network failures and HL7 listener bugs are common; duplicate sends happen under retry logic without idempotency guards. |
+| **Risk Controls** | RC-009a: Per-report idempotency key (SDS 04-01 §6) — every finalize attempt carries a stable key; the LIS listener (and the orchestrator forwarding layer) dedupe on key. RC-009b: Transmission status tracking (`TransmissionRecord` with `status: QUEUED | ACKED | NACKED`) — WILLET records and displays the outcome. RC-009c: Retry with exponential backoff and max-attempt cap — bounded retry, audit on each attempt and outcome. RC-009d: Pathologist-visible transmission state badge — an NACKed transmission is visibly broken so the pathologist knows to escalate. RC-009e: Audit trail of every transmission attempt with outcome. |
+| **Residual risk** | Low — controls address both failure modes (dedup prevents duplicates, status tracking surfaces failures). Residual risk is in prolonged LIS outage where the manual intervention path (re-finalize after LIS is back) must be taken. |
+| **Verification** | Integration test: transmit with pre-existing idempotency key → LIS returns ACK without duplicate. Integration test: LIS NACK → WILLET records NACK status and surfaces badge. Audit trail inspection for attempt counts. |
+
+---
+
+### HZ-010 — Lock bypass allows concurrent edits resulting in lost updates
+
+| Field | Value |
+|---|---|
+| **Hazard** | Two sessions open the same report simultaneously (e.g., pathologist opens on workstation A, then on workstation B, or pathologist and resident open the same case). Both make edits. The second save overwrites the first's changes without warning. |
+| **Harm** | Silent data loss — the pathologist who saved first believes their content is safe; the pathologist who saved second unknowingly clobbered it. Clinical content can be lost without either party noticing. |
+| **Pre-mitigation risk** | Moderate — workflow pattern is common (device switching, handover, residents assisting). |
+| **Risk Controls** | RC-010a: Optimistic locking with monotonic version number on each save request — the server accepts a save only when the client's base version matches the current server version (`SavePartRequest.baseVersion` / `SavePartResponse` conflict signal, SDS 04-01 §5.2). RC-010b: Conflict UI — when a save is rejected for version mismatch, the user sees the divergence and is offered a three-way merge or explicit "take theirs / take mine" resolution. RC-010c: Report-level finalization lock (SDS 04-03 §2.4) — once a report is FINALIZED, no edits are accepted from any session. RC-010d: Save state machine (IDLE → DIRTY → SAVING → SAVED / ERROR / DEGRADED, SDS 04-00 §4.3) — every save attempt is tracked and failures surface. |
+| **Residual risk** | Low — optimistic locking prevents silent overwrites; the conflict UI requires explicit resolution. Residual risk is in the conflict UI itself (pathologist may choose "take mine" under time pressure without reviewing). |
+| **Verification** | Unit tests for the save state machine transitions (`src/lib/stores/save.test.ts`). Integration test: simulate two clients saving with divergent baseVersions → second save returns conflict. E2E: conflict UI appears and forces resolution. |
+
+---
+
+### HZ-011 — Nomenclature conflict between dictionary tiers produces inconsistent standardization
+
+| Field | Value |
+|---|---|
+| **Hazard** | The same free-text designator resolves to different standardized outputs depending on which dictionary tier is consulted (e.g., the institutional entry says "Colon, ascending, polypectomy" but a personal shortcut says "Ascending colon polyp"; or two staging entries exist with the same designator but different confirmations counts because the de-duplication step missed a normalization variant). Reports produced in the same institution carry inconsistent terminology. |
+| **Harm** | Standardization degrades; downstream readers and aggregation queries (e.g., research cohorts, cancer registry submissions) see conceptually identical content under multiple surface forms. Not directly patient-harming but clinically important for data utility and institutional quality management. |
+| **Pre-mitigation risk** | Moderate — probability is meaningful because clinical language has many near-equivalent forms; de-duplication is best-effort. |
+| **Risk Controls** | RC-011a: Explicit lookup priority (SDS 04-04 §2.2) — personal > institutional > seed > staging > rule > LLM. The priority is deterministic; a personal override of an institutional standard is a documented design allowance, not a bug. RC-011b: Normalized-designator de-duplication at staging creation (SDS 04-04 §3.1) — case-insensitive, whitespace-collapsed match collapses typographic variants. RC-011c: Admin inspection (SDS 04-04 §5.2) — admins can browse tiers, identify duplicate/conflicting entries, and deprecate or merge. RC-011d: Promotion transaction retires the staging entry (SDS 04-04 §3.2) — once an institutional entry exists for a designator, the matching staging entry is retired, preventing a "two active entries" state. RC-011e: Quarterly QMS review (SDS 04-04 §3.5) — surfaces entries and supports institutional review. |
+| **Residual risk** | Low-to-moderate — the explicit priority prevents silent divergence on lookup, but conceptual duplicates (different designators resolving to the same thing via different normalization) can still proliferate. Accepted subject to admin review discipline. |
+| **Verification** | Unit tests for de-duplication variants (case, whitespace) in `src/lib/services/nomenclature.test.ts`. Unit tests for promotion transaction retiring staging (same file). Admin inspection UI testing at Stage 5. |
+
+---
+
+### HZ-012 — Report finalized with incomplete or invalid content
+
+| Field | Value |
+|---|---|
+| **Hazard** | The pathologist clicks Finalize on a report that has missing required elements (empty clauses, no DIAGNOSIS in a case that requires one, missing synoptic protocol fields in a case where a synoptic protocol applies). Without pre-finalize validation, the clinical record is incomplete. |
+| **Harm** | Incomplete clinical record transmitted to LIS; downstream consumers may make decisions on partial information. In a synoptic-required case, missing fields break registry reporting and institutional quality metrics. |
+| **Pre-mitigation risk** | Moderate — under time pressure pathologists may click Finalize prematurely; the UI state may not make it obvious that a required element is missing. |
+| **Risk Controls** | RC-012a: Pre-finalize validation (SDS 04-01 §6) — the server checks that every part has at least one DIAGNOSIS clause and that required metadata is present before issuing the transmission. RC-012b: Synoptic completeness check (SDS 04-05 §4) — when a protocol applies, finalize is blocked until all required protocol fields are populated or explicitly marked "not applicable". RC-012c: Final Review Pass (SRS-275) — surfaces cross-field inconsistencies at sign-out including required-laterality-missing for breast/lung/kidney specimens. RC-012d: Finalize dialog summary (FinalizeDialog) — shows the pathologist exactly what will be transmitted before they confirm. |
+| **Residual risk** | Low — multiple layers of validation; the Final Review Pass adds a last-mile check. Residual risk is in cases where the "required" definition is institutionally ambiguous (e.g., a RESIDENT-drafted report that needs attending review but doesn't meet the finalization gate); this is handled by the REVIEW workflow state rather than hard-blocked at finalize. |
+| **Verification** | Unit tests for finalize validation (server-side). E2E: click Finalize with missing required field → finalize is blocked with the missing-field signal. Synoptic completeness tests (`e2e/synoptic-panel.test.ts`). Final Review Pass required-laterality tests (`src/lib/services/final-review.test.ts`). |
+
+---
+
 ## 3. Hazard-to-Control Trace
 
 | Hazard | Primary Controls | URS/SRS |
@@ -116,6 +183,12 @@ Key hazard categories for WILLET include:
 | HZ-004 | Override counting, Quarantine at threshold, Admin unlock, Quarterly QMS review | UN-091; SRS-273 |
 | HZ-005 | Manual self-review, Institutional tightening option, Audit | UN-095; SRS-277 |
 | HZ-006 | Acknowledge-as-intentional, Rationale required, Audit | UN-094; SRS-276 |
+| HZ-007 | Transcription correction layer, verbatim contract, two-level undo, Final Review Pass | UN-092; SRS-185, 187 revised, 188 revised, 275 |
+| HZ-008 | Focus-based target resolution with debounce, Dictation indicator, Final Review Pass specimen-part detector, Header-edit gesture | SRS-185, 275 |
+| HZ-009 | Idempotency key, Transmission status tracking, Retry with backoff, Visible state badge, Audit | SDS 04-01 §6 — URS/SRS entries existing in pre-v2.3 set |
+| HZ-010 | Optimistic locking with version, Conflict UI, Finalization lock, Save state machine | SDS 04-00 §4.3, SDS 04-01 §5.2 — URS/SRS entries existing in pre-v2.3 set |
+| HZ-011 | Explicit lookup priority, Normalized de-duplication, Admin inspection, Promotion retires staging, Quarterly QMS review | UN-091; SRS-270–273 |
+| HZ-012 | Pre-finalize validation, Synoptic completeness check, Final Review Pass, Finalize dialog summary | SDS 04-01 §6, SDS 04-05 §4; SRS-275 |
 
 ---
 
@@ -125,3 +198,4 @@ Key hazard categories for WILLET include:
 |---|---|---|
 | 0.1 | — | Stub listing hazard categories. Full authoring pending Stage 5. |
 | 0.2 | 2026-04-18 | Added initial hazard entries HZ-001 through HZ-006 to establish traceable risk controls for v2.3 architectural changes (deterministic-first precedence, source-based automation policy, Final Review Pass, self-maintaining nomenclature dictionary, PHI vendor boundaries, intentional-override escape). Hazard-to-Control trace matrix populated. Format established; remaining hazard categories (voice command misinterpretation, cross-part contamination, LIS transmission failures, lock bypass, nomenclature conflicts, incomplete finalization) still pending full authoring at Stage 5. |
+| 1.0 | 2026-04-19 | Completed the hazard set — added HZ-007 through HZ-012 covering voice command misinterpretation, cross-part contamination, LIS transmission failure/duplication, lock bypass with lost-update, nomenclature tier conflict, and incomplete finalization. Each entry populates hazard/harm/pre-mitigation risk/controls/residual risk/verification per ISO 14971 §5–§7. Hazard-to-Control trace table extended. Scope prose rewritten to describe the two-dimensional risk structure (intrinsic clinical-authoring risks vs. risks introduced by WILLET's deterministic + probabilistic architecture). |

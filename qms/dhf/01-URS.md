@@ -6,12 +6,12 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-URS-001 |
-| **Version** | 2.4 DRAFT |
+| **Version** | 2.4 |
 | **Date** | April 18, 2026 |
 | **Applies to Spec** | Working Specification v1.2 + Addendum v1.2-A1 + Design Dialogue 2026-03-13 |
-| **Software Safety Class** | To be determined (see §2.3). Requirements written at Class B rigor. |
+| **Software Safety Class** | IEC 62304 Class B (per `05a-Risk-Plan.md §3`) |
 | **IEC 62304 Reference** | §5.2 — Software Requirements Analysis |
-| **Status** | DRAFT — Pending review and approval |
+| **Status** | Active |
 
 ---
 

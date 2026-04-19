@@ -176,6 +176,14 @@ export class NomenclatureStore {
     return this.entries.size;
   }
 
+  /**
+   * Clear all entries. Intended for test isolation (dev harness), not for
+   * runtime use — the production service is not expected to expose this.
+   */
+  reset(): void {
+    this.entries.clear();
+  }
+
   getById(id: string): NomenclatureEntry | undefined {
     return this.entries.get(id);
   }

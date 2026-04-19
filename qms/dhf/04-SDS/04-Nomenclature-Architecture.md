@@ -6,7 +6,7 @@
 | **Version** | 1.0 DRAFT |
 | **Date** | April 18, 2026 |
 | **Stage** | 3B — Nomenclature |
-| **Status** | DRAFT — initial authoring |
+| **Status** | Active |
 | **Parent** | SDS 04-03 §1.5 (Deterministic-First Precedence), §5.1 (Source-Based Automation Policy), §5.4 (Final Review Pass) |
 | **Related** | STARLING-LIS-002 (Linguistic Services Architecture), `mcp-server/tools/part_standardizer.py` |
 

@@ -3,18 +3,346 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SEC-003 |
-| **Status** | Planned |
-| **IEC 62304 Reference** | §5.2.2 — Software Requirements (security-related) |
+| **Version** | 1.0 |
+| **Date** | April 19, 2026 |
+| **Status** | Initial authoring complete |
+| **IEC 62304 Reference** | §5.2.2 — Software Requirements (security-related); §5.8.4 — Anomaly resolution |
+| **Related** | FDA Premarket Cybersecurity Guidance (2023); NIST SP 800-53 Rev. 5 (AC, AU, IA, SC families); OWASP Top 10; HIPAA Security Rule 45 CFR §164.308–164.312; ISO 14971 §5 (risk linkage to hazard analysis) |
 
 ---
 
-*This document will contain the threat model and security controls for WILLET, covering:*
+## 1. Purpose and Scope
 
-- *JWT handling and refresh (postMessage bridge with Starling)*
-- *CSRF protection on save endpoints*
-- *Lock service security (authorization checks on force takeover)*
-- *PHI exposure surface (voice transcription, LLM calls)*
-- *RTF payload integrity (version hash verification)*
-- *Audit log tamper resistance*
+This document is WILLET's cybersecurity risk analysis and control specification. It identifies threats to confidentiality, integrity, and availability of the system and the clinical data it handles, enumerates controls that reduce those threats to acceptable residual risk, and specifies the secure-development practices that maintain security posture over time.
 
-*To be authored during Stage 4 (Starling Integration) or earlier if security-critical design decisions arise.*
+The scope includes the WILLET module itself (frontend and any backend responsibilities specific to WILLET), its contract with the Starling orchestrator, its interactions with external vendors (speech-to-text, LLM interpreter, vocabulary correction), and its interaction with the auth-system (nomenclature persistence, audit sink). The scope excludes Starling orchestrator internals, LIS internals, and infrastructure below the HTTPS / Kubernetes substrate — those are addressed in Starling's cybersecurity documentation and operational security runbooks.
+
+The threats in §4 are derived using STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege), enumerated against the trust boundaries identified in §2. The control matrix in §5 cross-references threats to controls and to the hazards in `05b-Hazard-Analysis.md` so risk traceability is preserved end-to-end.
+
+---
+
+## 2. System and Data Flow Overview
+
+### 2.1 Trust Boundaries
+
+WILLET operates across six trust boundaries. A boundary is a point where data crosses from one security domain to another and where authentication, authorization, and data-handling requirements change.
+
+| Boundary | Principals | Transport | Auth | Notes |
+|---|---|---|---|---|
+| **B1: Pathologist → Browser** | Human, institutional workstation | Keyboard, mouse, microphone | Workstation OS auth + institutional SSO into Starling | The pathologist is assumed authenticated at the workstation; WILLET trusts the session identity forwarded by the browser. |
+| **B2: Browser → Orchestrator** | Browser tab, Starling orchestrator page | postMessage (same-origin after bootstrap) | Starling session cookie; orchestrator provisions WILLET-scoped JWT | See `STARLING-MIS-001-Module-Integration-Spec.md` for the bootstrap protocol. |
+| **B3: WILLET frontend → WILLET backend** | Browser tab, `willet-service` (Spring Boot) | HTTPS | Bearer JWT (orchestrator-provisioned) + CSRF double-submit cookie for state-changing requests | TLS 1.2+ required; public endpoints terminated at institutional ingress. |
+| **B4: WILLET backend → auth-system** | `willet-service`, `starling-auth-system` | HTTPS (internal) | Service-to-service JWT with restricted scopes | Nomenclature persistence, audit event sink, RBAC lookup. |
+| **B5: WILLET backend → external vendors** | `willet-service` outbound | HTTPS | Vendor-issued API keys / OAuth; tenant-scoped | STT, LLM interpreter, vocabulary correction. Zero-retention contractual; region-pinned. See §8. |
+| **B6: Starling → LIS (via orchestrator)** | Orchestrator → LIS MLLP/HL7 | MLLP over TLS or HL7 over HTTPS | Mutual TLS or institutional VPN | WILLET does not talk to the LIS directly; it surrenders the finalized report to the orchestrator which performs the institutional integration. |
+
+### 2.2 Data Classifications
+
+| Class | Examples | Transport Posture |
+|---|---|---|
+| **PHI** | Patient identifiers (name, DOB, MRN), accession numbers, clinical history text, report content referencing the patient | Always encrypted in transit (TLS) and at rest (database/object-store encryption). Minimized in vendor-bound payloads per §8. |
+| **Clinical content** | Clause text, nomenclature designators, synoptic field values | Encrypted in transit and at rest. Nomenclature designators may be sent to LLM with accession scrubbed; raw clause content may be sent to LLM when required by the §4 interpreter and only the minimum necessary. |
+| **Configuration** | Feature flags, institutional nomenclature tuning, policy parameters | Server-side only; client receives the subset relevant to the session. Not classified as PHI but institutionally sensitive. |
+| **Audit records** | User/case/timestamp/event tuples generated by WILLET | Encrypted in transit and at rest; append-only; cryptographic chain (§5.7) protects against tampering. |
+| **Authentication** | JWT, refresh tokens, CSRF tokens | Never logged, never sent to vendors, never persisted in browser storage beyond the session unless explicitly renewable. |
+
+### 2.3 Principal Data Flows
+
+```
+(A) Authentication & bootstrap
+    Pathologist → Starling login → Starling orchestrator [B1, B2]
+    Orchestrator → WILLET init payload (JWT, caseId, role) → WILLET frontend [B2]
+    WILLET frontend → POST /api/report/:caseId/scaffold → WILLET backend [B3]
+
+(B) Authoring
+    Pathologist speech → Browser MediaRecorder → WILLET frontend [B1]
+    WILLET frontend → POST audio blob to STT → STT vendor [B5, via backend proxy]
+    WILLET frontend → POST instruction → LLM interpreter → LLM vendor [B5, via backend proxy]
+    WILLET frontend → POST nomenclature staging → WILLET backend → auth-system [B3, B4]
+
+(C) Autosave
+    WILLET frontend → PUT /api/report/:caseId/parts/:partId → WILLET backend [B3]
+
+(D) Finalize
+    WILLET frontend → POST /api/report/:caseId/finalize → WILLET backend [B3]
+    WILLET backend → Orchestrator transmission queue → LIS [B4, B6]
+```
+
+Every flow produces audit events (§9).
+
+---
+
+## 3. Methodology
+
+Threats are identified using **STRIDE** applied to each data flow at each trust boundary. For each STRIDE category, we ask: what threats exist here? For each threat, we capture the same fields used in `05b-Hazard-Analysis.md` so the two documents remain formally linked: pre-mitigation severity/likelihood, controls, residual risk, and verification.
+
+Severity scale: **Low** (reputational, recoverable), **Moderate** (regulatory exposure, clinical delay), **High** (patient harm, breach reportable, institutional liability), **Critical** (mass PHI breach, patient death, system-wide compromise). Likelihood scale: **Rare** (requires multiple independent failures), **Unlikely**, **Possible**, **Likely** (occurs under normal operating conditions without mitigation).
+
+Pre-mitigation risk = Severity × Likelihood, rolled up to: **Low / Moderate / High / Critical**. Residual risk is the same scale after controls apply.
+
+---
+
+## 4. Threat Catalog
+
+### T-001 — JWT theft or forgery allows session hijack (Spoofing)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Spoofing |
+| **Boundary** | B2, B3 |
+| **Threat** | Attacker obtains a valid WILLET-scoped JWT (via XSS exfiltration, compromised workstation, or forged signature if signing key leaks) and impersonates the pathologist to author, finalize, or exfiltrate reports. |
+| **Pre-mitigation** | Severity: High · Likelihood: Possible · **High** |
+| **Controls** | C-001a: Orchestrator-issued short-lived JWTs (≤15 minutes) with rotating refresh (STARLING-MIS-001 bootstrap protocol). C-001b: JWT signature verified server-side against the orchestrator's public key on every request. C-001c: Token-bound session binding where supported (TLS channel binding). C-001d: Token never persisted to localStorage/IndexedDB; held in JS memory only. C-001e: Content Security Policy restricts `<script>` sources to same-origin + orchestrator CDN to block XSS injection vectors. C-001f: Automatic token refresh via `orchestrator:token-refresh` postMessage so expiry-at-signout is not a usability pressure that pushes users toward long-lived tokens. |
+| **Residual risk** | Low — compromise requires exfiltrating a live token within its validity window and either using it before the session-bound refresh replaces it or also holding the refresh channel. Accepted subject to the XSS prevention posture maintained across releases. |
+| **Verification** | Integration test: expired JWT on a write endpoint returns 401. Integration test: refresh flow rotates the JWT and invalidates the previous one. Pen-test activity: XSS fuzzing against every user-rendered field (Stage 5). CSP compliance test in CI. |
+
+---
+
+### T-002 — postMessage bridge injection from untrusted origin (Spoofing / Tampering)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Spoofing + Tampering |
+| **Boundary** | B2 |
+| **Threat** | A page loaded in a sibling iframe or a misconfigured cross-origin embed sends forged `orchestrator:*` messages to the WILLET frame, causing WILLET to accept a forged JWT, switch to a malicious caseId, or apply unauthorized instructions. |
+| **Pre-mitigation** | Severity: High · Likelihood: Unlikely · **Moderate** |
+| **Controls** | C-002a: `window.addEventListener('message', ...)` handler verifies `event.origin` against the orchestrator's canonical origin on every message. C-002b: Orchestrator and WILLET share a session nonce provisioned at bootstrap (`orchestrator:init` contains a session nonce; every subsequent message must echo it or the handler drops the message). C-002c: WILLET never accepts unsolicited `orchestrator:token-refresh` — only in response to its own `module:ready-for-refresh`. C-002d: All message schemas are typed and schema-validated; unknown or malformed messages are dropped with a SESSION_ERROR audit event. |
+| **Residual risk** | Low — forgery requires both origin spoof (prevented by origin check) and nonce knowledge (which is never leaked across frames). |
+| **Verification** | Unit tests for the bridge: forged-origin message is rejected; unsolicited refresh is rejected; malformed schema is rejected. E2E test with Playwright: iframe with a different origin cannot drive the WILLET frame. |
+
+---
+
+### T-003 — CSRF on state-changing endpoints (Tampering)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Tampering |
+| **Boundary** | B3 |
+| **Threat** | Attacker-controlled page induces the pathologist's browser to submit save/finalize/staging requests to WILLET using the ambient session cookie, modifying the report without the pathologist's knowledge. |
+| **Pre-mitigation** | Severity: Moderate · Likelihood: Possible · **Moderate** |
+| **Controls** | C-003a: Double-submit CSRF cookie (`XSRF-TOKEN` cookie + `X-XSRF-TOKEN` header) on every state-changing request. Server rejects mismatches (following the Starling auth-system pattern — see `starling/auth-system/.../CookieCsrfTokenRepository`). C-003b: `SameSite=Strict` on session cookies prevents cross-site sends. C-003c: CORS disallows cross-origin requests to the WILLET API; only the orchestrator origin is permitted. C-003d: Defense-in-depth: writes require both a valid JWT bearer and the CSRF pair, so cookie-only attacks fail. |
+| **Residual risk** | Low — the double-submit pattern, SameSite, and CORS compose. Residual exposure is in mis-implemented endpoints; caught by the CSRF integration tests below. |
+| **Verification** | Integration test per state-changing endpoint: missing CSRF header → 403. Integration test: missing cookie → 403. Integration test: mismatched pair → 403. E2E test: cross-origin POST is blocked by CORS. |
+
+---
+
+### T-004 — Lock bypass or unauthorized force-takeover (Elevation of Privilege)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Elevation of Privilege |
+| **Boundary** | B3 |
+| **Threat** | A lower-privileged user (e.g., RESIDENT) takes a report lock from a higher-privileged user (e.g., ATTENDING) mid-edit, or forces a takeover on a report whose current lock holder is still actively working, leading to loss of the attending's in-progress edits or to a role-inappropriate edit. |
+| **Pre-mitigation** | Severity: Moderate · Likelihood: Possible · **Moderate** |
+| **Controls** | C-004a: Server-side RBAC check on every lock action — role hierarchy (ATTENDING/DIRECTOR > FELLOW > RESIDENT) enforced by authorization policy; the role is taken from the validated JWT, not from the client request. C-004b: Force-takeover requires a supervisor-role (ATTENDING/DIRECTOR) signature and produces a `LOCK_FORCE_TAKEOVER` audit event with reason (SDS 04-01 §7). C-004c: Active-editor presence signal (heartbeat) — forcing over an active editor surfaces an "are you sure" confirmation with the editor's identity and last-activity timestamp. C-004d: Lock operations are idempotent on the server so concurrent requests resolve deterministically. |
+| **Residual risk** | Low — RBAC blocks the inadvertent case; audit captures the deliberate case. Residual risk is insider abuse by a privileged user, which is addressed organizationally rather than technically. |
+| **Verification** | Integration test: RESIDENT JWT attempting force-takeover → 403. Audit trail test: force-takeover produces an audit entry with actor role, target, and reason. E2E: active-editor confirmation dialog appears when taking over. |
+
+---
+
+### T-005 — PHI exposure through external vendor API boundary (Information Disclosure)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Information Disclosure |
+| **Boundary** | B5 |
+| **Threat** | Clinical content containing patient identifiers is sent to an STT, LLM, or correction vendor; the vendor logs or retains the payload, or the vendor operates outside the applicable data-protection jurisdiction. This is the direct counterpart to HZ-003 in `05b-Hazard-Analysis.md`. |
+| **Pre-mitigation** | Severity: High · Likelihood: Likely (without controls) · **High** |
+| **Controls** | C-005a: Vendor boundary payload specification (SDS 04-03 §17.2) — every field that may cross each B5 sub-boundary is enumerated; patient identifiers (name, MRN, DOB) are never included in vendor payloads. C-005b: Minimum-necessary context (SDS 04-03 §17.3) — LLM instruction requests carry only the case context fields the interpreter needs (specimen type, part list, clause texts), never the full clinical history or patient record. C-005c: Zero-retention contractual obligation (SDS 04-03 §17.4) — STT and LLM vendors are contractually bound to zero-retention of clinical audio and prompts; BAA required. C-005d: Region-pinned endpoints (SDS 04-03 §17.2) — vendor endpoints are in jurisdictions with applicable healthcare privacy regimes (US: HIPAA; EU: GDPR + member-state equivalent). C-005e: Outbound payload egress filter — every vendor-bound request passes through a server-side payload validator that rejects payloads containing disallowed fields (MRN regexes, DOB-shaped patterns in free text). C-005f: Prompt template audit (SDS 04-03 §17.5) — expanded LLM prompts are logged separately from the clinical record so the institution can audit what leaves the boundary. |
+| **Residual risk** | Low-to-moderate — the controls are comprehensive at the design level; residual risk is in vendor performance against contract. Further reduced by C-005g: vendor SOC 2 Type II evidence required at onboarding and annually. |
+| **Verification** | Unit test of the payload validator (egress filter) against a corpus of known-sensitive shapes. Integration test: outbound STT request contains no `patient.*` fields. Design-review gate on any change to vendor-boundary payloads. Vendor BAA audit at onboarding and renewal. |
+
+---
+
+### T-006 — Prompt injection leads to LLM exfiltrating prior context (Information Disclosure)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Information Disclosure |
+| **Boundary** | B5 |
+| **Threat** | Clinical text (e.g., LIS-provided part designator, dictated content, clinical history) contains adversarial prompt content that causes the LLM interpreter to output previously-seen case context in a later response, across case or session boundaries. |
+| **Pre-mitigation** | Severity: Moderate · Likelihood: Unlikely · **Moderate** |
+| **Controls** | C-006a: Structured-output enforcement — the §4 LLM interpreter uses JSON-schema-constrained output; free-form text is not accepted as an action. C-006b: Stateless LLM invocation per case — no cross-case context sharing; each invocation carries only the current case's minimum-necessary context. C-006c: Conversation history is scoped to the current session and the current case; switching cases resets the history visible to the LLM. C-006d: Prompt-injection-resistant system prompt — the system prompt explicitly instructs the LLM to treat instruction content as untrusted and to output only structured actions. C-006e: Output filter — any LLM output that does not parse as the expected action schema is rejected; the free-text `summary` field is truncated and escaped before display. |
+| **Residual risk** | Low — structured output plus stateless invocation blocks the principal exfiltration pathway. Residual risk is in novel prompt-injection techniques that a future LLM upgrade may be more susceptible to; mitigated by the per-release regression corpus. |
+| **Verification** | Fixture corpus of prompt-injection attempts (to be developed, Stage 5). JSON schema validation test on every LLM response. Release-time rerun of the injection corpus on the new model. |
+
+---
+
+### T-007 — Finalized RTF tampering in transit corrupts the LIS record (Tampering)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Tampering |
+| **Boundary** | B4, B6 |
+| **Threat** | The finalized RTF payload is modified between WILLET's finalize step and the LIS acknowledgment, producing a LIS record that differs from what the pathologist signed. |
+| **Pre-mitigation** | Severity: High · Likelihood: Unlikely · **Moderate** |
+| **Controls** | C-007a: RTF version hash — the finalize response carries a SHA-256 hash of the exact RTF payload that was signed; the LIS acknowledgment echoes the hash; any mismatch raises a `TRANSMISSION_MISMATCH` audit event. C-007b: End-to-end encryption on the B4 and B6 segments (mutual TLS between `willet-service`, orchestrator, and LIS). C-007c: RTF payload stored server-side immutably, cryptographically linked to the report version; can be re-transmitted from the stored canonical copy in case of LIS re-sync. C-007d: Transmission retry uses the same idempotency key; does not regenerate the RTF, reducing opportunity for drift. |
+| **Residual risk** | Low — hash chain detects tampering end-to-end; immutable storage provides recovery path. |
+| **Verification** | Integration test: modified RTF at MLLP listener → hash mismatch raised. Unit test: RTF hash is deterministic given the same report version. |
+
+---
+
+### T-008 — Audit log tampering enables repudiation (Repudiation / Tampering)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Repudiation + Tampering |
+| **Boundary** | B4 |
+| **Threat** | An attacker or insider modifies or deletes audit events after they are written, making it impossible to reconstruct who did what. This undermines both forensic analysis and IEC 62304 Class B traceability. |
+| **Pre-mitigation** | Severity: High · Likelihood: Unlikely · **Moderate** |
+| **Controls** | C-008a: Append-only audit store at the auth-system layer; no `DELETE` or `UPDATE` privileges granted to the `willet_service` role. C-008b: Per-row cryptographic chain — each audit record's hash includes the previous record's hash; any modification breaks the chain. Periodic chain-integrity job verifies and alerts. C-008c: Separate write path — audit events are written via a dedicated ingest endpoint whose only permission is `INSERT` on the audit table. C-008d: Admin access to audit storage is role-restricted and itself audited (meta-audit). C-008e: Offsite replication of the audit log (daily snapshot to immutable object storage with WORM policy) provides a tamper-evident baseline. |
+| **Residual risk** | Low — chain + append-only + meta-audit create layered detection. Residual risk is in administrative collusion, which is addressed organizationally. |
+| **Verification** | Integration test: attempt to UPDATE an audit row → permission denied. Periodic chain-integrity job runs in CI against test fixtures. Recovery test: restore from offsite replica and verify continuity. |
+
+---
+
+### T-009 — Resource exhaustion via conversation-history bloat or dictation flood (Denial of Service)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Denial of Service |
+| **Boundary** | B3, B5 |
+| **Threat** | A client sends abnormally large payloads (multi-megabyte dictation blobs, enormous conversation histories, runaway nomenclature-staging submissions) to saturate server memory/CPU or to drive costly vendor API calls. This can be inadvertent (voice-pipeline bug) or deliberate (abuse by an authenticated insider). |
+| **Pre-mitigation** | Severity: Moderate · Likelihood: Possible · **Moderate** |
+| **Controls** | C-009a: Per-endpoint request-size limits at the ingress (e.g., 10 MB for audio, 128 KB for instruction JSON, 4 KB for nomenclature staging). C-009b: Per-user rate limits — token-bucket at 10 instructions/minute, 60 saves/minute, 5 finalizes/minute; bucket replenishment aligns with normal authoring cadence. C-009c: Conversation history is truncated to the most recent N entries (default 20) before being sent to the LLM interpreter; client-side truncation also. C-009d: Vendor-call budget per session — if the session exceeds a daily threshold of vendor calls, further calls are refused with a clear UI error; institutional admin alert fires. C-009e: Backpressure signal — when the WILLET backend is under load, it returns 503 with a `Retry-After` header; the client honors this and pauses autosave. |
+| **Residual risk** | Low-to-moderate — controls address both the inadvertent and malicious patterns. Residual risk is coordinated multi-user abuse, which requires organizational-level response. |
+| **Verification** | Integration test: request exceeding size limit → 413. Rate-limit test: exceeding the bucket → 429. Load test (Stage 5): sustained 2× normal load with graceful degradation. |
+
+---
+
+### T-010 — Session fixation via stale or reused JWT after role change (Spoofing)
+
+| Field | Value |
+|---|---|
+| **STRIDE** | Spoofing |
+| **Boundary** | B2, B3 |
+| **Threat** | A pathologist's role changes (e.g., DIRECTOR demoted to RESIDENT) but their existing JWT still carries the prior role until expiry; during the window they retain elevated privileges. |
+| **Pre-mitigation** | Severity: Moderate · Likelihood: Rare · **Low** |
+| **Controls** | C-010a: Short JWT lifetime (≤15 minutes) minimizes the stale-role window. C-010b: Server-side authorization re-checks role against the auth-system on privileged operations (finalize, admin endpoints), not only against the JWT claim — so a role change takes effect before the JWT expires for privileged ops. C-010c: Admin role change triggers a `user.role_changed` event that the orchestrator receives and uses to force a token refresh / session invalidation for the affected user. |
+| **Residual risk** | Very low — the layered check ensures privileged ops always reflect current state; routine reads may lag for up to one JWT lifetime, which is acceptable. |
+| **Verification** | Integration test: demote a user, verify privileged endpoint rejects the old JWT before its expiry. Audit inspection: role-change events produce expected revocation audit entries. |
+
+---
+
+## 5. Control-to-Threat Matrix
+
+| Control | Threats | Hazards | Source |
+|---|---|---|---|
+| C-001 (JWT handling) | T-001, T-010 | — | This §, SDS 04-03 §17.5 |
+| C-002 (postMessage origin + nonce) | T-002 | — | `STARLING-MIS-001` |
+| C-003 (CSRF double-submit) | T-003 | — | Spring `CookieCsrfTokenRepository` (auth-system) |
+| C-004 (RBAC + lock authorization) | T-004 | HZ-010 | SDS 04-01 §7 |
+| C-005 (vendor boundary) | T-005 | HZ-003 | SDS 04-03 §17 |
+| C-006 (structured LLM output + stateless) | T-006 | HZ-002 | SDS 04-03 §4 |
+| C-007 (RTF hash chain) | T-007 | HZ-009 | SDS 04-01 §6 |
+| C-008 (append-only audit, chain) | T-008 | HZ-004, HZ-005 | SDS 04-03 §9 |
+| C-009 (rate limits, budgets) | T-009 | — | This § |
+| C-010 (server-side role recheck) | T-010 | — | This § |
+
+---
+
+## 6. Secure Development Lifecycle
+
+### 6.1 Dependency Management
+
+- **SBOM**: every release produces a Software Bill of Materials (SPDX 2.3) covering frontend npm dependencies, backend Gradle dependencies, and container base images.
+- **Vulnerability scanning**: Dependabot/Renovate + `npm audit --audit-level=high` in CI; `./gradlew dependencyCheck` against NVD. Builds fail on High/Critical CVEs without a documented time-boxed acceptance.
+- **Supply-chain integrity**: `package-lock.json` committed; CI verifies `npm ci` against the lockfile without network mutation. Gradle uses pinned dependency versions (no dynamic `+` ranges).
+- **Container provenance**: base images from verified publishers (`cgr.dev`, `eclipse-temurin`) with image digests pinned per release.
+
+### 6.2 Secret Management
+
+- **No secrets in source**. `.env` files are gitignored and included in secret-hardening checks (see `.dev-notes/2026-04-08-gitignore-secret-hardening.md`).
+- **Runtime secrets** are provisioned via institutional secret store (Vault / AWS Secrets Manager / Kubernetes sealed secrets); rotated at the institutional cadence.
+- **Vendor API keys** are per-tenant when the vendor supports it; otherwise per-institution with quota alerts.
+- Automated secret scanning (gitleaks or equivalent) runs on every PR.
+
+### 6.3 Secure Coding
+
+- **TypeScript strict mode** and svelte-check run in CI; build fails on TS errors.
+- **ESLint/Biome rules** include the `security/*` plugin set (eval bans, insecure regex detection, unsafe innerHTML patterns).
+- **Input validation** at every trust boundary — schema validation for JSON bodies, explicit parsing for URL params, bounded sizes for free-text fields.
+- **Output encoding** — Svelte templates escape by default; `{@html}` usage is reviewed and restricted to trusted server-rendered content.
+- **Crypto**: library-provided primitives only (Web Crypto API in the frontend; `java.security` / BouncyCastle on the backend). No hand-rolled crypto.
+
+### 6.4 Review and Testing
+
+- **Security-relevant changes** (auth, CSRF, crypto, vendor-boundary payloads) require two-reviewer approval with at least one reviewer holding the security-reviewer role.
+- **Pen-test cadence**: external penetration testing at least annually and before any major release that changes trust boundaries.
+- **Fuzzing**: targeted fuzzing on the LLM output parser and on the postMessage bridge.
+- **Threat-model revisit**: this document is reviewed every release or whenever a trust boundary, data classification, or vendor relationship changes.
+
+---
+
+## 7. Monitoring, Detection, and Incident Response
+
+### 7.1 Detection
+
+Security-relevant events emit to the SIEM integration via the orchestrator audit stream. The following events are treated as Level-2 (warrant operator attention) or Level-1 (page on-call):
+
+| Event | Level | Trigger |
+|---|---|---|
+| `auth.jwt_signature_invalid` | 2 | Forged or expired JWT on a write endpoint. |
+| `auth.role_escalation_attempt` | 1 | Role-restricted endpoint called by a user without the role. |
+| `bridge.postmessage_origin_mismatch` | 2 | postMessage from an origin that is not the orchestrator. |
+| `csrf.mismatch` | 2 | CSRF header/cookie pair mismatch on a state-changing request. |
+| `vendor.payload_egress_blocked` | 1 | Egress filter rejected a vendor-bound payload containing disallowed fields. |
+| `audit.chain_broken` | 1 | Audit-chain integrity job detected a break. |
+| `rate_limit.exceeded` | 2 | Per-user rate limit bucket exhausted. |
+| `transmission.hash_mismatch` | 1 | LIS ACK hash does not match the finalized RTF hash. |
+
+### 7.2 Incident Response
+
+Incident response aligns with the institutional IR runbook and the FDA postmarket cybersecurity management plan. WILLET-specific IR playbooks, kept under `qms/incident-response/`, cover:
+
+- Suspected PHI vendor breach: freeze the affected vendor endpoint at the egress filter, rotate vendor credentials, notify privacy officer, institutional legal, and (within 60 days) affected individuals per 45 CFR §164.404.
+- Suspected credential compromise: force token rotation for the affected users, invalidate active sessions, capture forensic snapshot of the auth-system's token-refresh log, notify the user.
+- Audit chain integrity break: stop writes, freeze the audit store for forensic capture, invoke the offsite replica to determine the last-known-good chain position, coordinate with QMS leadership on regulatory notification.
+
+All IR activities produce their own audit entries via the meta-audit pipeline (C-008d).
+
+---
+
+## 8. Vendor Security Requirements
+
+Vendors crossing the B5 boundary must meet all of the following before onboarding and on every annual review:
+
+1. **Business Associate Agreement** executed, aligned with 45 CFR §164.314 and the institution's covered-entity posture.
+2. **SOC 2 Type II report** (or equivalent — ISO 27001/27017/27018 where applicable for non-US jurisdictions) provided annually; findings reviewed.
+3. **Data-processing agreement** specifying: data fields received, permitted uses, retention policy (zero-retention required for clinical audio and LLM prompts), subprocessor list.
+4. **Region pinning** — explicit endpoint(s) in the institutionally-approved jurisdiction; no cross-region fallback without a renewed DPA.
+5. **Vulnerability-disclosure program** — vendor commits to responsible-disclosure and to notification of material CVEs in their stack within an agreed window.
+6. **Data-breach notification** — vendor commits to notifying the institution of any security incident affecting its data within 24 hours of discovery.
+7. **Termination data-handling** — on contract termination, vendor certifies deletion of any persisted data (zero-retention contracts should make this a no-op, but the certification is required anyway).
+
+Vendors in scope at v1.0: placeholder until institutional procurement selection; the requirements apply whichever specific vendors are chosen for STT and LLM services.
+
+---
+
+## 9. Security Event Audit Catalog
+
+The events listed in §7.1 are the ones WILLET emits for security signaling. Each event carries the common audit envelope (`timestamp`, `actor`, `caseId` when applicable, `sessionId`, `requestId`) plus an event-specific payload. Retention follows the institution's clinical record retention policy; security events are also mirrored to the SIEM for the operational retention period (typically 1 year).
+
+All security events are PHI-adjacent: the event metadata itself does not contain PHI, but the correlated case/user identifiers may be considered PHI-adjacent per §2.2.
+
+---
+
+## 10. References
+
+- **FDA Guidance** — "Cybersecurity in Medical Devices: Quality System Considerations and Content of Premarket Submissions", September 2023.
+- **IEC 81001-5-1** — Health software and health IT systems safety, effectiveness and security — Part 5-1: Security — Activities in the product life cycle.
+- **NIST SP 800-53 Rev. 5** — Security and Privacy Controls for Information Systems and Organizations.
+- **OWASP Top 10 2021** — used as a cross-check for common web-application threat categories.
+- **HIPAA Security Rule** — 45 CFR §164.308 (administrative), §164.310 (physical), §164.312 (technical).
+- **ISO 14971:2019** — for the risk-linkage methodology that aligns this document with `05b-Hazard-Analysis.md`.
+- **OWASP STRIDE Threat Modeling** — for the categorization in §3–§4.
+- **WILLET DHF internal** — `SDS 04-03 §17 PHI Posture and Vendor Boundaries`; `SDS 04-01 §5.2 Save State Machine`, `§6 Finalization`, `§7 Lock Service`; `STARLING-MIS-001 Module Integration Spec`.
+
+---
+
+## 11. Revision History
+
+| Version | Date | Changes |
+|---|---|---|
+| — | — | Stub listing topic scope (JWT handling, CSRF, lock service, PHI exposure, RTF integrity, audit tamper resistance). |
+| 1.0 | 2026-04-19 | Initial complete authoring. Scope and system overview with six trust boundaries (§2). Four data classifications (PHI, clinical, configuration, audit, authentication) and four principal data flows. STRIDE-based threat methodology (§3). Ten threats enumerated covering JWT compromise, postMessage injection, CSRF, lock bypass, vendor PHI exposure, LLM prompt injection, RTF tampering, audit tampering, resource exhaustion, and session fixation — each with STRIDE category, pre-mitigation risk, controls, residual risk, and verification. Control-to-threat-to-hazard traceability matrix linking to `05b-Hazard-Analysis.md`. Secure development lifecycle (SBOM, vulnerability scanning, secrets, secure coding, review). Monitoring and incident response playbooks with Level-1/Level-2 event catalog. Vendor security requirements for B5 boundary (BAA, SOC 2, zero-retention, region pinning). References to FDA, NIST, OWASP, HIPAA, ISO 14971, IEC 81001-5-1. |

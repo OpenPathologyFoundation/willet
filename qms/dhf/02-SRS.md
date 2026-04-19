@@ -6,12 +6,12 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SRS-002 |
-| **Version** | 2.5 DRAFT |
+| **Version** | 2.5 |
 | **Date** | April 18, 2026 |
-| **Derived From** | URS v2.0 (WILLET-DHF-URS-001), Design Dialogue v2.0 |
-| **Software Safety Class** | Written at Class B rigor (pending formal classification) |
+| **Derived From** | URS v2.4 (WILLET-DHF-URS-001), Design Dialogue v2.0, v2.3 architecture cascade |
+| **Software Safety Class** | IEC 62304 Class B (per `05a-Risk-Plan.md §3`) |
 | **IEC 62304 Reference** | §5.2.2 — Software Requirements |
-| **Status** | DRAFT — Pending review and approval |
+| **Status** | Active |
 
 ---
 
