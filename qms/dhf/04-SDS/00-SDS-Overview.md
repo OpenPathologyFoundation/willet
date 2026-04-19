@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-00 |
-| **Version** | 2.0 DRAFT |
-| **Date** | March 13, 2026 |
+| **Version** | 2.1 |
+| **Date** | April 19, 2026 |
 | **IEC 62304 Reference** | §5.3 — Software Architectural Design |
-| **Status** | DRAFT |
+| **Status** | Active |
 
 ---
 
@@ -395,3 +395,4 @@ willet/
 | 1.1 | 2026-03-11 | Added svelte-rtf-editor to technology stack. Updated FinalizeDialog component description to reference two-layer authoring model (SDS 04-05). |
 | 1.2 | 2026-03-11 | Added PromptArea component to component tree (SDS 04-03). Replaced VoicePanel with PromptArea (conversational authoring subsumes voice-only panel). Added promptStore to store table. |
 | 2.0 | 2026-03-13 | Major revision from Design Dialogue v2.0 and URS v2.0. Revised component tree: three-zone layout (authoring zone + context dock + Starling nav), prompt area at bottom, context dock with vertical tabs (Clinical/Images/Synoptic), template bar, drag handles, insert handles, type suggestions, dictation indicator, preferences panel. Added 4 new stores (preferencesStore, contextDockStore, templateStore, suggestionMetricsStore). Added 5 new API endpoints (preferences, clinical, images, templates). Added SDS 04-07 (Synoptic) and 04-08 (Template) to cross-reference table. ARIA landmarks documented in component tree. |
+| 2.1 | 2026-04-19 | Cross-reference table §10 updated to reflect SDS 04-03 v2.3 scope (design principles, source-based policy, Final Review Pass, PHI posture) and SDS 04-04 v1.0 scope (four-tier dictionary, lifecycle, override quarantine). Document header bumped from DRAFT to Active; version aligned with the rest of the DHF regulated-catch-up pass. No structural changes to §1–§9; this is a consistency refresh, not a design revision. |

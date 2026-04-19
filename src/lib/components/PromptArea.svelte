@@ -16,6 +16,7 @@
   import { correctTranscription, type CorrectionResult } from '$lib/services/transcription-correction';
   import { normalizeFindingSingular } from '$lib/services/instruction-classifier';
   import { decidePolicy } from '$lib/services/source-policy';
+  import { nomenclatureStore } from '$lib/stores/nomenclature.svelte';
   import PipelineProgress from './PipelineProgress.svelte';
   import type { PipelineStage } from './PipelineProgress.svelte';
 
@@ -523,6 +524,32 @@
     const lastEntry = promptStore.history[promptStore.history.length - 1];
     if (lastEntry && !lastEntry.applied) {
       lastEntry.applied = true;
+    }
+    // Staging-dictionary submission (SDS 04-04 §3.1). Only `ai_suggested` responses
+    // produce staging entries — a rules-engine label is already deterministic and
+    // needs no staging. The "designator" is whatever was on the page when the
+    // pathologist accepted the standardization (authored_label if edited, else the
+    // LIS part designator), which matches §3.1's "the free-text input."
+    // Non-blocking: a staging failure doesn't affect the action application.
+    if (response.source === 'ai_suggested') {
+      for (const action of response.actions) {
+        if (action.type !== 'set_authored_label') continue;
+        const part = reportStore.parts.find((p) => p.partLabel === action.partLabel);
+        if (!part) continue;
+        const previousDesignator = part.metadata?.authored_label ?? part.partDesignator ?? '';
+        const payload = action.payload as { label: string };
+        if (!previousDesignator || !payload.label || previousDesignator === payload.label) continue;
+        nomenclatureStore
+          .submitAcceptance(services.api, {
+            designator: previousDesignator,
+            standardized: payload.label,
+            userId: 'standalone-user',
+            caseId,
+          })
+          .catch((err) => {
+            console.warn('[WILLET] Nomenclature staging submission failed:', err);
+          });
+      }
     }
     onaction(response.actions);
     pendingConfirmation = null;

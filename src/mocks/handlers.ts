@@ -7,6 +7,11 @@ import type { UserPreferences } from '$lib/stores/preferences.svelte';
 import { mockInterpretInstruction } from './llm-mock';
 import { normalizeDictation, type NormalizationRequest } from '$lib/services/dictation-normalizer';
 import { correctTranscription as localCorrect } from '$lib/services/transcription-correction';
+import {
+  NomenclatureStore,
+  type CreateStagingInput,
+  type Confirmation,
+} from '$lib/services/nomenclature';
 
 // In-memory user preferences (standalone persistence)
 let mockPreferences: Partial<UserPreferences> = {};
@@ -14,6 +19,20 @@ let mockPreferences: Partial<UserPreferences> = {};
 // In-memory state for autosave persistence during dev session
 const savedParts = new Map<string, { finalDiagnosis: string; metadata: Record<string, unknown> }>();
 const savedCaseComments = new Map<string, string>();
+
+// Module-level NomenclatureStore singleton for standalone mode. In integrated
+// mode the server (auth-system) owns the authoritative store; here we simulate
+// it per dev session. Exported for tests that need to reset between runs.
+export const mockNomenclatureStore = new NomenclatureStore();
+
+/**
+ * Dev-harness pattern that simulates an LLM-inferred label standardization so
+ * the nomenclature staging lifecycle (SDS 04-04 §3.1) can be exercised in
+ * standalone mode without a running MCP server. Matches both at the rules-engine
+ * endpoint (forcing an empty-actions response to trigger escalation) and at
+ * the /api/interpret endpoint (where the set_authored_label action is emitted).
+ */
+const DEV_HARNESS_STANDARDIZE_PATTERN = /^\s*(?:standardize|rename)\s+part\s+([A-Za-z0-9]+)\s+(?:as|to)\s+["']?(.+?)["']?\s*\.?\s*$/i;
 
 export const handlers = [
   // GET /api/report/:caseId/scaffold — Load report scaffold
@@ -174,6 +193,21 @@ export const handlers = [
     await delay(400); // Simulate LLM processing time
 
     const body = (await request.json()) as LlmInstructionRequest;
+
+    // Dev-harness: for the "standardize/rename part X as Y" pattern, the rules
+    // engine mock returns an empty-actions response so PromptArea escalates to
+    // the LLM handler at /api/interpret (which produces the set_authored_label
+    // action tagged 'ai_suggested'). Without this short-circuit, the classifier
+    // would match "part A" as a content intent and never escalate.
+    if (DEV_HARNESS_STANDARDIZE_PATTERN.test(body.instruction)) {
+      return HttpResponse.json({
+        actions: [],
+        clarifications: [],
+        confidence: 0,
+        summary: 'Escalating to LLM for label standardization',
+      });
+    }
+
     const response = mockInterpretInstruction(body);
     return HttpResponse.json(response);
   }),
@@ -254,9 +288,39 @@ export const handlers = [
     });
   }),
 
-  // NOTE: /api/interpret is NOT handled by MSW — it passes through to the Vite proxy
-  // which routes to the MCP server at localhost:8001/interpret for real LLM interpretation.
-  // If the MCP server is not running, the fetch fails and the frontend uses the local fallback.
+  // NOTE: /api/interpret is normally passed through to the MCP server. The handler
+  // below only intercepts a specific dev-harness pattern that simulates an LLM
+  // producing a `set_authored_label` action, so the nomenclature staging lifecycle
+  // (SDS 04-04 §3.1) can be exercised in standalone mode without a running MCP.
+  // All other requests passthrough to let real MCP inference do its thing.
+  http.post('/api/interpret', async ({ request }) => {
+    const body = (await request.clone().json()) as LlmInstructionRequest;
+    const match = body.instruction.match(DEV_HARNESS_STANDARDIZE_PATTERN);
+    if (!match) {
+      return HttpResponse.passthrough();
+    }
+    const partLabel = match[1].toUpperCase();
+    const newLabel = match[2].trim();
+    const targetPart = body.caseContext.parts.find((p) => p.partLabel === partLabel);
+    if (!targetPart) {
+      return HttpResponse.passthrough();
+    }
+    await delay(100);
+    return HttpResponse.json({
+      actions: [
+        {
+          type: 'set_authored_label',
+          partLabel,
+          payload: { label: newLabel },
+          confidence: 0.85,
+        },
+      ],
+      clarifications: [],
+      confidence: 0.85,
+      summary: `Standardize Part ${partLabel} label to "${newLabel}"`,
+      provider: 'mock-dev-harness',
+    });
+  }),
 
   // GET /api/mnemonics/search — Mnemonic search (standalone mock)
   http.get('/api/mnemonics/search', async ({ request }) => {
@@ -297,6 +361,65 @@ export const handlers = [
   // POST /api/audit/events — Audit event sink (no-op in standalone)
   http.post('/api/audit/events', async () => {
     return HttpResponse.json({ accepted: true });
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Nomenclature staging dictionary (SDS 04-04 §3.1–§3.2)
+  // ---------------------------------------------------------------------------
+
+  // POST /api/nomenclature/staging — Create (or dedup+confirm) a staging entry
+  http.post('/api/nomenclature/staging', async ({ request }) => {
+    await delay(50);
+    const body = (await request.json()) as CreateStagingInput;
+    const result = mockNomenclatureStore.createStagingEntry(body);
+    return HttpResponse.json(result);
+  }),
+
+  // POST /api/nomenclature/staging/:id/confirm — Append a confirmation
+  http.post('/api/nomenclature/staging/:id/confirm', async ({ params, request }) => {
+    await delay(50);
+    const id = params.id as string;
+    const body = (await request.json()) as Confirmation;
+    try {
+      const result = mockNomenclatureStore.appendConfirmation(id, body);
+      return HttpResponse.json(result);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return HttpResponse.json({ error: msg }, { status: 404 });
+    }
+  }),
+
+  // POST /api/nomenclature/staging/:id/promote — Promote if eligible
+  http.post('/api/nomenclature/staging/:id/promote', async ({ params }) => {
+    await delay(50);
+    const id = params.id as string;
+    try {
+      const result = mockNomenclatureStore.promoteIfEligible(id);
+      return HttpResponse.json(result);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return HttpResponse.json({ error: msg }, { status: 404 });
+    }
+  }),
+
+  // GET /api/nomenclature/staging — List all non-retired staging entries
+  http.get('/api/nomenclature/staging', async () => {
+    await delay(50);
+    return HttpResponse.json(mockNomenclatureStore.getByTier('staging'));
+  }),
+
+  // GET /api/nomenclature/institutional — List all non-retired institutional entries
+  http.get('/api/nomenclature/institutional', async () => {
+    await delay(50);
+    return HttpResponse.json(mockNomenclatureStore.getByTier('institutional'));
+  }),
+
+  // POST /api/nomenclature/_reset — Dev-only test isolation endpoint (no production equivalent).
+  // Replaces the in-memory NomenclatureStore with a fresh instance so E2E tests can run
+  // without inheriting state from earlier runs. Not present in integrated mode.
+  http.post('/api/nomenclature/_reset', async () => {
+    mockNomenclatureStore.reset();
+    return HttpResponse.json({ ok: true });
   }),
 ];
 

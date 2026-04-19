@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-03 |
-| **Version** | 2.3 DRAFT |
+| **Version** | 2.3 |
 | **Date** | April 18, 2026 |
 | **Stage** | 3A (Voice), 3C (LLM Assist) |
-| **Status** | DRAFT |
+| **Status** | Active |
 
 ---
 

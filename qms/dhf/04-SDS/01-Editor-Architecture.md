@@ -3,10 +3,10 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-01 |
-| **Version** | 2.0 DRAFT |
+| **Version** | 2.0 |
 | **Date** | March 13, 2026 |
 | **Stage** | 1 — Editor Core |
-| **Status** | DRAFT |
+| **Status** | Active |
 
 ---
 
