@@ -201,7 +201,9 @@ function executeIntent(intent: InstructionIntent, req: LlmInstructionRequest): I
     case 'add_finding_to_part':
       return executePartFinding(intent, parts);
     case 'populate_counted':
-      return executeCounted(intent, parts);
+      return executeCounted(intent, parts, req.caseContext.specimenType);
+    case 'populate_range':
+      return executeRange(intent, parts, req.caseContext.specimenType);
     case 'reorder_parts':
       return executeReorderParts(intent, parts);
     case 'populate_fallback':
@@ -708,9 +710,73 @@ function executePartFinding(
 function executeCounted(
   intent: InstructionIntent,
   parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
 ): IntentResult {
-  const findings = intent.params.findings as CountedFinding[];
+  const rawFindings = intent.params.findings as CountedFinding[];
+  // Expand bare "benign" findings to the institutional specimen-aware form
+  // (same expert-system logic as extractBenignDiagnosis). Anything already
+  // qualified ("Benign polyp", "Hyperplastic polyp") passes through.
+  const findings = rawFindings.map((f) => ({
+    ...f,
+    text: expandIfBareBenign(f.text, specimenType),
+  }));
   return handleCountBasedPopulation(findings, parts);
+}
+
+function executeRange(
+  intent: InstructionIntent,
+  parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
+): IntentResult {
+  const startPart = intent.params.startPart as number;
+  const endPart = intent.params.endPart as number;
+  const rawText = intent.params.text as string;
+  const finalText = expandIfBareBenign(rawText, specimenType);
+
+  const actions: LlmAction[] = [];
+  const clarifications: Clarification[] = [];
+
+  // Range is 1-based inclusive; the pathologist said "parts 1 through 6".
+  for (let i = startPart - 1; i <= endPart - 1; i++) {
+    if (i < 0 || i >= parts.length) continue;
+    const part = parts[i];
+    actions.push({
+      type: 'set_clauses',
+      partLabel: part.partLabel,
+      payload: {
+        clauses: [{ text: finalText, type: 'DIAGNOSIS' as ClauseType }],
+      },
+      confidence: 0.9,
+    });
+  }
+
+  if (actions.length === 0) {
+    clarifications.push({
+      question:
+        `Part range ${startPart}–${endPart} is out of bounds for this case (${parts.length} parts).`,
+      context: 'Range out of bounds',
+    });
+  }
+
+  return {
+    actions,
+    clarifications,
+    confidence: actions.length > 0 ? 0.9 : 0.3,
+  };
+}
+
+/**
+ * Expand a bare "Benign" (or "benign") finding to the institutional
+ * specimen-aware form via the same table used by `extractBenignDiagnosis`.
+ * Anything that's already qualified passes through unchanged. Shared by the
+ * count and range handlers so range-based "parts 1 through 6 benign" and
+ * count-based "six benign" both get the right institutional phrasing.
+ */
+function expandIfBareBenign(text: string, specimenType: string | null): string {
+  if (text.trim().toLowerCase() !== 'benign') return text;
+  const organ = extractOrganSystem(specimenType);
+  if (organ && BENIGN_BY_ORGAN[organ]) return BENIGN_BY_ORGAN[organ];
+  return 'Benign';
 }
 
 function executeFallback(

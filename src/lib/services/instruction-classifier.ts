@@ -16,6 +16,7 @@ export type InstructionIntentType =
   | 'remove_clause'         // "remove the margin from Part A"
   | 'populate_benign'       // "benign" / "all benign"
   | 'populate_counted'      // "two hyperplastic polyps and one adenoma"
+  | 'populate_range'        // "parts 1 through 6 are benign"
   | 'add_margin'            // "margins negative closest 3 mm"
   | 'add_finding_to_part'   // "Part B has positive margins"
   | 'populate_fallback'     // single diagnosis dictation (text looks medical)
@@ -187,7 +188,41 @@ function classifySegment(
     return intents;
   }
 
-  // --- Benign pattern (must be checked before margin/part-ref/count) ---
+  // --- Range pattern: "parts 1 through 6 are benign", "8 through 15 benign" ---
+  // Checked before benign/count so explicit range syntax wins when present.
+  const range = parseRangeInstruction(text);
+  if (range) {
+    intents.push({
+      type: 'populate_range',
+      sourceFragment: segment,
+      params: {
+        rawText: text,
+        startPart: range.startPart,
+        endPart: range.endPart,
+        text: range.text,
+      },
+      confidence: 0.95,
+    });
+    return intents;
+  }
+
+  // --- Count-based pattern: "six benign prostatic tissue", "two polyps" ---
+  // Checked before the bare-benign pattern so "six benign ..." routes to the
+  // count handler (populates only N parts) rather than the benign handler
+  // (populates ALL parts). The benign handler remains the fallback for
+  // count-less instructions like "benign" or "all benign".
+  const countedEarly = parseCountBasedInstruction(text);
+  if (countedEarly) {
+    intents.push({
+      type: 'populate_counted',
+      sourceFragment: segment,
+      params: { findings: countedEarly },
+      confidence: 0.9,
+    });
+    return intents;
+  }
+
+  // --- Benign pattern (bare "benign" / "all benign" — apply to all parts) ---
   if (/\bbenign\b/.test(text) && !/\bmalignant|carcinoma|adenoma\b/.test(text)) {
     intents.push({
       type: 'populate_benign',
@@ -241,17 +276,9 @@ function classifySegment(
     return intents;
   }
 
-  // --- Count-based: "two hyperplastic polyps and one adenoma" ---
-  const counted = parseCountBasedInstruction(text);
-  if (counted) {
-    intents.push({
-      type: 'populate_counted',
-      sourceFragment: segment,
-      params: { findings: counted },
-      confidence: 0.9,
-    });
-    return intents;
-  }
+  // Note: the count-based pattern check moved above the benign/margin/part-ref
+  // blocks so "six benign prostatic tissue" routes through the count handler
+  // (populate only 6 parts) rather than the benign handler (populate all).
 
   // --- Fallback decision: medical content → populate, ambiguous → escalate ---
   if (text.trim()) {
@@ -732,19 +759,33 @@ export interface CountedFinding {
   text: string;
 }
 
-function parseCountBasedInstruction(instruction: string): CountedFinding[] | null {
-  const numberWords: Record<string, number> = {
-    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6,
-  };
+const NUMBER_WORDS: Record<string, number> = {
+  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6,
+  seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+  thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+  eighteen: 18, nineteen: 19, twenty: 20,
+};
 
-  const pattern = /(\d+|one|two|three|four|five|six)\s+(.+?)(?:\s+and\s+|\s*,\s*|$)/gi;
+const NUMBER_WORD_OR_DIGIT = String.raw`\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty`;
+
+function parseNumberToken(token: string): number {
+  const lower = token.toLowerCase();
+  if (NUMBER_WORDS[lower] !== undefined) return NUMBER_WORDS[lower];
+  const n = parseInt(lower, 10);
+  return isNaN(n) ? 0 : n;
+}
+
+function parseCountBasedInstruction(instruction: string): CountedFinding[] | null {
+  const pattern = new RegExp(
+    `(${NUMBER_WORD_OR_DIGIT})\\s+(.+?)(?:\\s+and\\s+|\\s*,\\s*|$)`,
+    'gi',
+  );
   const findings: CountedFinding[] = [];
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(instruction)) !== null) {
-    const countStr = match[1].toLowerCase();
-    const count = numberWords[countStr] ?? parseInt(countStr, 10);
-    if (isNaN(count)) continue;
+    const count = parseNumberToken(match[1]);
+    if (!count) continue;
 
     let text = match[2].trim();
 
@@ -759,4 +800,48 @@ function parseCountBasedInstruction(instruction: string): CountedFinding[] | nul
   }
 
   return findings.length > 0 ? findings : null;
+}
+
+/**
+ * Parse a range instruction: "parts 1 through 6 are benign", "8 through 15
+ * benign", "cores 17 to 19 benign prostatic tissue". Returns the 1-based
+ * start/end part indices and the finding text (singularized + capitalized).
+ *
+ * Supports number-words and digits on both endpoints; separators `through`,
+ * `to`, `-`, `–` (en-dash). The "parts/cores/sections" prefix is optional,
+ * and connector phrases ("are", "is", "has", "should say") between the
+ * endpoint and the finding are tolerated.
+ */
+export interface RangeFinding {
+  startPart: number;
+  endPart: number;
+  text: string;
+}
+
+function parseRangeInstruction(instruction: string): RangeFinding | null {
+  const re = new RegExp(
+    // Optional "parts/cores/sections" + first number + separator + second number
+    `\\b(?:parts?|cores?|sections?)?\\s*(${NUMBER_WORD_OR_DIGIT})\\s*(?:through|to|-|\u2013|\u2014)\\s*(${NUMBER_WORD_OR_DIGIT})`
+    // Optional connector ("are", "is", "has", "should say", "should be") + finding
+    + `\\s*(?:are|is|has|should\\s+say|should\\s+be)?\\s*(.+?)\\s*$`,
+    'i',
+  );
+  const m = instruction.match(re);
+  if (!m) return null;
+
+  const startPart = parseNumberToken(m[1]);
+  const endPart = parseNumberToken(m[2]);
+  if (!startPart || !endPart || endPart < startPart) return null;
+
+  let text = m[3].trim();
+  if (!text) return null;
+
+  // Drop trailing punctuation.
+  text = text.replace(/[.!?]+$/, '').trim();
+  if (!text) return null;
+
+  text = normalizeFindingSingular(text);
+  text = text.charAt(0).toUpperCase() + text.slice(1);
+
+  return { startPart, endPart, text };
 }

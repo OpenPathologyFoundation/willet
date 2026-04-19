@@ -123,6 +123,104 @@ describe('mockInterpretInstruction', () => {
       );
     });
 
+    it('"six benign prostatic tissue" populates only 6 parts on an 8-part case', () => {
+      // The previous bug: benign pattern matched first and populated ALL parts
+      // ignoring the count word. Fixed by moving count check above benign.
+      const parts = Array.from({ length: 8 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('six benign prostatic tissue', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(6);
+      // First 6 parts (A..F) get the finding; G and H are untouched.
+      const labels = result.actions.map((a) => a.partLabel);
+      expect(labels).toEqual(['A', 'B', 'C', 'D', 'E', 'F']);
+      for (const a of result.actions) {
+        const payload = a.payload as { clauses: Clause[] };
+        expect(payload.clauses[0].text).toBe('Benign prostatic tissue');
+      }
+    });
+
+    it('"six benign" (bare) on a prostate case expands to the institutional form per part', () => {
+      const parts = Array.from({ length: 8 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('six benign', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(6);
+      const firstPayload = result.actions[0].payload as { clauses: Clause[] };
+      expect(firstPayload.clauses[0].text).toBe('Benign prostatic tissue');
+    });
+
+    it('extended number words ("eight", "fifteen", "twenty") count correctly', () => {
+      const parts = Array.from({ length: 20 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const eight = mockInterpretInstruction(
+        makeRequest('eight benign prostatic tissue', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(eight.actions).toHaveLength(8);
+
+      const fifteen = mockInterpretInstruction(
+        makeRequest('fifteen benign prostatic tissue', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(fifteen.actions).toHaveLength(15);
+    });
+
+    it('range syntax "parts 1 through 6 are benign" populates parts 1–6 (specimen-aware)', () => {
+      const parts = Array.from({ length: 8 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('parts 1 through 6 are benign', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(6);
+      const labels = result.actions.map((a) => a.partLabel);
+      expect(labels).toEqual(['A', 'B', 'C', 'D', 'E', 'F']);
+      const firstPayload = result.actions[0].payload as { clauses: Clause[] };
+      expect(firstPayload.clauses[0].text).toBe('Benign prostatic tissue');
+    });
+
+    it('range syntax with an offset start: "8 through 15 benign" populates parts 8–15', () => {
+      const parts = Array.from({ length: 20 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('8 through 15 benign', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(8);
+      // Parts H (index 7) through O (index 14) — that's 1-based 8 through 15.
+      const labels = result.actions.map((a) => a.partLabel);
+      expect(labels).toEqual(['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']);
+      const firstPayload = result.actions[0].payload as { clauses: Clause[] };
+      expect(firstPayload.clauses[0].text).toBe('Benign prostatic tissue');
+    });
+
+    it('range syntax with word numbers: "eight through fifteen benign"', () => {
+      const parts = Array.from({ length: 20 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('eight through fifteen benign', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(8);
+      expect(result.actions[0].partLabel).toBe('H');
+    });
+
+    it('range syntax: "cores 17 to 19 benign" also works with "cores" and "to"', () => {
+      const parts = Array.from({ length: 20 }, (_, i) =>
+        makePart(String.fromCharCode(65 + i)),
+      );
+      const result = mockInterpretInstruction(
+        makeRequest('cores 17 to 19 benign', parts, undefined, 'Prostate, needle biopsy'),
+      );
+      expect(result.actions).toHaveLength(3);
+      const labels = result.actions.map((a) => a.partLabel);
+      expect(labels).toEqual(['Q', 'R', 'S']);
+    });
+
     it('handles part-specific instruction', () => {
       const result = mockInterpretInstruction(
         makeRequest('Part A has adenocarcinoma', [makePart('A'), makePart('B')]),
