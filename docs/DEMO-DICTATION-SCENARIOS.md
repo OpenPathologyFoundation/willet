@@ -1,9 +1,11 @@
 # WILLET — Pathologist Dictation Demo Scenarios
 
-**Version:** 3.0
-**Date:** 2026-04-05
+**Version:** 3.1
+**Date:** 2026-04-19
 **Purpose:** Human testing script for live dictation demos. Each scenario maps to a mock case fixture and exercises a specific voice pipeline pathway.
 
+> **v3.1 changes:** Added Scenario 31 — Full Prostate Needle Biopsy Workup (20-core synthetic case). Exercises specimen-aware expansion, range-based population, LLM escalation on complex per-core findings, visual provenance badges, hover-to-acknowledge, and explicit LLM invocation (`ai:` prefix / Ask AI button). Designed as the capstone demo showing the dual-process architecture (SDS 04-03 §5.5) in a single realistic pathologist workflow.
+>
 > **v3.0 changes:** Added Scenarios 16–30 (LLM escalation, conversational framing, multi-part via LLM, formatting instructions, implicit references, error recovery, full workup sequences, stress tests). These require the MCP server running for real Claude interpretation.
 >
 > **v2.0 changes:** Added Scenarios 11–15 (intent classification, correction, replacement, formatting, compound multi-intent). Updated critical review notes throughout. Added Layer 1 correction spot-check entries for new confusion pairs.
@@ -915,6 +917,115 @@ Part B: sentinel lymph node with quantified metastatic deposit
 - Gleason uses symbols: 4+3=7
 - Professional formatting throughout
 - MCP server should show `POST /interpret` (this is too complex for the rules engine)
+
+
+## Scenario 31 — Full Prostate Needle Biopsy Workup (20-core synthetic case)
+
+**Case:** S26-0007 (Prostate needle biopsy — currently 8 parts; this scenario is written for a 20-core biopsy. Use the 8-part fixture and compress the ranges, or extend the fixture to 20 cores for the full demo.)
+**Pipeline layers tested:** Every layer — specimen-aware expansion (rules), range-based population (rules → LLM), complex per-part findings (LLM), visual provenance + hover-to-acknowledge, explicit LLM invocation.
+**What this demonstrates:** A realistic end-to-end pathologist workflow on a multi-core prostate biopsy. Most cores are benign — handled by the fast expert-system path. A few have complex carcinoma findings — escalated to the LLM with full structured detail. The result is a clinically plausible final diagnosis that shows both halves of the dual-process architecture (SDS 04-03 §5.5) working together.
+
+### Synthetic case
+
+**Cores 1–20, right and left prostate:**
+
+| Cores | Finding |
+|---|---|
+| 1–6   | Benign prostatic tissue |
+| 7     | Prostatic adenocarcinoma, Gleason 3+4=7, Grade Group 2, pattern 3 at 8%, core positive 10 × 18 mm (~60%) |
+| 8–15  | Benign prostatic tissue |
+| 16    | Prostatic adenocarcinoma, Gleason 3+4=7, Grade Group 2, pattern 3 at 8% |
+| 17–19 | Benign prostatic tissue |
+| 20    | Prostatic adenocarcinoma, Gleason 3+3=6, Grade Group 1, core positive 7 × 12 mm (~60%) |
+
+**What the pathologist sees at the end:** 17 benign cores and 3 carcinoma cores, each with the right level of detail. Benign cores come from the expert-system path (tagged `rule`, auto-applied, no badge). Carcinoma cores come through the LLM path (tagged `ai_suggested`, badges appear for attention, hover to acknowledge).
+
+### Steps
+
+1. Open case **S26-0007** from the worklist. Do NOT click into any clause field — leave focus neutral so dictation goes to the prompt.
+
+2. **Bulk benign — cores 1 through 6** (expert-system path). Dictate or type:
+
+   > "Parts 1 through 6 are benign"
+
+   Click Send. Each of cores 1–6 populates with **"Benign prostatic tissue"** — the specimen-aware expansion table (SDS 04-03 §5.5) recognizes the prostate context and writes the institutional form. No "AI, verify" badge; tagged `rule`; auto-applied. Watch the MCP server terminal — no `POST /interpret` should fire.
+
+3. **Core 7 — complex carcinoma** (LLM path). Dictate or type:
+
+   > "Part 7: prostatic adenocarcinoma, Gleason 3 plus 4 equals 7, grade group 2, pattern 3 at 8 percent, core positive 10 by 18 millimeters, about 60 percent of the core"
+
+   Click Send. The rules engine returns no actions for this complex instruction, so the pipeline auto-escalates to the LLM. The LLM returns structured clauses for Part 7 with the full quantitative detail. Because the source is `ai_suggested`, the pending-confirmation block appears. Click **Apply**. An **"AI, verify"** badge appears beneath the clause text.
+
+4. **Cores 8 through 15 — benign range** (expert-system path):
+
+   > "Parts 8 through 15 are benign"
+
+   Send. Eight cores populate with "Benign prostatic tissue." Rules-engine, auto-applied.
+
+5. **Core 16 — second carcinoma** (LLM path):
+
+   > "Part 16: prostatic adenocarcinoma, Gleason 3 plus 4 equals 7, grade group 2, pattern 3 at 8 percent"
+
+   Send → confirm → "AI, verify" badge appears on Part 16.
+
+6. **Cores 17 through 19 — benign** (expert-system path):
+
+   > "Parts 17 through 19 are benign"
+
+7. **Core 20 — low-grade carcinoma** (LLM path):
+
+   > "Part 20: prostatic adenocarcinoma, Gleason 3 plus 3 equals 6, grade group 1, core positive 7 by 12 millimeters, about 60 percent"
+
+   Send → confirm → "AI, verify" badge on Part 20.
+
+8. **Acknowledge the AI-verify badges** on cores 7, 16, and 20. Rest the pointer on each badge for ~1 second; the badge fades out. (Keyboard alternative: Tab to the badge → Enter.) The clause text stays; only the attention flag is dismissed.
+
+9. **(Optional) Explicit LLM invocation for formatting**. At the end, type:
+
+   > "ai: format the entire report for academic sign-out"
+
+   Or click the **Ask AI** button next to Send with the same instruction. The `ai:` prefix (or the button) bypasses the rules engine and routes directly to the LLM. All clauses get a formatted pass for sign-out.
+
+### Expected final state
+
+- **17 benign cores** (1–6, 8–15, 17–19): each reads "Benign prostatic tissue"
+- **Core 7**: Prostatic adenocarcinoma DIAGNOSIS + quantitative ancillary detail (Gleason 3+4=7, Grade Group 2, pattern 3 at 8%, core positive 10 × 18 mm, ~60%). AI-verify badge acknowledged.
+- **Core 16**: Prostatic adenocarcinoma, Gleason 3+4=7, Grade Group 2, pattern 3 at 8%. AI-verify badge acknowledged.
+- **Core 20**: Prostatic adenocarcinoma, Gleason 3+3=6, Grade Group 1, core positive 7 × 12 mm, ~60%. AI-verify badge acknowledged.
+- Gleason scores use symbols (3+4=7, not "3 plus 4 equals 7") — applied by the LLM's structured output or by the `use symbols` format directive.
+- The instruction log shows 6 or 7 entries (one per Send), each labeled with rules-engine vs. LLM provenance.
+
+### What this really tests
+
+| Capability | Step |
+|---|---|
+| Specimen-aware expansion ("benign" + prostate → "Benign prostatic tissue") | 2, 4, 6 |
+| Range-based multi-part population ("Parts 1 through 6") | 2, 4, 6 |
+| LLM handling of complex clinical content (quantitative detail) | 3, 5, 7 |
+| v2.3 source-based confirmation flow (`ai_suggested` never auto-applies) | 3, 5, 7 |
+| Visual provenance badge rendering (clause-level) | 3, 5, 7 |
+| Hover-to-acknowledge on AI-verify badges | 8 |
+| Explicit LLM invocation via `ai:` prefix or Ask AI button | 9 |
+| Dual-process architecture (rules + LLM composing across turns) | whole scenario |
+
+### Variations to try during the demo
+
+- **Say "grade group 2" for 3+3=6** (a common clinical slip) and then correct with: *"Change Part 20 to grade group 1"* — demonstrates the `replace_clause` intent. Grade Group 1 corresponds to Gleason 3+3=6.
+- **Mix range and per-part in one utterance** (stress test):
+  > "Parts 1 through 6 are benign. Part 7 is prostatic adenocarcinoma Gleason 3 plus 4 equals 7."
+
+  LLM should split into two actions: a range populate + a part-specific populate.
+- **Use dictation instead of typing** to exercise Layer 0 (prostate vocabulary seeding) and Layer 1 (correction of "gleeson" → "Gleason", "i snap" → "ISUP", etc.).
+- **Reverse the AI-invocation pattern**: type *"all benign"* (rules engine, auto-apply) vs. *"ai: all benign"* (LLM path, requires confirmation). Same result, different source tag and different UX — demonstrates the architectural principle without a single pathologist character difference.
+
+### What Can Go Wrong
+
+- If "benign" on a prostate part produces just "Benign" (not "Benign prostatic tissue"), the specimen-aware expansion table isn't reading `caseContext.specimenType`. Check that S26-0007's specimenType starts with "Prostate, needle biopsy" or similar.
+- If range syntax ("Parts 1 through 6") populates only one part, the rules engine's range parser didn't match — the instruction escalates to the LLM, which should handle the range correctly. If neither does, the pipeline falls back to "populate first empty part."
+- If the "AI, verify" badge doesn't fade on hover, check that the clause's `source` field is `ai_suggested` (inspect in DevTools). Hover-to-acknowledge only applies to `ai_suggested`; deterministic sources have no badge to acknowledge.
+- If the Gleason score stays as words ("3 plus 4 equals 7") rather than symbols, the LLM didn't apply the `use_symbols` format directive. Add an explicit formatting instruction at the end.
+
+> **Demo narration tip:** when running this scenario live, pause after step 2 to show that the rules engine handled 6 cores in a single utterance with zero ceremony — no badges, no confirmations, just institutional-form text auto-applied. Then after step 3, pause to show the "AI, verify" badge and explain that the LLM path deliberately surfaces probabilistic output for human confirmation — the System-2-in-the-loop principle. The contrast makes the dual-process architecture visceral in ten seconds.
 
 
 ---
