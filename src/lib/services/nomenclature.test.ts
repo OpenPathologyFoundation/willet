@@ -526,3 +526,183 @@ describe('NomenclatureStore — personal tier (SDS 04-04 §2.1)', () => {
     expect(() => store.deletePersonalEntry(entry.id)).toThrow(/not 'personal'/);
   });
 });
+
+describe('NomenclatureStore — override-quarantine (SDS 04-04 §3.4)', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  function makeStagingWithOverrides(): string {
+    const { entry } = store.createStagingEntry({
+      designator: 'Tumor',
+      standardized: 'Colon, right hemicolectomy, resection',
+      userId: 'alice',
+      caseId: 'c1',
+    });
+    return entry.id;
+  }
+
+  it('counts a substantive override and emits an override_counted event', () => {
+    const id = makeStagingWithOverrides();
+    const result = store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'alice',
+        caseId: 'c1',
+        timestamp: '2026-04-19T10:00:00Z',
+        before: 'Colon, right hemicolectomy, resection',
+        after: 'Right hemicolectomy, terminal ileum and cecum',
+      },
+    });
+    expect(result.counted).toBe(true);
+    expect(result.entry.overrides).toHaveLength(1);
+    expect(result.events[0].kind).toBe('override_counted');
+    expect(result.newlyQuarantined).toBe(false);
+  });
+
+  it('ignores trivial (whitespace / case / punctuation) edits per §3.4', () => {
+    const id = makeStagingWithOverrides();
+    const result = store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'alice',
+        caseId: 'c1',
+        timestamp: '2026-04-19T10:00:00Z',
+        before: 'Colon, right hemicolectomy, resection',
+        after: 'COLON, RIGHT HEMICOLECTOMY, RESECTION',
+      },
+    });
+    expect(result.counted).toBe(false);
+    expect(result.events).toHaveLength(0);
+    expect(result.entry.overrides ?? []).toHaveLength(0);
+  });
+
+  it('quarantines at the 3rd override within the 30-day window and emits a quarantined event', () => {
+    const id = makeStagingWithOverrides();
+    const base = new Date('2026-04-19T10:00:00Z');
+    const results = [0, 1, 2].map((i) =>
+      store.recordOverride({
+        entryId: id,
+        record: {
+          userId: `user-${i}`,
+          caseId: `c-${i}`,
+          timestamp: new Date(base.getTime() + i * 86400_000).toISOString(),
+          before: 'Colon, right hemicolectomy, resection',
+          after: `Preferred form ${i}`,
+        },
+        now: new Date(base.getTime() + i * 86400_000),
+      }),
+    );
+    expect(results[0].newlyQuarantined).toBe(false);
+    expect(results[1].newlyQuarantined).toBe(false);
+    expect(results[2].newlyQuarantined).toBe(true);
+    const quarantinedEvent = results[2].events.find((e) => e.kind === 'quarantined');
+    expect(quarantinedEvent).toBeDefined();
+    expect(results[2].entry.quarantined).toBe(true);
+    expect(results[2].entry.quarantineReason).toBe('override_threshold');
+    expect(results[2].entry.unlockEligibleAt).toBeNull();
+  });
+
+  it('does NOT re-quarantine an already-quarantined entry on further overrides', () => {
+    const id = makeStagingWithOverrides();
+    const base = new Date('2026-04-19T10:00:00Z');
+    for (const i of [0, 1, 2]) {
+      store.recordOverride({
+        entryId: id,
+        record: {
+          userId: `user-${i}`,
+          caseId: `c-${i}`,
+          timestamp: new Date(base.getTime() + i * 86400_000).toISOString(),
+          before: 'Colon, right hemicolectomy, resection',
+          after: `X-${i}`,
+        },
+        now: new Date(base.getTime() + i * 86400_000),
+      });
+    }
+    const fourth = store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'user-4',
+        caseId: 'c-4',
+        timestamp: new Date(base.getTime() + 3 * 86400_000).toISOString(),
+        before: 'Colon, right hemicolectomy, resection',
+        after: 'Yet another',
+      },
+      now: new Date(base.getTime() + 3 * 86400_000),
+    });
+    expect(fourth.counted).toBe(true);
+    expect(fourth.newlyQuarantined).toBe(false);
+    expect(fourth.events.find((e) => e.kind === 'quarantined')).toBeUndefined();
+  });
+
+  it('drops overrides whose age exceeds the 30-day window from the quarantine calculation', () => {
+    const id = makeStagingWithOverrides();
+    // Two overrides long ago...
+    store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'u', caseId: 'c1',
+        timestamp: '2026-01-01T10:00:00Z',
+        before: 'Colon, right hemicolectomy, resection', after: 'X1',
+      },
+      now: new Date('2026-01-01T10:00:00Z'),
+    });
+    store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'u', caseId: 'c2',
+        timestamp: '2026-01-02T10:00:00Z',
+        before: 'Colon, right hemicolectomy, resection', after: 'X2',
+      },
+      now: new Date('2026-01-02T10:00:00Z'),
+    });
+    // ...and one today, ~100 days later. Only the recent one is in the window.
+    const result = store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'u', caseId: 'c3',
+        timestamp: '2026-04-19T10:00:00Z',
+        before: 'Colon, right hemicolectomy, resection', after: 'X3',
+      },
+      now: new Date('2026-04-19T10:00:00Z'),
+    });
+    expect(result.newlyQuarantined).toBe(false);
+    expect(result.entry.quarantined).not.toBe(true);
+  });
+
+  it('throws for an unknown id', () => {
+    expect(() =>
+      store.recordOverride({
+        entryId: 'missing',
+        record: {
+          userId: 'u', caseId: 'c',
+          timestamp: '2026-04-19T10:00:00Z',
+          before: 'a', after: 'b',
+        },
+      }),
+    ).toThrow(/No entry with id/);
+  });
+
+  it('no-ops for retired entries without counting the override', () => {
+    const id = makeStagingWithOverrides();
+    // Force-retire by promoting.
+    store.appendConfirmation(id, { userId: 'bob', caseId: 'c', timestamp: '2026-04-19T11:00:00Z' });
+    store.appendConfirmation(id, { userId: 'carol', caseId: 'c', timestamp: '2026-04-19T12:00:00Z' });
+    store.appendConfirmation(id, { userId: 'dave', caseId: 'c', timestamp: '2026-04-19T13:00:00Z' });
+    store.appendConfirmation(id, { userId: 'erin', caseId: 'c', timestamp: '2026-04-19T14:00:00Z' });
+    const promoted = store.promoteIfEligible(id);
+    expect(promoted).not.toBeNull();
+    // Staging entry is now retired. Attempting to record an override is a no-op.
+    const result = store.recordOverride({
+      entryId: id,
+      record: {
+        userId: 'u', caseId: 'c',
+        timestamp: '2026-04-19T15:00:00Z',
+        before: 'Colon, right hemicolectomy, resection', after: 'Other',
+      },
+    });
+    expect(result.counted).toBe(false);
+    expect(result.events).toHaveLength(0);
+  });
+});

@@ -24,6 +24,8 @@ import type {
   PromotionResult,
   CreatePersonalInput,
   PersonalResult,
+  OverrideRecord,
+  OverrideResult,
 } from '$lib/services/nomenclature';
 
 /** Case- and whitespace-insensitive normalization (mirrors the server-side rule). */
@@ -185,6 +187,33 @@ class NomenclatureSvelteStore {
   async removePersonal(api: ApiClient, entryId: string): Promise<void> {
     await api.deleteNomenclaturePersonal(entryId);
     this.personal = this.personal.filter((e) => e.id !== entryId);
+  }
+
+  /**
+   * Submit a substantive pathologist override of a dictionary entry's
+   * deterministic output (SDS 04-04 §3.4). Trivial edits (whitespace / case /
+   * punctuation only) are dropped server-side. When the override count
+   * reaches the threshold, the entry transitions to `quarantined: true`
+   * and `decidePolicy` in `source-policy` demotes it to `always_confirm`.
+   * The reactive `staging` and `institutional` arrays are updated in place
+   * so provenance badges reflect the new quarantine state immediately.
+   */
+  async recordOverride(
+    api: ApiClient,
+    entryId: string,
+    record: OverrideRecord,
+  ): Promise<OverrideResult> {
+    const result = await api.recordNomenclatureOverride(entryId, record);
+    // Mirror the updated entry into whichever tier array it lives in.
+    const replaceIn = (list: NomenclatureEntry[]) => {
+      const idx = list.findIndex((e) => e.id === entryId);
+      if (idx === -1) return list;
+      return [...list.slice(0, idx), result.entry, ...list.slice(idx + 1)];
+    };
+    this.staging = replaceIn(this.staging);
+    this.institutional = replaceIn(this.institutional);
+    this.personal = replaceIn(this.personal);
+    return result;
   }
 
   private upsertPersonal(entry: NomenclatureEntry): void {

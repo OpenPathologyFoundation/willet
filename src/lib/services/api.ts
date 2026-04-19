@@ -28,6 +28,8 @@ import type {
   Confirmation,
   CreatePersonalInput,
   PersonalResult,
+  OverrideRecord,
+  OverrideResult,
 } from './nomenclature';
 
 export interface ApiClient {
@@ -60,6 +62,9 @@ export interface ApiClient {
   createNomenclaturePersonal(input: CreatePersonalInput): Promise<PersonalResult>;
   listNomenclaturePersonal(userId?: string): Promise<NomenclatureEntry[]>;
   deleteNomenclaturePersonal(entryId: string): Promise<void>;
+
+  // Override-quarantine (SDS 04-04 §3.4)
+  recordNomenclatureOverride(entryId: string, record: OverrideRecord): Promise<OverrideResult>;
 }
 
 /** Typed API error with HTTP status and optional response body. */
@@ -193,6 +198,13 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     },
     async deleteNomenclaturePersonal(entryId) {
       await request<unknown>('DELETE', `/api/nomenclature/personal/${encodeURIComponent(entryId)}`);
+    },
+    recordNomenclatureOverride(entryId, record) {
+      return request<OverrideResult>(
+        'POST',
+        `/api/nomenclature/${encodeURIComponent(entryId)}/override`,
+        record,
+      );
     },
   };
 }

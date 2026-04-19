@@ -12,6 +12,7 @@ import {
   type CreateStagingInput,
   type Confirmation,
   type CreatePersonalInput,
+  type OverrideRecord,
 } from '$lib/services/nomenclature';
 
 // In-memory user preferences (standalone persistence)
@@ -445,6 +446,22 @@ export const handlers = [
     try {
       mockNomenclatureStore.deletePersonalEntry(id);
       return HttpResponse.json({ ok: true });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return HttpResponse.json({ error: msg }, { status: 404 });
+    }
+  }),
+
+  // POST /api/nomenclature/:id/override — Record a substantive pathologist
+  // override of a deterministic output (SDS 04-04 §3.4). Triggers quarantine
+  // when the override count within the window reaches the threshold.
+  http.post('/api/nomenclature/:id/override', async ({ params, request }) => {
+    await delay(50);
+    const id = params.id as string;
+    const record = (await request.json()) as OverrideRecord;
+    try {
+      const result = mockNomenclatureStore.recordOverride({ entryId: id, record });
+      return HttpResponse.json(result);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       return HttpResponse.json({ error: msg }, { status: 404 });

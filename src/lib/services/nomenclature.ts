@@ -29,7 +29,12 @@
  *   - Persistence wrapper + MSW handlers — Phase 2B.
  */
 
-import { isPromotionEligible, type PolicyConfig, DEFAULT_POLICY } from './source-policy';
+import {
+  isPromotionEligible,
+  shouldQuarantine,
+  type PolicyConfig,
+  DEFAULT_POLICY,
+} from './source-policy';
 
 /**
  * Storage tiers from SDS 04-04 §2.1. Each tier has distinct governance and
@@ -55,6 +60,20 @@ export interface Confirmation {
   readonly userId: string;
   readonly timestamp: string; // ISO-8601
   readonly caseId: string;
+}
+
+/**
+ * Record of a pathologist substantively overriding a deterministic output
+ * (SDS 04-04 §3.4). Three of these within a 30-day window triggers
+ * override-quarantine, which demotes the entry from auto-apply to
+ * `always_confirm` per `source-policy.decidePolicy`.
+ */
+export interface OverrideRecord {
+  readonly userId: string;
+  readonly timestamp: string; // ISO-8601
+  readonly caseId: string;
+  readonly before: string;
+  readonly after: string;
 }
 
 /**
@@ -94,6 +113,9 @@ export interface NomenclatureEntry {
   readonly retired?: boolean;
   readonly retiredAt?: string;
   readonly retirementReason?: 'unused_window' | 'admin_deprecation' | 'superseded';
+
+  // Override history (for §3.4 quarantine threshold evaluation)
+  readonly overrides?: OverrideRecord[];
 }
 
 /**
@@ -121,6 +143,20 @@ export type NomenclatureEvent =
       readonly stagingEntry: NomenclatureEntry; // Post-retirement state
       readonly institutionalEntry: NomenclatureEntry;
       readonly confirmationsSnapshot: readonly Confirmation[];
+    }
+  | {
+      readonly kind: 'override_counted';
+      readonly entryId: string;
+      readonly record: OverrideRecord;
+      readonly overrideCount: number;
+    }
+  | {
+      readonly kind: 'quarantined';
+      readonly entryId: string;
+      readonly reason: 'override_threshold';
+      readonly overrideCount: number;
+      readonly windowStart: string;
+      readonly windowEnd: string;
     };
 
 export interface CreateStagingInput {
@@ -154,6 +190,27 @@ export interface PromotionResult {
   readonly event: NomenclatureEvent;
 }
 
+export interface RecordOverrideInput {
+  readonly entryId: string;
+  readonly record: OverrideRecord;
+  /** Current time for the 30-day sliding window; defaults to `new Date()`. */
+  readonly now?: Date;
+  /** Override policy config; defaults to DEFAULT_POLICY from source-policy. */
+  readonly config?: PolicyConfig;
+}
+
+export interface OverrideResult {
+  readonly entry: NomenclatureEntry;
+  /** Counted (non-trivial) vs. ignored (trivial per §3.4). */
+  readonly counted: boolean;
+  /**
+   * True when THIS override pushed the entry into quarantined state.
+   * (Already-quarantined entries do NOT re-emit quarantined events here.)
+   */
+  readonly newlyQuarantined: boolean;
+  readonly events: NomenclatureEvent[];
+}
+
 export interface CreatePersonalInput {
   readonly designator: string;
   readonly standardized: string;
@@ -176,6 +233,22 @@ export interface PersonalResult {
  */
 function normalizeDesignator(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+/**
+ * Trivial-edit exclusion per SDS 04-04 §3.4. Whitespace-only, case-only,
+ * and punctuation-only edits do NOT count as overrides — they are cosmetic
+ * and should not drive the quarantine threshold. Exported so UI callers
+ * can short-circuit the override path on trivial edits.
+ */
+export function isTrivialEdit(before: string, after: string): boolean {
+  const strip = (s: string) =>
+    s
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[.,;:!?()\[\]{}"'`\-—–]/g, '');
+  return strip(before) === strip(after);
 }
 
 /**
@@ -465,6 +538,86 @@ export class NomenclatureStore {
       if (userId != null && e.createdBy !== userId) return false;
       return true;
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Override-quarantine (SDS 04-04 §3.4)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Record a substantive pathologist override of an entry's deterministic
+   * output. Trivial edits (whitespace / case / punctuation only, per §3.4)
+   * are silently dropped — the caller may also pre-filter via
+   * `isTrivialEdit` to avoid the round-trip. When the override count within
+   * the sliding window reaches the threshold, the entry transitions to
+   * `quarantined: true`.
+   *
+   * Returns `{entry, counted, newlyQuarantined, events}`. `events` contains
+   * an `override_counted` event for counted overrides and a `quarantined`
+   * event when the transition fires — the caller should emit both to the
+   * audit pipeline (SDS 04-04 §6).
+   *
+   * Throws if the entry does not exist. Retired entries silently no-op
+   * (counting overrides on dead entries has no effect).
+   */
+  recordOverride(input: RecordOverrideInput): OverrideResult {
+    const entry = this.entries.get(input.entryId);
+    if (!entry) throw new Error(`No entry with id: ${input.entryId}`);
+    if (entry.retired) {
+      return { entry, counted: false, newlyQuarantined: false, events: [] };
+    }
+
+    // §3.4 trivial-edit exclusion.
+    if (isTrivialEdit(input.record.before, input.record.after)) {
+      return { entry, counted: false, newlyQuarantined: false, events: [] };
+    }
+
+    const overrides = [...(entry.overrides ?? []), input.record];
+    const config = input.config ?? DEFAULT_POLICY;
+    const now = input.now ?? new Date();
+    const wasQuarantined = entry.quarantined === true;
+    const reachedThreshold = shouldQuarantine(overrides, now, config);
+
+    const events: NomenclatureEvent[] = [
+      {
+        kind: 'override_counted',
+        entryId: entry.id,
+        record: input.record,
+        overrideCount: overrides.length,
+      },
+    ];
+
+    let updated: NomenclatureEntry;
+    let newlyQuarantined = false;
+
+    if (reachedThreshold && !wasQuarantined) {
+      const windowEnd = now.toISOString();
+      const windowStart = new Date(
+        now.getTime() - config.overrideWindowDays * 24 * 60 * 60 * 1000,
+      ).toISOString();
+      updated = {
+        ...entry,
+        overrides,
+        quarantined: true,
+        quarantineReason: 'override_threshold',
+        quarantinedAt: windowEnd,
+        unlockEligibleAt: null, // §3.4: explicit admin unlock only
+      };
+      events.push({
+        kind: 'quarantined',
+        entryId: entry.id,
+        reason: 'override_threshold',
+        overrideCount: overrides.length,
+        windowStart,
+        windowEnd,
+      });
+      newlyQuarantined = true;
+    } else {
+      updated = { ...entry, overrides };
+    }
+
+    this.entries.set(entry.id, updated);
+    return { entry: updated, counted: true, newlyQuarantined, events };
   }
 
   /**

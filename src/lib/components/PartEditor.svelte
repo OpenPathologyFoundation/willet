@@ -245,7 +245,12 @@
 
   async function commitHeaderEdit() {
     editingHeader = false;
-    if (headerDraft === (authoredLabel ?? part.partDesignator ?? '')) return;
+    const previousValue = authoredLabel ?? part.partDesignator ?? '';
+    if (headerDraft === previousValue) return;
+
+    // Capture provenance BEFORE we mutate the reportStore — labelProvenance
+    // is derived from the current displayLabel, which changes with the edit.
+    const overridenEntry = labelProvenance;
 
     try {
       await services.api.updateAuthoredLabel(
@@ -256,6 +261,23 @@
       reportStore.updatePart(part.id, part.finalDiagnosis ?? '', {
         authored_label: headerDraft,
       });
+
+      // If the edit overrode a deterministic output (staging or institutional),
+      // record an override per SDS 04-04 §3.4. The service side filters
+      // trivial edits, so we forward unconditionally; it's cheap.
+      if (overridenEntry && (overridenEntry.tier === 'staging' || overridenEntry.tier === 'institutional')) {
+        nomenclatureStore
+          .recordOverride(services.api, overridenEntry.id, {
+            userId: 'standalone-user',
+            caseId: reportStore.caseData!.caseId,
+            timestamp: new Date().toISOString(),
+            before: overridenEntry.standardized,
+            after: headerDraft,
+          })
+          .catch((err) => {
+            console.warn('[WILLET] Override record failed:', err);
+          });
+      }
     } catch {
       // Revert on failure — header stays unchanged
     }
