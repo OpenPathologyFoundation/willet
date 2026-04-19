@@ -6,8 +6,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SRS-002 |
-| **Version** | 2.0 DRAFT |
-| **Date** | March 13, 2026 |
+| **Version** | 2.5 DRAFT |
+| **Date** | April 18, 2026 |
 | **Derived From** | URS v2.0 (WILLET-DHF-URS-001), Design Dialogue v2.0 |
 | **Software Safety Class** | Written at Class B rigor (pending formal classification) |
 | **IEC 62304 Reference** | §5.2.2 — Software Requirements |
@@ -965,38 +965,38 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
-#### SRS-187 · Phase 1
+#### SRS-187 · Phase 1 (Revised v2.3)
 
-**After transcription correction, the system shall apply clause-type-driven normalization to transform clinical shorthand into report-ready language. Normalization behavior shall be determined by the clause type of the target clause: DIAGNOSIS receives full clinical normalization (abbreviation expansion, standard nomenclature); MARGIN and ANCILLARY receive structured normalization (canonical phrasing with measurements); COMMENT receives minimal normalization (grammar and capitalization only); SYNOPTIC_REF receives no normalization. No explicit mode-switch UI shall exist — the clause type badge serves as the implicit indicator.**
+**The system shall provide clinical-to-clerical text normalization (expansion of shorthand into report-ready clinical prose) only on the conversational prompt-area path, as an intrinsic operation of the §4 LLM interpreter that produces structured clause actions. On the direct-dictation path, no semantic normalization shall be applied; the corrected transcript (SRS-185) shall be inserted verbatim. This reconciles with UN-092 (verbatim contract for direct dictation) and UN-087 (clinical-to-clerical translation on the conversational path). Mnemonic expansion remains available in the direct-dictation path via explicit mnemonic entry.**
 
 | Field | Value |
 |---|---|
-| URS trace | UN-087 |
-| SDS trace | 04-03 §16.4 |
-| Verification | Functional test: "mod diff adenocarcinoma" in DIAGNOSIS clause → "Adenocarcinoma, moderately differentiated." "margins are great" in MARGIN clause → "Surgical margins uninvolved by carcinoma." "recommend levels" in COMMENT clause → minimal change. SYNOPTIC_REF → verbatim. |
+| URS trace | UN-087 (revised), UN-092 |
+| SDS trace | 04-03 §2.2, §4, §16.4 |
+| Verification | Functional test: "mod diff adenocarcinoma" dictated into prompt area → DIAGNOSIS clause created containing "Adenocarcinoma, moderately differentiated." Same phrase dictated into a clause field → clause contains "mod diff adenocarcinoma" verbatim. Regression test: fixture-based assertion that direct-dictation output is never normalized. |
 
 ---
 
-#### SRS-188 · Phase 1
+#### SRS-188 · Phase 1 (Revised v2.3)
 
-**Voice dictation into a clause shall push a two-level undo entry. The first Ctrl+Z shall revert the clause text to the Layer 1 output (transcription-corrected but not normalized). The second Ctrl+Z shall revert to the raw Whisper transcript. This provides granular control over the level of automated processing applied to the dictated text.**
+**Voice dictation into a clause (direct-dictation path) shall push a two-level undo entry per dictation event, representing the two processing stages applied in the pipeline (§16.5). The **first Ctrl+Z** shall reveal the raw STT transcript (peeling back the Layer 1 correction), allowing the pathologist to see what the STT actually captured before correction. The **second Ctrl+Z** shall revert the entire dictation (removing the dictated content from the clause). This ordering mirrors "peel back processing in reverse order of application" — the correction is the most recent non-destructive transformation, so it is the first to undo. There is no pre-normalization undo level on the direct-dictation path because there is no normalization (§SRS-187). For the conversational path, undo follows the standard clause-action undo model (SRS-160, SRS-161).**
 
 | Field | Value |
 |---|---|
-| URS trace | UN-086, UN-087 |
+| URS trace | UN-086, UN-092 |
 | SDS trace | 04-03 §16.5 |
-| Verification | Functional test: dictate → normalized text appears → Ctrl+Z → corrected text → Ctrl+Z → raw transcript. Unit test: undo stack contains two entries per dictation event. |
+| Verification | Functional test: dictate into clause → corrected text inserted → Ctrl+Z → raw STT transcript replaces corrected text in the clause → Ctrl+Z → dictation entirely removed. Direct-dictation undo contains exactly two entries per event. Regression: no third undo level exposing a "pre-normalization" state; no undo level reorder. |
 
 ---
 
-#### SRS-189 · Phase 1
+#### SRS-189 · Phase 1 (Revised v2.3)
 
-**When the LLM service is unavailable, transcription correction shall fall back to the deterministic confusion-pair table only, and clause-type normalization shall be skipped entirely. Text shall be inserted as corrected-but-not-normalized (or raw if no table entry exists). This degrades gracefully to the existing SRS-180 direct dictation behavior.**
+**When the LLM service is unavailable, transcription correction (SRS-185) shall fall back to the deterministic confusion-pair table only; the LLM correction fallback step shall be skipped. Text shall be inserted (direct-dictation path) or passed to the LLM interpreter (conversational path — which in this failure mode is itself disabled per §8 graceful degradation). Layer 0 vocabulary biasing continues to operate as long as STT is reachable. There is no "normalization layer" to skip in v2.3 — semantic normalization is implicit in the LLM interpreter, which is itself unavailable.**
 
 | Field | Value |
 |---|---|
-| URS trace | UN-086, UN-087 |
-| SDS trace | 04-03 §16.6 |
+| URS trace | UN-086, UN-095 |
+| SDS trace | 04-03 §16.6, §8 |
 | Verification | Integration test: LLM service returns 503 → dictation inserts correction-only text → no normalization applied. Regression test: behavior matches SRS-180 when both correction table and LLM are unavailable. |
 
 ---
@@ -1461,6 +1461,128 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
+### 3.28 Dual-System Architecture and Oversight (Added v2.5)
+
+#### SRS-270 · Phase 1 (Added v2.3)
+
+**The system shall govern automatic application of proposed actions by source provenance, not by numeric confidence. Sources shall be classified as one of: `seed`, `institutional`, `rule`, `staged`, `ai_suggested`, `ambiguous`. Sources `seed`, `institutional`, and `rule` shall auto-apply. Source `staged` shall auto-apply with a visual provenance badge and a pathologist-revertible state. Sources `ai_suggested` and `ambiguous` shall never auto-apply and shall always require an explicit confirmation gesture. Numeric confidence scores shall not be displayed to pathologists.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-090 |
+| SDS trace | 04-03 §5.1, 04-04 §2 |
+| Verification | Unit test: policy table returns correct behavior for each source tag. Functional test: `ai_suggested` entries render with the "AI, verify" badge and cannot be persisted without explicit confirm gesture. Regression: no UI element displays a numeric confidence. |
+
+---
+
+#### SRS-271 · Phase 1 (Added v2.3)
+
+**A staging dictionary entry shall be auto-promoted to the institutional dictionary when it has accumulated at least 5 confirmations from at least 3 distinct pathologists. The 5/3 thresholds shall be tunable per institution within constraint floors (minimum 3 distinct pathologists). Promotion shall be a transactional operation that creates the institutional entry, marks the staging entry retired, and writes an audit event. Promotions shall not require administrator approval in the default configuration.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-091 |
+| SDS trace | 04-04 §3.2 |
+| Verification | Integration test: 5 confirmations from 3 users → entry is promoted; audit log records promotion. Concurrency test: two simultaneous 5th-confirmation events produce exactly one institutional entry. Constraint test: attempting to configure <3 distinct pathologists is rejected. |
+
+---
+
+#### SRS-272 · Phase 1 (Added v2.3)
+
+**An entry in any dictionary tier whose `lastUsedAt` is older than 12 months shall be marked deprecated (`retired: true`) by a scheduled retirement job. The retirement window shall be tunable per institution between 6 and 24 months. Retired entries shall not be consulted during lookup but shall remain in the database for traceability of prior reports that referenced them.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-091 |
+| SDS trace | 04-04 §3.3 |
+| Verification | Integration test: entry with `lastUsedAt` 13 months old is marked retired by batch job; subsequent lookup does not return it; reports previously using the entry still render it correctly. |
+
+---
+
+#### SRS-273 · Phase 1 (Added v2.3)
+
+**The system shall count substantive pathologist overrides of deterministic dictionary and rule outputs. An override is recorded when the pathologist's final value differs non-trivially (beyond whitespace, case, and punctuation) from the automatically applied value. When any single deterministic entity accumulates at least 3 overrides within a 30-day sliding window, it shall be quarantined — its source shall be effectively demoted from auto-apply to `ai_suggested` for all future encounters, and it shall appear in the administrator's quarantine review queue. Quarantined entities shall be unlockable only by an explicit administrator action with a recorded rationale.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-091 |
+| SDS trace | 04-04 §3.4 |
+| Verification | Functional test: override a specific institutional entry 3 times in 30 days → entry is quarantined. Test: quarantined entry's 4th encounter no longer auto-applies. Test: unlock action requires non-empty rationale. Test: trivial edits (whitespace, case, punctuation) do not count as overrides. |
+
+---
+
+#### SRS-274 · Phase 1 (Added v2.3)
+
+**Every nomenclature-derived or inferred value in the UI shall be rendered with a visual state keyed to its source provenance. Visual states shall be distinguishable without color alone. Sources `staged`, `ai_suggested`, and `ambiguous` shall reveal an "edit / confirm" affordance on hover or keyboard focus. Double-click on any text-bearing UI element shall open that element for inline editing.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-090, UN-092 |
+| SDS trace | 04-03 §1.5.3, 04-04 §4 |
+| Verification | Accessibility test: source states are distinguishable with color inverted, in grayscale, and with high-contrast themes. Functional test: hover over an `ai_suggested` value reveals Edit and Confirm buttons; keyboard focus reveals the same via ARIA. Functional test: double-click any clause text enters inline edit mode. |
+
+---
+
+#### SRS-275 · Phase 1 (Added v2.3)
+
+**Before a report transitions to FINALIZED, the system shall execute a Final Review Pass that checks the full report for internal inconsistencies from a controlled set of discrepancy classes (specimen ↔ part-label organ mismatch, laterality inconsistency across parts, clause-type ↔ content mismatch, synoptic ↔ diagnosis disagreement, part label ↔ dictation content mismatch, required-laterality missing, unresolved staged items). If any discrepancy is found, Finalize shall be blocked and each discrepancy shall be presented for explicit resolution (Edit, Confirm as correct, or Acknowledge as intentional).**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-093 |
+| SDS trace | 04-03 §5.4 |
+| Verification | Integration test: finalize a report with a specimen-vs-part-label mismatch → Finalize is blocked, the discrepancy is surfaced, selecting Edit opens the affected field. Integration test: finalize a report with no discrepancies → proceeds without additional interaction. Unit test: the discrepancy class set is the controlled set (no ad-hoc critique). |
+
+---
+
+#### SRS-276 · Phase 1 (Added v2.3)
+
+**When the pathologist selects "Acknowledge as intentional" for any flagged discrepancy during the Final Review Pass, the system shall require a free-text rationale of at least 10 characters before accepting the resolution. The audit record shall include the discrepancy class, the rationale, the user identity, the timestamp, and the case identifier.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-094 |
+| SDS trace | 04-03 §1.5.3, §5.4 |
+| Verification | Functional test: rationale under 10 characters rejects submission. Integration test: accepting with a valid rationale records the full audit envelope. Institutional-tuning test: configuring additional controlled-list constraints narrows the accepted rationales correctly. |
+
+---
+
+#### SRS-277 · Phase 1 (Added v2.3)
+
+**When the AI service is unavailable, the Final Review Pass shall degrade to a manual self-review dialog listing items that would have been AI-reviewed (any `staged`-source items, any deterministic cross-check mismatches) and offering an explicit "Proceed without AI review" gesture. The default configuration shall permit this degraded sign-out path. Institutions may opt into a stricter configuration (`REQUIRE_AI_REVIEW_AT_SIGNOUT = true`) that hard-blocks Finalize when the review service is unavailable. All sign-outs completed without AI review shall be audited with `final_review: skipped_unavailable` and the service error code.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-095 |
+| SDS trace | 04-03 §5.4, §8 |
+| Verification | Integration test: with review service mocked to 503, Finalize completes via manual self-review path. Audit log contains the skipped-unavailable marker. Toggling `REQUIRE_AI_REVIEW_AT_SIGNOUT` to `true` blocks Finalize under the same conditions. |
+
+---
+
+#### SRS-278 · Phase 1 (Added v2.3)
+
+**The clause-direct dictation path shall insert the Layer-1-corrected transcript verbatim, without invoking any LLM-driven semantic normalization, paraphrasing, or clause-type transformation. The Layer 1 LLM correction fallback prompt shall be engineered and fixture-tested to reject paraphrasing responses; any paraphrasing output shall be treated as a validation failure and the deterministic-only correction shall be used instead.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-092 |
+| SDS trace | 04-03 §2.2, §14.1, §16.3, §16.4 |
+| Verification | Fixture-based regression test (`mcp-server/tests/fixtures/corrections.json`): input/expected pairs where the expected output preserves meaning; any output that changes meaning is a failure. Functional test: voice dictation into a DIAGNOSIS clause field produces verbatim output even for recognized shorthand. |
+
+---
+
+#### SRS-279 · Phase 1 (Added v2.5)
+
+**Every resolution of a Final Review Pass discrepancy shall be recorded in the audit trail as a `final_review.discrepancy_resolved` event. The event shall contain: the discrepancy class, the resolution type (`edit`, `confirm_as_correct`, or `acknowledge_as_intentional`), the rationale text (if `acknowledge_as_intentional`; may be empty for other resolution types), the user identity, the case identifier, the timestamp, and the pre-resolution and post-resolution content snapshots where applicable. The audit record shall be persisted before the Finalize action is allowed to proceed.**
+
+| Field | Value |
+|---|---|
+| URS trace | UN-093, UN-094 |
+| SDS trace | 04-03 §5.4, §9, §17.5 |
+| Verification | Integration test: resolve a discrepancy via each of the three gestures → audit trail contains exactly one `final_review.discrepancy_resolved` event per gesture with the correct resolution type. Audit record retrieval by case ID returns the full resolution history. Finalize fails closed (with a recoverable error state) if the audit persistence fails before the Finalize action. |
+
+---
+
 ---
 
 ## 4. Requirements Summary
@@ -1494,7 +1616,8 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 | Layout/Workspace | SRS-240 – SRS-242 | 3 | 1 |
 | Accessibility | SRS-250 – SRS-252 | 3 | 1 |
 | Case-Level Comments | SRS-260 – SRS-263 | 4 | 1 |
-| **Total** | | **114** | **Phase 1: 108, Phase 2: 6** |
+| Dual-System Architecture and Oversight | SRS-270 – SRS-279 | 10 | 1 |
+| **Total** | | **124** | **Phase 1: 118, Phase 2: 6** |
 
 ---
 
@@ -1590,9 +1713,15 @@ Every URS user need traces to at least one SRS requirement:
 | UN-084 | SRS-242 |
 | UN-085 | SRS-250, SRS-251, SRS-252 |
 | UN-086 | SRS-185, SRS-186, SRS-188, SRS-189, SRS-196 |
-| UN-087 | SRS-187, SRS-188, SRS-189 |
+| UN-087 | SRS-187, SRS-188, SRS-189 (revised v2.5) |
 | UN-088 | SRS-194, SRS-195 |
 | UN-089 | SRS-260, SRS-261, SRS-262, SRS-263 |
+| UN-090 | SRS-270, SRS-274 |
+| UN-091 | SRS-271, SRS-272, SRS-273 |
+| UN-092 | SRS-187, SRS-188, SRS-278 |
+| UN-093 | SRS-275, SRS-279 |
+| UN-094 | SRS-276, SRS-279 |
+| UN-095 | SRS-277 |
 
 ---
 
@@ -1606,6 +1735,7 @@ Every URS user need traces to at least one SRS requirement:
 | 2.2 | 2026-03-14 | DRAFT | Added SRS-194 (contextual prompt seeding for STT vocabulary biasing) and SRS-195 (STT model selection: gpt-4o-transcribe default, whisper-1 fallback). Added UN-088 to traceability index. Updated Direct Dictation count to 12 (SRS-180–195). Total: 109 requirements (103 Phase 1, 6 Phase 2). |
 | 2.3 | 2026-03-14 | DRAFT | Added SRS-196 (keyboard shortcut Ctrl+Alt+Space for hands-free dictation toggle, foot pedal compatible). Updated Direct Dictation count to 13 (SRS-180–196). Updated UN-086 traceability. Total: 110 requirements (104 Phase 1, 6 Phase 2). |
 | 2.4 | 2026-04-09 | DRAFT | Added §3.27 Case-Level Comments (SRS-260–263). SRS-260: case-level comment UI input. SRS-261: persistence in cases.metadata.case_comment + autosave. SRS-262: finalization rendering as Comment section in RTF. SRS-263: audit trail for comment changes. Traceable to UN-089. Updated requirements summary table and traceability index. Total: 114 requirements (108 Phase 1, 6 Phase 2). |
+| 2.5 | 2026-04-18 | DRAFT | **Revised SRS-187** to reflect v2.3 architectural reconciliation: semantic normalization is an intrinsic operation of the §4 LLM interpreter in the conversational path, not a clause-direct pipeline stage. **Revised SRS-188** to correct undo-order specification: first Ctrl+Z reveals raw STT transcript (peeling back Layer 1 correction), second Ctrl+Z reverts entire dictation — aligned with SDS 04-03 §16.5 "peel back processing in reverse order of application." **Revised SRS-189** graceful-degradation behavior to reflect two-layer transcription pipeline and conversational-path disablement under LLM outage. **Added §3.28 Dual-System Architecture and Oversight** with ten new requirements: SRS-270 source-based automation policy, SRS-271 staging promotion ≥5 confirmations from ≥3 pathologists, SRS-272 12-month retirement, SRS-273 override quarantine at 3 overrides in 30 days, SRS-274 visual provenance display, SRS-275 Final Review Pass behavior, SRS-276 acknowledge-as-intentional audit requirement, SRS-277 graceful degradation of Final Review Pass, SRS-278 verbatim-contract enforcement on clause-direct path, SRS-279 audit logging of all three resolution gestures (edit/confirm/acknowledge). Traceable to UN-090–UN-095 (new URS entries). Header version bumped from 2.0 → 2.5 (document-control fix). Total: 124 requirements (118 Phase 1, 6 Phase 2). |
 
 ---
 

@@ -493,47 +493,25 @@
     }
   }
 
-  // Direct dictation routing (SDS 04-03 §14.1, SRS-180, SRS-181)
-  async function handleDictation(rawText: string, correctedText: string, target: FocusedClause, corrections: CorrectionResult['corrections'] = []) {
+  // Direct dictation routing — v2.3 verbatim contract (SDS 04-03 §14.1, §16.4; UN-092; SRS-180, SRS-181, SRS-187 revised).
+  // The clause-direct path inserts the Layer-1-corrected transcript verbatim. Semantic normalization
+  // (clinical-to-clerical translation) is NOT applied on this path — that now lives intrinsically in the
+  // LLM interpreter on the conversational prompt-area path (§4, UN-087 revised). Pathologists who want
+  // shorthand expansion in a clause field use mnemonics (explicit trigger).
+  //
+  // Undo management is handled entirely by PartEditor.insertDictation to avoid the redundant double-push
+  // that plagued the v2.1/v2.2 implementation. That single point of control produces the two-level undo
+  // specified in SRS-188 revised: first Ctrl+Z reveals raw STT, second Ctrl+Z reverts the whole dictation.
+  function handleDictation(rawText: string, correctedText: string, target: FocusedClause, corrections: CorrectionResult['corrections'] = []) {
     const partIdx = reportStore.parts.findIndex((p) => p.id === target.partId);
     if (partIdx === -1) return;
 
-    // Normalize the corrected text via the API (SRS-187)
-    let normalizedText = correctedText;
-    try {
-      const result = await services.api.normalizeDictation(
-        correctedText,
-        target.clauseType,
-        reportStore.caseData?.specimenType ?? null,
-      );
-      normalizedText = result.text;
-    } catch {
-      // Normalization unavailable — use corrected text directly (graceful degradation)
-    }
-
-    // Two-level undo (SRS-188):
-    // Push raw Whisper text first, then corrected text, so:
-    //   1st Ctrl+Z → reverts to corrected (pre-normalization)
-    //   2nd Ctrl+Z → reverts to raw Whisper
-    const history = getPartHistory(target.partId);
-    const currentClauses = parseClauses(reportStore.parts[partIdx]);
-
-    // Level 2 undo entry: raw Whisper text
-    history.push(currentClauses);
-
-    // Build intermediate state with corrected (pre-normalization) text
-    if (normalizedText !== correctedText) {
-      const withCorrected = currentClauses.map((c, i) => {
-        if (i !== target.clauseIndex) return c;
-        const existing = c.text;
-        return { ...c, text: existing ? existing + ' ' + correctedText : correctedText };
-      });
-      // Level 1 undo entry: corrected text (pre-normalization)
-      history.push(withCorrected);
-    }
-
-    // Insert the final normalized text; pass correction flag for visual feedback (SRS-186)
-    partRefs[partIdx]?.insertDictation(normalizedText, target.clauseIndex, corrections.length > 0);
+    partRefs[partIdx]?.insertDictation(
+      correctedText,
+      target.clauseIndex,
+      corrections.length > 0,
+      rawText,
+    );
   }
 
   // Template application (SRS-222, SRS-223)

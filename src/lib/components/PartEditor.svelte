@@ -295,14 +295,41 @@
   }
 
   /**
-   * Insert text into the currently focused clause (for direct dictation).
-   * When hasCorrections is true, triggers a 2-second visual flash on the clause (SRS-186).
+   * Insert text into the currently focused clause (direct-dictation path, v2.3 verbatim contract).
+   * SRS-180, SRS-187 (revised), SRS-188 (revised): the inserted text is the Layer-1-corrected transcript.
+   * No semantic normalization is applied on this path — that belongs to the conversational prompt path.
+   *
+   * Undo model (SRS-188 revised, aligned with SDS 04-03 §16.5):
+   *   - If Layer 1 applied a correction (rawText !== corrected), the undo stack contains two levels:
+   *     • Top:  pre-dictation state   → 2nd Ctrl+Z reverts the entire dictation.
+   *     • Next: with-raw state         → 1st Ctrl+Z reveals the raw STT transcript (peels back Layer 1).
+   *   - If no correction was applied, the undo stack contains one level (pre-dictation).
+   *
+   * When hasCorrections is true, a 2-second visual flash marks the insertion (SRS-186).
    */
-  export function insertDictation(text: string, clauseIndex: number, hasCorrections = false): void {
+  export function insertDictation(
+    corrected: string,
+    clauseIndex: number,
+    hasCorrections = false,
+    rawText?: string,
+  ): void {
     if (clauseIndex < 0 || clauseIndex >= clauses.length) return;
-    pushHistory();
+
     const current = clauses[clauseIndex].text;
-    clauses[clauseIndex] = { ...clauses[clauseIndex], text: current ? current + ' ' + text : text };
+
+    // Push pre-dictation state. Top of stack after this = original clause text.
+    pushHistory();
+
+    // If Layer 1 corrected the transcript, transiently insert raw text and push it so
+    // the first Ctrl+Z will reveal it. The final overwrite happens below.
+    if (hasCorrections && rawText && rawText !== corrected) {
+      clauses[clauseIndex] = { ...clauses[clauseIndex], text: current ? current + ' ' + rawText : rawText };
+      pushHistory();
+    }
+
+    // Final display state: corrected transcript inserted verbatim.
+    clauses[clauseIndex] = { ...clauses[clauseIndex], text: current ? current + ' ' + corrected : corrected };
+
     // Clear placeholder flag
     if (placeholderFlags[clauseIndex]) {
       placeholderFlags[clauseIndex] = false;

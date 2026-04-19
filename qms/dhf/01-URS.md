@@ -6,8 +6,8 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-URS-001 |
-| **Version** | 2.0 DRAFT |
-| **Date** | March 13, 2026 |
+| **Version** | 2.4 DRAFT |
+| **Date** | April 18, 2026 |
 | **Applies to Spec** | Working Specification v1.2 + Addendum v1.2-A1 + Design Dialogue 2026-03-13 |
 | **Software Safety Class** | To be determined (see §2.3). Requirements written at Class B rigor. |
 | **IEC 62304 Reference** | §5.2 — Software Requirements Analysis |
@@ -1006,27 +1006,27 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 ---
 
-#### UN-086 · Phase 1
+#### UN-086 · Phase 1 (Clarified v2.3)
 
-**Requirement:** The system shall apply context-aware transcription correction to all voice-transcribed text before insertion into the report. The correction shall use the case context (specimen type, anatomic site, clause type) to identify and fix domain-specific speech recognition errors (e.g., "cervical margins" corrected to "surgical margins" when the specimen is a colon resection).
+**Requirement:** The system shall apply context-aware transcription correction to all voice-transcribed text (both direct-dictation and conversational paths) before the corrected transcript is used downstream. The correction shall use case context (specimen type, anatomic site, and — for the direct-dictation path only — clause type) to identify and fix domain-specific speech recognition errors (e.g., "cervical margins" corrected to "surgical margins" when the specimen is a colon resection). This is error correction, not paraphrase or semantic normalization.
 
-**Rationale:** Speech-to-text engines like Whisper have no pathology domain awareness and frequently confuse phonetically similar medical terms, especially with accented speech. Context-aware correction reduces error rates by leveraging information the system already has — the case context — to disambiguate homophonic medical terms. This is error correction, not interpretation.
+**Rationale:** Speech-to-text engines have no pathology domain awareness and frequently confuse phonetically similar medical terms, especially with accented speech. Context-aware correction reduces error rates by leveraging information the system already has — the case context — to disambiguate homophonic medical terms. Correction applies to both voice paths because accuracy is a universal concern; meaning preservation is the constraint that keeps correction from drifting into normalization (which, per UN-087, belongs only to the conversational path).
 
-**Source:** Product Owner voice input testing; Design Dialogue §III (direct dictation workflow)
+**Source:** Product Owner voice input testing; Design Dialogue §III (direct dictation workflow); v2.3 clarification of both-paths applicability.
 
-**Acceptance:** When dictating "surgical margins" into a colon resection case and Whisper transcribes "cervical margins," the system corrects it to "surgical margins" before insertion. Corrected words are briefly highlighted so the pathologist can verify. Ctrl+Z reverts to the raw transcript if the correction was wrong. When the LLM service is unavailable, the system falls back to a deterministic correction table (or raw transcript if no table entry exists).
+**Acceptance:** When dictating "surgical margins" into a colon resection case (either path) and the STT transcribes "cervical margins," the system corrects it to "surgical margins" before downstream use. Corrected words are briefly highlighted (direct-dictation path) or reflected in the structured actions (conversational path) so the pathologist can verify. Ctrl+Z reverts to the raw transcript if the correction was wrong. When the LLM correction fallback is unavailable, the system falls back to the deterministic correction table only. The correction prompt, when an LLM is used, is strictly constrained to correction-only behavior and must not paraphrase (verified by fixture tests against paraphrasing regressions).
 
 ---
 
-#### UN-087 · Phase 1
+#### UN-087 · Phase 1 (Revised v2.3)
 
-**Requirement:** When voice input is dictated into a clause via the direct dictation path, the system shall normalize the transcribed text based on the clause type. DIAGNOSIS clauses shall receive full clinical normalization (abbreviation expansion, standard nomenclature). MARGIN and ANCILLARY clauses shall receive structured normalization (canonical phrasing). COMMENT clauses shall receive minimal normalization (grammar and capitalization only). The clause type badge already visible in the editor serves as the implicit indicator of normalization behavior — no explicit mode switch shall exist.
+**Requirement:** The system shall provide clinical-to-clerical text translation — converting clinical shorthand into legally defensible report language — on the **conversational prompt-area path**. When the pathologist elects the conversational path (cursor in the prompt area, voice or typed input), the system shall interpret the input and produce structured clause actions with clinical report-ready phrasing. When the pathologist elects the direct dictation path (cursor in a specific clause field), the system shall insert the pathologist's words **verbatim** without semantic transformation — the pathologist has explicitly indicated they intend their exact words to appear in that field.
 
-**Rationale:** Pathologists dictate in clinical shorthand ("mod diff adenocarcinoma," "margins look good"). A legally defensible report requires formal language. Rather than forcing pathologists to dictate in report-ready language or manually edit every clause, the system should translate clinical thinking into clerical text — with the translation behavior determined by the kind of clause they're dictating into. This transforms the dictation workflow from transcription into authoring.
+**Rationale (Revised v2.3):** Pathologists dictate in clinical shorthand ("mod diff adenocarcinoma," "margins look good"). A legally defensible report requires formal language. However, automatically normalizing clause-direct dictation violates the pathologist's stated intent: when they dictate into a specific clause field, they know what they want to say and expect their words to appear. The correct surface for clinical-to-clerical translation is the conversational prompt area — where the pathologist explicitly asks the system to interpret. The prompt-area-vs-clause-field distinction is the explicit mode selector; no other mode switch is needed. The original v2.1/v2.2 design (clause-type-driven normalization in direct dictation) was reconciled in v2.3 when this contradiction was identified.
 
-**Source:** Product Owner workflow analysis; Design Dialogue §III, §IX (clinical-to-clerical transformation)
+**Source:** Product Owner workflow analysis (original); v2.3 revision from architectural review identifying the verbatim-contract conflict with direct dictation.
 
-**Acceptance:** Dictating "mod diff adenocarcinoma" into a DIAGNOSIS clause produces "Adenocarcinoma, moderately differentiated." Dictating "margins are great, everything is good" into a MARGIN clause produces "Surgical margins uninvolved by carcinoma." Dictating "recommend levels for margin assessment" into a COMMENT clause produces "Recommend levels for margin assessment." (minimal change). Ctrl+Z reverts to the transcription-corrected text (pre-normalization). A second Ctrl+Z reverts to the raw Whisper transcript. When the LLM service is unavailable, normalization is skipped and the corrected (or raw) transcript is inserted verbatim.
+**Acceptance:** Dictating "mod diff adenocarcinoma" into the **prompt area** (voice or typed) produces a DIAGNOSIS clause on the appropriate Part: "Adenocarcinoma, moderately differentiated." Dictating "margins are great, everything is good" into the **prompt area** produces MARGIN clause content: "Surgical margins uninvolved by carcinoma." Dictating the same shorthand directly into a clause field (clause-direct path) produces verbatim insertion: "mod diff adenocarcinoma" appears literally in the clause. Pathologists wanting shorthand expansion in a specific clause field use mnemonics (explicit user request via registered shortcut). Ctrl+Z in the direct-dictation path reverts to the raw transcript. Ctrl+Z in the prompt-area path follows normal clause-action undo.
 
 ---
 
@@ -1303,6 +1303,82 @@ Requirements are organized by functional domain. Each requirement includes a uni
 
 ---
 
+### 5.27 Dual-System Architecture and Oversight (Added v2.3)
+
+These requirements express the user-facing principles of the deterministic-first-with-enforced-oversight architecture. Implementation is specified in SDS 04-03 §1.5 and SDS 04-04.
+
+#### UN-090 · Phase 1 (Added v2.3)
+
+**Requirement:** The system shall combine two decision systems — a deterministic expert system (dictionaries, regex patterns, rule-based classifiers, mnemonic expansion) and a probabilistic AI layer (LLM-based interpretation, correction, and cross-validation) — under enforced human oversight. When both systems could produce an answer, the deterministic system takes precedence; the AI layer operates in three roles (fallback when rules cannot resolve, cross-validation of the full report before sign-out, and seeding of the staging dictionary from accepted inferences). No uncertain outcome shall be applied automatically without an explicit pathologist confirmation gesture.
+
+**Rationale:** Neither system is adequate alone. The expert system is brittle when input is context-mismatched; the AI is non-deterministic and poorly calibrated for autonomous use in clinical content. The combination under enforced oversight is safe; it is also a patient-safety requirement (predictable, auditable decisions where possible) and a standardization requirement (reports comparable across pathologists, cases, and time). This establishes the design principle that SDS 04-03 §1.5 implements.
+
+**Source:** Architectural discussion 2026-04-18; SDS 04-03 review critique resolved in v2.3.
+
+**Acceptance:** No system behavior is driven by a numeric confidence score surfaced to the pathologist (source provenance is used instead). Every AI-suggested item requires explicit confirmation before it can persist into a finalized report. The Final Review Pass (UN-093) is the closing gate that enforces oversight at sign-out.
+
+---
+
+#### UN-091 · Phase 1 (Added v2.3)
+
+**Requirement:** The nomenclature dictionary shall grow, retire, and self-correct without requiring a human curator in the per-entry loop. When pathologists accept LLM-inferred mappings, those mappings shall enter a staging dictionary. When a staging entry accumulates a specified number of confirmations from distinct pathologists, it shall be auto-promoted to the institutional dictionary. Entries unused for a specified window shall be auto-retired (preserved in audit history). When pathologists override a deterministic rule a specified number of times within a sliding window, the rule shall be quarantined — demoted from auto-apply to "AI-suggested, verify" — until an administrator reviews and explicitly unlocks it.
+
+**Rationale:** Manual dictionary curation scales poorly; it also introduces review bottlenecks that pathologists route around by manually editing every output, defeating the standardization goal. A self-maintaining loop lets the dictionary follow real usage without administrator gatekeeping, while the override-quarantine mechanism detects terminology drift and rule errors automatically. Governance is preserved by a periodic non-blocking QMS review (default quarterly).
+
+**Source:** Architectural discussion 2026-04-18. Parameter values (5 confirmations from ≥3 pathologists, 12-month retirement, 3 overrides in 30 days) are tunable per SDS 04-03 §5.1 with constraint floors.
+
+**Acceptance:** New LLM inferences accepted by pathologists appear in future sessions as "staged" with a confirmation counter. After reaching the threshold, they become institutional without admin action. Unused institutional entries are marked deprecated after the retirement window. A rule overridden 3 times in 30 days stops auto-applying; its further use requires explicit confirm gestures until admin unlock. Every lifecycle transition is audit-logged.
+
+---
+
+#### UN-092 · Phase 1 (Added v2.3)
+
+**Requirement:** When the pathologist dictates or types into a specific clause field (direct-dictation path), the system shall insert the input verbatim — no LLM-driven paraphrasing, no clause-type-specific normalization, no semantic rewriting. Mnemonic expansion is the only transformation applied to verbatim text and only when the pathologist explicitly enters a registered mnemonic. Transcription-accuracy layers (vocabulary-biased STT, context-aware correction of misrecognitions) apply because they do not change meaning; they restore meaning the STT got wrong.
+
+**Rationale:** The prompt area vs. clause-field distinction serves as an explicit mode selector. Clause-direct dictation is an explicit statement of intent: the pathologist knows what they want to say and wants it to appear in that field. Automatic normalization in this path violates their stated intent. Pathologists who want clinical-to-clerical translation use the prompt area (per UN-087 as revised in v2.3), which is the explicit conversational surface.
+
+**Source:** Architectural discussion 2026-04-18 reconciling the v2.1/v2.2 clause-type normalization design with the verbatim principle.
+
+**Acceptance:** "mod diff adenocarcinoma" dictated directly into a DIAGNOSIS clause appears as "mod diff adenocarcinoma" (verbatim, after any Layer 1 transcription-error correction). The same phrase spoken into the prompt area is interpreted by the LLM and produces a DIAGNOSIS clause containing "Adenocarcinoma, moderately differentiated." Pathologists wanting shorthand expansion in a specific clause field use mnemonics (explicit registered shortcut). In the direct-dictation path, the **first Ctrl+Z reveals the raw STT transcript** (peeling back the Layer 1 correction); the **second Ctrl+Z reverts the entire dictation**. There is no pre-normalization undo level because there is no normalization on this path.
+
+---
+
+#### UN-093 · Phase 1 (Added v2.3)
+
+**Requirement:** Before transitioning a report to FINALIZED, the system shall run an AI-driven consistency review of the entire report. The review shall surface internal inconsistencies (specimen vs. part-label organ mismatches, laterality inconsistencies across parts, clause-type vs. content mismatches, synoptic vs. diagnosis disagreements, required-laterality missing, unresolved staged items). If discrepancies are found, the Finalize action shall be blocked; each discrepancy shall be resolved by the pathologist via an explicit gesture (edit, confirm as correct, or acknowledge as intentional) before Finalize proceeds.
+
+**Rationale:** Deterministic rules operate at field or clause level; they cannot detect cross-field inconsistencies that arise when one field is correct in isolation but wrong in the context of another. The AI review pass is the cross-validation mechanism — the "System 2 reviews System 1's output" check — that catches these context mismatches before sign-out.
+
+**Source:** Architectural discussion 2026-04-18 extending the enforced-oversight principle to the sign-out boundary.
+
+**Acceptance:** Attempting to finalize a report with a specimen-vs-part-label organ mismatch presents the discrepancy for resolution and blocks finalization until resolved. A report with no discrepancies finalizes without additional interaction. Each resolution gesture is audit-logged with the discrepancy class, the resolution type, and any rationale text.
+
+---
+
+#### UN-094 · Phase 1 (Added v2.3)
+
+**Requirement:** The Final Review Pass (UN-093) shall offer an **acknowledge-as-intentional** resolution for discrepancies the pathologist recognizes as deliberate clinical choices (e.g., truly bilateral specimens with asymmetric laterality; non-standard part labels for unusual specimens; deferred diagnoses pending ancillary results). Choosing this option shall require a free-text rationale of at least 10 characters. The audit trail shall record the discrepancy class, the rationale, and the user identity.
+
+**Rationale:** Forced conformance to the most common pattern is not the clinical goal; forced confirmation of intentional deviations is. Without an intentional-override path, the Final Review Pass would block legitimate edge cases — a usability failure that would either prevent correct reports or train pathologists to ignore the review. The explicit, rationale-logged escape preserves oversight while admitting clinical judgment.
+
+**Source:** Advisor critique during v2.3 revision: blocking-save would trap pathologists on legitimately unusual cases without an escape path.
+
+**Acceptance:** On any flagged discrepancy, an "Acknowledge as intentional" option is available alongside Edit and Confirm. Selecting it requires a rationale text input before proceeding. Rationales under the minimum length reject the submission with a clear message. The audit record is retrievable by case ID for legal and regulatory review.
+
+---
+
+#### UN-095 · Phase 1 (Added v2.3)
+
+**Requirement:** When an AI service is temporarily unavailable (HTTP 5xx, timeout, network partition) during authoring, the Finalize action shall not be blocked by the service outage alone. The Final Review Pass shall degrade to a manual self-review dialog listing items that would have been AI-reviewed (staged items requiring confirmation, detectable deterministic mismatches), and the pathologist shall have an explicit "Proceed without AI review" gesture. The audit trail shall record that sign-out occurred without AI review, with timestamp and service error code. Institutional policy may tighten this (an option to hard-block Finalize when the review service is unavailable), but the default is permissive.
+
+**Rationale:** A finalized report is a legal document; it cannot be held hostage to vendor uptime. Permissive degradation preserves the clinical workflow under realistic failure modes while the audit trail preserves the information needed for post-hoc review. Institutions with stricter risk tolerance can opt into blocking behavior.
+
+**Source:** Advisor critique during v2.3 revision: service unavailability must not create an unrecoverable state.
+
+**Acceptance:** With the AI service unreachable, the pathologist can still complete Finalize through the manual self-review path. The audit record shows `final_review: skipped_unavailable` with timestamp and reason. Toggling the institutional setting `REQUIRE_AI_REVIEW_AT_SIGNOUT` to `true` makes Finalize block when the review service is unavailable; this is an institution-level choice.
+
+---
+
 ## 6. Open Questions Affecting Requirements
 
 The following questions remain unresolved and may result in additional or modified requirements. Each question is tracked with its current status and the requirement areas it affects.
@@ -1345,6 +1421,7 @@ The following traceability matrix will be completed as Design Inputs are derived
 | 2.1 | 2026-03-13 | DRAFT | Added UN-086 (context-aware transcription correction) and UN-087 (clause-type-driven normalization) to §5.18 Direct Dictation section. These address speech recognition accuracy with accented speech and the clinical-to-clerical text transformation during dictation. Total requirements: 87 (78 Phase 1, 9 Phase 2). |
 | 2.2 | 2026-03-14 | DRAFT | Added UN-088 (contextual prompt seeding for STT model). Pre-transcription vocabulary biasing reduces domain-specific speech recognition errors at source. Total requirements: 88 (79 Phase 1, 9 Phase 2). |
 | 2.3 | 2026-04-09 | DRAFT | Added UN-089 (case-level comment field) in new §5.26 Case-Level Comments. Addresses the need for a whole-report free-text annotation distinct from part-level COMMENT clauses. Total requirements: 89 (80 Phase 1, 9 Phase 2). |
+| 2.4 | 2026-04-18 | DRAFT | Revised UN-086 (context-aware transcription correction) for clarity: correction applies to both voice paths; prompt constraints prevent paraphrasing drift. **Revised UN-087 (clause-type-driven normalization)** to reflect v2.3 architectural reconciliation: normalization lives in the conversational prompt-area path, not the direct-dictation path; direct dictation is verbatim per UN-092. Added new §5.27 Dual-System Architecture and Oversight with six new user needs: UN-090 (deterministic + AI under enforced oversight), UN-091 (self-maintaining nomenclature dictionary with staging promotion, retirement, and override quarantine), UN-092 (clause-direct dictation verbatim contract), UN-093 (AI Final Review Pass before sign-out, blocking on discrepancy), UN-094 (acknowledge-as-intentional escape for clinically unusual cases), UN-095 (permissive degradation when AI review service unavailable). Total requirements: 95 (86 Phase 1, 9 Phase 2). Header version bumped from 2.0 → 2.4 (document-control fix). |
 
 ---
 
