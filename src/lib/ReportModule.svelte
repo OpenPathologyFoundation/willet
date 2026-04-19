@@ -20,7 +20,10 @@
   import CaseCommentEditor from '$lib/components/CaseCommentEditor.svelte';
   import QuickEntryEditor from '$lib/components/QuickEntryEditor.svelte';
   import FinalizeDialog from '$lib/components/FinalizeDialog.svelte';
+  import FinalReviewDialog from '$lib/components/FinalReviewDialog.svelte';
+  import type { Resolution } from '$lib/components/FinalReviewDialog.svelte';
   import DictationIndicator from '$lib/components/DictationIndicator.svelte';
+  import { runFinalReview, type FinalReviewResult } from '$lib/services/final-review';
   import MnemonicPopover from '$lib/components/MnemonicPopover.svelte';
   import type { MnemonicHit } from '$lib/types';
   import { rtfToHtml } from 'svelte-rtf-editor';
@@ -37,6 +40,13 @@
   let showFinalizeDialog = $state(false);
   let finalizeHtml = $state('');
   let finalizeError = $state<string | null>(null);
+
+  // Final Review Pass state (SDS 04-03 §5.4, SRS-275 – SRS-279).
+  // `pendingFinalizeHtml` buffers the formatted RTF while the review dialog is open so
+  // that resolving all discrepancies can proceed straight to the existing FinalizeDialog.
+  let showFinalReviewDialog = $state(false);
+  let finalReviewResult = $state<FinalReviewResult | null>(null);
+  let pendingFinalizeHtml = $state('');
 
   // Synoptic protocol state
   let hasSynoptic = $state(false);
@@ -314,8 +324,96 @@
       return;
     }
 
-    finalizeHtml = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
+    const html = applyFinalizationTemplate(reportStore.parts, reportStore.caseComment);
+
+    // Final Review Pass (SDS 04-03 §5.4, SRS-275). Run before presenting the formatted
+    // RTF so the pathologist resolves any cross-field inconsistencies before finalization.
+    // `llmAvailable` is determined by the mcp-status probe in PromptArea; for now we treat
+    // it as available-by-default and let SRS-277 degradation kick in if the §4 LLM-backed
+    // detectors are wired later and their service call fails.
+    const review = runFinalReview({
+      specimenType: reportStore.caseData?.specimenType ?? null,
+      parts: reportStore.parts,
+    });
+
+    if (review.discrepancies.length === 0 && !review.degraded) {
+      // Clean report — proceed directly to the existing finalize dialog (no change from prior behavior).
+      finalizeHtml = html;
+      showFinalizeDialog = true;
+      return;
+    }
+
+    // Surface the review dialog. Hold the formatted HTML so we can proceed without
+    // re-running the template assembly once all discrepancies are resolved.
+    pendingFinalizeHtml = html;
+    finalReviewResult = review;
+    showFinalReviewDialog = true;
+  }
+
+  // Final Review resolution handlers (SRS-279, SRS-276, SRS-277).
+  // Each resolution emits a REPORT_SAVED audit event with action=FINAL_REVIEW_DISCREPANCY_RESOLVED
+  // so downstream audit consumers can reconstruct the resolution history per case.
+  function handleReviewResolve(r: Resolution) {
+    services.emitEvent({
+      type: 'REPORT_SAVED',
+      caseId,
+      timestamp: new Date().toISOString(),
+      payload: {
+        action: 'FINAL_REVIEW_DISCREPANCY_RESOLVED',
+        discrepancyClass: r.class,
+        discrepancyId: r.id,
+        partIds: r.partIds,
+        resolution: r.resolution,
+        // Rationale is only included when the pathologist chose acknowledge_as_intentional.
+        rationale: r.rationale,
+      },
+    });
+  }
+
+  function handleReviewProceed() {
+    showFinalReviewDialog = false;
+    finalReviewResult = null;
+    finalizeHtml = pendingFinalizeHtml;
+    pendingFinalizeHtml = '';
     showFinalizeDialog = true;
+  }
+
+  function handleReviewEdit(discrepancyId: string, partIds: string[]) {
+    services.emitEvent({
+      type: 'REPORT_SAVED',
+      caseId,
+      timestamp: new Date().toISOString(),
+      payload: {
+        action: 'FINAL_REVIEW_EDIT_REQUESTED',
+        discrepancyId,
+        partIds,
+      },
+    });
+    // Close the review dialog so the pathologist can edit. The review re-runs automatically
+    // the next time they click Finalize (SRS-275).
+    showFinalReviewDialog = false;
+    finalReviewResult = null;
+    pendingFinalizeHtml = '';
+  }
+
+  function handleReviewCancel() {
+    showFinalReviewDialog = false;
+    finalReviewResult = null;
+    pendingFinalizeHtml = '';
+  }
+
+  function handleReviewProceedWithoutReview() {
+    // SRS-277: permissive degradation path. Audit the skipped review, then proceed.
+    services.emitEvent({
+      type: 'REPORT_SAVED',
+      caseId,
+      timestamp: new Date().toISOString(),
+      payload: {
+        action: 'FINAL_REVIEW_SKIPPED_UNAVAILABLE',
+        reason: 'ai_service_unavailable',
+      },
+    });
+    handleReviewProceed();
   }
 
   async function handleFinalizeConfirm(rtf: string) {
@@ -762,6 +860,20 @@
     <DictationIndicator />
 
     <!-- Finalize dialog modal -->
+    <!-- Final Review Pass dialog (SDS 04-03 §5.4, SRS-275). Opens before FinalizeDialog
+         when discrepancies are detected or the review is degraded. Pathologist must
+         resolve each discrepancy (Edit / Confirm / Acknowledge) before Finalize proceeds. -->
+    {#if showFinalReviewDialog && finalReviewResult}
+      <FinalReviewDialog
+        result={finalReviewResult}
+        onresolve={handleReviewResolve}
+        onproceed={handleReviewProceed}
+        onedit={handleReviewEdit}
+        onproceedwithoutreview={handleReviewProceedWithoutReview}
+        oncancel={handleReviewCancel}
+      />
+    {/if}
+
     {#if showFinalizeDialog}
       <FinalizeDialog
         mode="finalize"

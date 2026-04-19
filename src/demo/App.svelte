@@ -17,7 +17,9 @@
   let selectedCase = $state('S26-0005');
 
   function handleEvent(event: ModuleEvent) {
-    console.log('[WILLET Demo] ModuleEvent:', event);
+    // Stringify the event so its contents show up in `msg.text()` for Playwright
+    // console-capture tests — otherwise the browser renders it as `JSHandle@object`.
+    console.log('[WILLET Demo] ModuleEvent:', JSON.stringify(event, null, 2));
   }
 
   onMount(() => {
