@@ -241,6 +241,15 @@ export interface LlmInstructionResponse {
   clarifications: Clarification[];
   confidence: number;
   summary: string;
+  /**
+   * Provenance of the response (SDS 04-03 §5.1, SRS-270). Drives automation
+   * decisions through `source-policy.decidePolicy`: rules-engine results are
+   * `'rule'` (auto-apply); LLM-interpreted results are `'ai_suggested'`
+   * (always require explicit confirmation). Optional so existing mock test
+   * fixtures don't have to be rewritten; the consumer defaults to `'rule'`
+   * when unset to match the pre-v2.3 rules-only behavior.
+   */
+  source?: import('../services/source-policy').ActionSource;
 }
 
 export interface InstructionEntry {
