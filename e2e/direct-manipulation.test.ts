@@ -91,6 +91,33 @@ test.describe('Part label direct manipulation (SDS 04-04 §4.2, §4.3)', () => {
     const input = page.locator('[data-part-id]').first().locator('input[type="text"]').first();
     await expect(input).toBeVisible({ timeout: 2_000 });
   });
+
+  test('clicking outside the label input commits and exits edit mode', async ({ page }) => {
+    const report = new ReportPage(page);
+    await report.goto();
+    await report.selectCase('S26-0004');
+
+    const part = page.locator('[data-part-id]').first();
+    const label = part.getByRole('button', { name: /Part A label:/i });
+    await label.dblclick();
+
+    const input = part.locator('input[type="text"]').first();
+    await expect(input).toBeVisible({ timeout: 2_000 });
+
+    // Modify the draft and then click on a non-interactive region elsewhere
+    // (the case header area). This was unreliable before the document-level
+    // pointerdown listener was added.
+    await input.fill('Right colon, hemicolectomy, edited via click-outside');
+    await page.locator('header').first().click();
+
+    // Input should be gone; displayLabel reflects the new value.
+    await expect(input).not.toBeVisible({ timeout: 2_000 });
+    await expect(
+      part.getByRole('button', {
+        name: /Part A label: Right colon, hemicolectomy, edited via click-outside/i,
+      }),
+    ).toBeVisible({ timeout: 2_000 });
+  });
 });
 
 test.describe('Staging-entry confirm via keyboard / click (SDS 04-04 §4.2)', () => {

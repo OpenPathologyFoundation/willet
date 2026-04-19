@@ -187,11 +187,29 @@
     requestAnimationFrame(() => clauseRefs[atIndex]?.focus());
   }
 
+  let headerInputEl = $state<HTMLInputElement | null>(null);
+
   function startHeaderEdit() {
     if (readOnly) return;
     headerDraft = authoredLabel ?? part.partDesignator ?? '';
     editingHeader = true;
   }
+
+  // Click-outside: when the header is being edited, a click anywhere outside
+  // the input should commit (not just tab / blur, which were unreliable when
+  // the click target itself was non-focusable). Attach a document listener
+  // only while editing and remove it when edit mode exits.
+  $effect(() => {
+    if (!editingHeader) return;
+    function onDocumentPointerDown(e: PointerEvent) {
+      if (!headerInputEl) return;
+      const target = e.target as Node | null;
+      if (target && headerInputEl.contains(target)) return;
+      commitHeaderEdit();
+    }
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+  });
 
   /**
    * Confirm the current authored_label as correct (SDS 04-04 §4.2). Appends
@@ -433,6 +451,7 @@
 
       {#if editingHeader}
         <input
+          bind:this={headerInputEl}
           type="text"
           bind:value={headerDraft}
           class="flex-1 rounded bg-clinical-input-bg px-2 py-0.5 text-sm text-clinical-text outline-none ring-1 ring-clinical-primary/50 border border-clinical-input-border"

@@ -76,6 +76,45 @@
   --badge-yellow-text: #FBBF24;
   --badge-blue-bg: rgba(59, 130, 246, 0.1);
   --badge-blue-text: #60A5FA;
+
+  /*
+   * svelte-rtf-editor (InkEditor / Toolbar) dark-mode theming.
+   * The package uses these CSS custom properties with light-mode hex fallbacks;
+   * overriding them under `:root.dark` syncs the toolbar and chrome with the
+   * clinical dark palette. The document body (.ink-content) is deliberately
+   * left at its light default — a formatted pathology report is a legal
+   * artifact that reads better as white-on-dark text, not inverted.
+   */
+  --bg-toolbar: #282C34;           /* matches --clinical-surface */
+  --surface: #2D3139;              /* raised surfaces (buttons, tab backgrounds) */
+  --border: #374151;               /* matches --clinical-border */
+  --border-active: #4B5563;        /* focus/active ring on the editor */
+  --text: #F3F4F6;                 /* toolbar text: matches --clinical-text */
+  --text-muted: #9CA3AF;           /* matches --clinical-muted */
+  --ink: #1a1714;                  /* strong doc text — STAY dark for the document body */
+  --accent: #3B82F6;               /* matches --clinical-primary */
+  --accent-hover: #2563EB;         /* darker shade on hover */
+  --accent-soft: rgba(59, 130, 246, 0.15); /* soft highlight under accent */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/*
+ * Scoped selectors into the RTF editor. In `src/app.css` all selectors are
+ * global by default (no :global() wrapper needed — this isn't a Svelte
+ * component style block). The document body (`.ink-content`) keeps its
+ * white background deliberately; we only dark-theme the editor chrome.
+ */
+:root.dark .ink-editor {
+  background: var(--clinical-surface);
+  border-color: var(--clinical-border);
+  color: var(--clinical-text);
+}
+:root.dark .ink-toolbar,
+:root.dark .ink-editor .toolbar {
+  background: var(--clinical-surface);
+  border-color: var(--clinical-border);
+  color: var(--clinical-text);
 }
 
 @theme {
