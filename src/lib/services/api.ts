@@ -26,6 +26,8 @@ import type {
   ConfirmationResult,
   PromotionResult,
   Confirmation,
+  CreatePersonalInput,
+  PersonalResult,
 } from './nomenclature';
 
 export interface ApiClient {
@@ -53,6 +55,11 @@ export interface ApiClient {
   promoteNomenclatureStaging(entryId: string): Promise<PromotionResult | null>;
   listNomenclatureStaging(): Promise<NomenclatureEntry[]>;
   listNomenclatureInstitutional(): Promise<NomenclatureEntry[]>;
+
+  // Personal dictionary (SDS 04-04 §2.1)
+  createNomenclaturePersonal(input: CreatePersonalInput): Promise<PersonalResult>;
+  listNomenclaturePersonal(userId?: string): Promise<NomenclatureEntry[]>;
+  deleteNomenclaturePersonal(entryId: string): Promise<void>;
 }
 
 /** Typed API error with HTTP status and optional response body. */
@@ -176,6 +183,16 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     },
     listNomenclatureInstitutional() {
       return request<NomenclatureEntry[]>('GET', '/api/nomenclature/institutional');
+    },
+    createNomenclaturePersonal(input) {
+      return request<PersonalResult>('POST', '/api/nomenclature/personal', input);
+    },
+    listNomenclaturePersonal(userId) {
+      const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+      return request<NomenclatureEntry[]>('GET', `/api/nomenclature/personal${qs}`);
+    },
+    async deleteNomenclaturePersonal(entryId) {
+      await request<unknown>('DELETE', `/api/nomenclature/personal/${encodeURIComponent(entryId)}`);
     },
   };
 }

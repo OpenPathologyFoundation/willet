@@ -11,6 +11,7 @@ import {
   NomenclatureStore,
   type CreateStagingInput,
   type Confirmation,
+  type CreatePersonalInput,
 } from '$lib/services/nomenclature';
 
 // In-memory user preferences (standalone persistence)
@@ -420,6 +421,34 @@ export const handlers = [
   http.post('/api/nomenclature/_reset', async () => {
     mockNomenclatureStore.reset();
     return HttpResponse.json({ ok: true });
+  }),
+
+  // Personal dictionary (SDS 04-04 §2.1) — pathologist-owned shortcuts.
+
+  http.post('/api/nomenclature/personal', async ({ request }) => {
+    await delay(50);
+    const body = (await request.json()) as CreatePersonalInput;
+    const result = mockNomenclatureStore.createPersonalEntry(body);
+    return HttpResponse.json(result);
+  }),
+
+  http.get('/api/nomenclature/personal', async ({ request }) => {
+    await delay(50);
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId') ?? undefined;
+    return HttpResponse.json(mockNomenclatureStore.getPersonalEntries(userId));
+  }),
+
+  http.delete('/api/nomenclature/personal/:id', async ({ params }) => {
+    await delay(50);
+    const id = params.id as string;
+    try {
+      mockNomenclatureStore.deletePersonalEntry(id);
+      return HttpResponse.json({ ok: true });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return HttpResponse.json({ error: msg }, { status: 404 });
+    }
   }),
 ];
 

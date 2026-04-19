@@ -26,11 +26,15 @@
   let loading = $state(false);
   let loadError = $state<string | null>(null);
 
+  // Add-personal form state
+  let personalDesignatorDraft = $state('');
+  let personalStandardizedDraft = $state('');
+
   async function refresh() {
     loading = true;
     loadError = null;
     try {
-      await nomenclatureStore.loadAll(api);
+      await nomenclatureStore.loadAll(api, 'standalone-user');
     } catch (e) {
       loadError = e instanceof Error ? e.message : String(e);
     } finally {
@@ -41,6 +45,31 @@
   async function promote(entryId: string) {
     try {
       await nomenclatureStore.promoteIfEligible(api, entryId);
+    } catch (e) {
+      loadError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  async function addPersonal() {
+    const designator = personalDesignatorDraft.trim();
+    const standardized = personalStandardizedDraft.trim();
+    if (!designator || !standardized) return;
+    try {
+      await nomenclatureStore.submitPersonal(api, {
+        designator,
+        standardized,
+        userId: 'standalone-user',
+      });
+      personalDesignatorDraft = '';
+      personalStandardizedDraft = '';
+    } catch (e) {
+      loadError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  async function removePersonal(entryId: string) {
+    try {
+      await nomenclatureStore.removePersonal(api, entryId);
     } catch (e) {
       loadError = e instanceof Error ? e.message : String(e);
     }
@@ -64,7 +93,7 @@
     <span class="w-3 inline-block text-center">{expanded ? '▾' : '▸'}</span>
     <span>Nomenclature dictionaries</span>
     <span class="text-clinical-text">
-      staging {nomenclatureStore.staging.length} · institutional {nomenclatureStore.institutional.length}
+      staging {nomenclatureStore.staging.length} · institutional {nomenclatureStore.institutional.length} · personal {nomenclatureStore.personal.length}
     </span>
     {#if loading}<span class="text-clinical-muted">loading…</span>{/if}
     {#if loadError}<span class="text-badge-rose-text">{loadError}</span>{/if}
@@ -72,7 +101,7 @@
   </button>
 
   {#if expanded}
-    <div class="grid grid-cols-2 gap-4 border-t border-clinical-border px-4 py-2 text-[11px]">
+    <div class="grid grid-cols-3 gap-4 border-t border-clinical-border px-4 py-2 text-[11px]">
       <!-- Staging section -->
       <div>
         <div class="mb-1 flex items-center gap-2">
@@ -130,6 +159,66 @@
                 <span class="text-clinical-muted">{entry.designator}</span>
                 <span class="mx-1 text-clinical-muted">→</span>
                 <span class="text-clinical-text">{entry.standardized}</span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+
+      <!-- Personal section -->
+      <div>
+        <div class="mb-1 flex items-center gap-2">
+          <span class="font-mono font-medium text-clinical-text">Personal</span>
+          <span class="text-[10px] text-clinical-muted">wins over institutional in lookup</span>
+        </div>
+
+        <form
+          class="mb-2 flex flex-col gap-1"
+          onsubmit={(e) => { e.preventDefault(); addPersonal(); }}
+        >
+          <input
+            type="text"
+            placeholder="designator (e.g., 'left breast biopsy')"
+            bind:value={personalDesignatorDraft}
+            class="rounded bg-clinical-input-bg border border-clinical-input-border px-2 py-0.5 text-[11px] text-clinical-text"
+          />
+          <input
+            type="text"
+            placeholder="standardized (e.g., 'Breast, left, needle core biopsy')"
+            bind:value={personalStandardizedDraft}
+            class="rounded bg-clinical-input-bg border border-clinical-input-border px-2 py-0.5 text-[11px] text-clinical-text"
+          />
+          <button
+            type="submit"
+            class="self-start rounded bg-clinical-primary px-2 py-0.5 text-[10px] font-medium text-white hover:bg-clinical-primary/90 disabled:opacity-50"
+            disabled={!personalDesignatorDraft.trim() || !personalStandardizedDraft.trim()}
+          >Add shortcut</button>
+        </form>
+
+        {#if nomenclatureStore.personal.length === 0}
+          <p class="text-clinical-muted italic">No personal shortcuts yet.</p>
+        {:else}
+          <ul class="space-y-1">
+            {#each nomenclatureStore.personal as entry (entry.id)}
+              <li class="border border-clinical-border rounded px-2 py-1">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0 truncate">
+                    <span class="text-clinical-muted">{entry.designator}</span>
+                    <span class="mx-1 text-clinical-muted">→</span>
+                    <span class="text-clinical-text">{entry.standardized}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="shrink-0 text-clinical-muted hover:text-badge-rose-text transition-colors"
+                    onclick={() => removePersonal(entry.id)}
+                    title="Delete shortcut"
+                    aria-label="Delete personal shortcut"
+                  >
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </li>
             {/each}
           </ul>

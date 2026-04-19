@@ -154,6 +154,20 @@ export interface PromotionResult {
   readonly event: NomenclatureEvent;
 }
 
+export interface CreatePersonalInput {
+  readonly designator: string;
+  readonly standardized: string;
+  readonly components?: Partial<NomenclatureEntry['components']>;
+  readonly userId: string;
+  readonly timestamp?: string;
+}
+
+export interface PersonalResult {
+  readonly entry: NomenclatureEntry;
+  /** True when this call updated an existing (same-user, same-designator) entry. */
+  readonly replaced: boolean;
+}
+
 /**
  * Normalize a designator for de-duplication. Case-insensitive and
  * collapses internal whitespace. Trailing/leading whitespace is trimmed.
@@ -369,5 +383,101 @@ export class NomenclatureStore {
         confirmationsSnapshot: [...confirmations],
       },
     };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Personal tier (SDS 04-04 §2.1)
+  //
+  // Personal entries are pathologist-owned shortcuts: "when I see THIS
+  // designator, I prefer THIS standardization." They win over institutional
+  // in the §2.2 lookup order — a pathologist's explicit preference overrides
+  // the institutional standard for their own reports.
+  //
+  // Scoping is per-user. Two pathologists may hold different personal entries
+  // for the same designator without conflict. Same-user same-designator
+  // creation replaces the existing entry rather than creating a duplicate.
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Create or update a personal dictionary entry. Same-user same-designator
+   * calls replace the existing entry (upsert). Returns `{entry, replaced}`.
+   */
+  createPersonalEntry(input: CreatePersonalInput): PersonalResult {
+    const timestamp = input.timestamp ?? new Date().toISOString();
+    const existing = this.findPersonalByDesignator(input.designator, input.userId);
+
+    if (existing) {
+      const updated: NomenclatureEntry = {
+        ...existing,
+        standardized: input.standardized,
+        components: {
+          organ: input.components?.organ ?? existing.components.organ,
+          site: input.components?.site ?? existing.components.site,
+          laterality: input.components?.laterality ?? existing.components.laterality,
+          specimenType: input.components?.specimenType ?? existing.components.specimenType,
+        },
+        lastUsedAt: timestamp,
+      };
+      this.entries.set(existing.id, updated);
+      return { entry: updated, replaced: true };
+    }
+
+    const entry: NomenclatureEntry = {
+      id: 'personal-' + crypto.randomUUID(),
+      designator: input.designator,
+      standardized: input.standardized,
+      components: {
+        organ: input.components?.organ ?? null,
+        site: input.components?.site ?? null,
+        laterality: input.components?.laterality ?? null,
+        specimenType: input.components?.specimenType ?? null,
+      },
+      tier: 'personal',
+      source: 'institutional', // personal overrides behave like institutional for the owning user
+      createdAt: timestamp,
+      createdBy: input.userId,
+      lastUsedAt: timestamp,
+      retired: false,
+      quarantined: false,
+    };
+    this.entries.set(entry.id, entry);
+    return { entry, replaced: false };
+  }
+
+  /** Delete a personal entry by id. Throws if missing or not personal-tier. */
+  deletePersonalEntry(entryId: string): void {
+    const entry = this.entries.get(entryId);
+    if (!entry) throw new Error(`No entry with id: ${entryId}`);
+    if (entry.tier !== 'personal') {
+      throw new Error(`Entry ${entryId} is in tier '${entry.tier}', not 'personal'`);
+    }
+    this.entries.delete(entryId);
+  }
+
+  /**
+   * All non-retired personal entries. When `userId` is supplied, limits to
+   * that pathologist's entries; when omitted, returns all personal entries
+   * across users (for admin/dev panel views).
+   */
+  getPersonalEntries(userId?: string): NomenclatureEntry[] {
+    return [...this.entries.values()].filter((e) => {
+      if (e.tier !== 'personal' || e.retired) return false;
+      if (userId != null && e.createdBy !== userId) return false;
+      return true;
+    });
+  }
+
+  /**
+   * Find a personal entry by designator for a specific pathologist. Case- and
+   * whitespace-insensitive.
+   */
+  findPersonalByDesignator(designator: string, userId: string): NomenclatureEntry | undefined {
+    const normalized = normalizeDesignator(designator);
+    for (const entry of this.entries.values()) {
+      if (entry.tier !== 'personal' || entry.retired) continue;
+      if (entry.createdBy !== userId) continue;
+      if (normalizeDesignator(entry.designator) === normalized) return entry;
+    }
+    return undefined;
   }
 }

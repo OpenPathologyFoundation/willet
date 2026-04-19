@@ -435,3 +435,94 @@ describe('NomenclatureStore — promoteIfEligible (SDS 04-04 §3.2)', () => {
     expect(() => store.promoteIfEligible(result.institutional.id)).toThrow(/not 'staging'/);
   });
 });
+
+describe('NomenclatureStore — personal tier (SDS 04-04 §2.1)', () => {
+  let store: NomenclatureStore;
+  beforeEach(() => {
+    store = new NomenclatureStore();
+  });
+
+  it('creates a personal entry with the expected shape', () => {
+    const result = store.createPersonalEntry({
+      designator: 'left breast biopsy',
+      standardized: 'Breast, left, needle core biopsy',
+      userId: 'dr-smith',
+      timestamp: '2026-04-19T10:00:00Z',
+    });
+    expect(result.replaced).toBe(false);
+    expect(result.entry.tier).toBe('personal');
+    expect(result.entry.createdBy).toBe('dr-smith');
+    expect(result.entry.designator).toBe('left breast biopsy');
+    expect(result.entry.standardized).toBe('Breast, left, needle core biopsy');
+  });
+
+  it('upserts on same-user same-designator call (case-insensitive)', () => {
+    const first = store.createPersonalEntry({
+      designator: 'left breast biopsy',
+      standardized: 'Breast, left, biopsy',
+      userId: 'dr-smith',
+    });
+    const second = store.createPersonalEntry({
+      designator: 'LEFT BREAST BIOPSY',
+      standardized: 'Breast, left, needle core biopsy',
+      userId: 'dr-smith',
+    });
+    expect(second.replaced).toBe(true);
+    expect(second.entry.id).toBe(first.entry.id);
+    expect(second.entry.standardized).toBe('Breast, left, needle core biopsy');
+    expect(store.getPersonalEntries()).toHaveLength(1);
+  });
+
+  it('different users create distinct personal entries for the same designator', () => {
+    store.createPersonalEntry({
+      designator: 'prostate biopsy',
+      standardized: 'Prostate, needle biopsy',
+      userId: 'dr-smith',
+    });
+    store.createPersonalEntry({
+      designator: 'prostate biopsy',
+      standardized: 'Prostate, transrectal needle biopsy',
+      userId: 'dr-jones',
+    });
+    expect(store.getPersonalEntries()).toHaveLength(2);
+    expect(store.getPersonalEntries('dr-smith')).toHaveLength(1);
+    expect(store.getPersonalEntries('dr-jones')).toHaveLength(1);
+  });
+
+  it('findPersonalByDesignator is scoped to userId', () => {
+    store.createPersonalEntry({
+      designator: 'prostate biopsy',
+      standardized: 'Prostate, needle biopsy',
+      userId: 'dr-smith',
+    });
+    const smithHit = store.findPersonalByDesignator('prostate biopsy', 'dr-smith');
+    const jonesHit = store.findPersonalByDesignator('prostate biopsy', 'dr-jones');
+    expect(smithHit?.createdBy).toBe('dr-smith');
+    expect(jonesHit).toBeUndefined();
+  });
+
+  it('deletePersonalEntry removes the entry', () => {
+    const { entry } = store.createPersonalEntry({
+      designator: 'x',
+      standardized: 'X',
+      userId: 'u',
+    });
+    store.deletePersonalEntry(entry.id);
+    expect(store.getPersonalEntries()).toHaveLength(0);
+    expect(store.getById(entry.id)).toBeUndefined();
+  });
+
+  it('deletePersonalEntry throws for unknown id', () => {
+    expect(() => store.deletePersonalEntry('missing')).toThrow(/No entry with id/);
+  });
+
+  it('deletePersonalEntry throws for non-personal-tier entries', () => {
+    const { entry } = store.createStagingEntry({
+      designator: 'x',
+      standardized: 'X',
+      userId: 'alice',
+      caseId: 'c',
+    });
+    expect(() => store.deletePersonalEntry(entry.id)).toThrow(/not 'personal'/);
+  });
+});
