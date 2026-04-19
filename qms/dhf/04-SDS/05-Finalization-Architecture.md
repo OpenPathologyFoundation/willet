@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-05 |
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Date** | April 19, 2026 |
 | **Stage** | 1 (model), 4 (integration) |
 | **Status** | Active |
@@ -304,15 +304,60 @@ WILLET observes on next sync: case state transitions to
 
 **Scope of WILLET's RTF**: WILLET emits only the **formatted diagnosis component** (parts, clauses, synoptic output, case comment). The LIS assembles the ultimate patient record by combining WILLET's diagnosis RTF with other components it owns (gross description, accession header, patient demographics). WILLET does NOT render accession headers, patient identifiers, or collection metadata in the RTF body.
 
-### 6.5 Dialogue System and Pre-Sign-Out Re-Edit
+### 6.5 Dialogue System — Post-Finalize Validation (Canonical — Revised v1.2)
 
-Between WILLET's finalize action and the LIS's ultimate sign-out, the orchestrator runs a separate clerical-validation layer known as the **Dialogue System** — it checks consistency between the finalized report and ancillary documents (requisitions, operative notes, prior-case cross-references). Any issues it flags appear in the pathologist's work list with an indication that attention is needed.
+This section is the **canonical description** of where cross-field clinical-consistency validation lives in the Starling platform. A prior v2.3 revision of `04-03 §5.4` attempted in-module AI-driven review; that approach was retired on 2026-04-19 (see the Superseded entries in `01-URS.md` UN-093/094/095 and `02-SRS.md` SRS-275/276/277/279). This section states the current design without reference to that superseded attempt.
 
-During this window the report is in a "finalized, awaiting LIS sign-out" state. The pathologist can:
-- Walk away and continue clinical work (the preferred model — clean separation of clinical and clerical work).
-- Return to the case if the work list shows an issue, re-open and edit, then **re-finalize**. The re-finalize produces a new RTF with a new idempotency key; the Hermes engine forwards it as an amendment-style update before the LIS signs out.
+**Scope of Dialogue.** The Dialogue module in the orchestration platform runs asynchronously after WILLET finalizes a report. It performs:
 
-Once the LIS signs out, the report is legally final and any further change requires the formal amendment workflow (out of scope for this SDS; see `01-URS.md §5.14`).
+- **Cross-field clinical-consistency validation** — specimen ↔ part-label organ mismatch, laterality consistency across parts, clause-type ↔ content alignment, synoptic ↔ diagnosis agreement, required-field presence.
+- **Clerical reconciliation** against ancillary documents the orchestrator owns — requisitions, operative notes, prior-case cross-references, tissue-handling manifests.
+- **Amendment-window coordination** — while the report is "finalized, awaiting LIS sign-out," Dialogue coordinates any edits the pathologist makes in response to flagged issues.
+
+**Why it lives in the orchestrator, not WILLET.** Three reasons:
+
+1. **Separation of concerns.** WILLET is an authoring tool. Dialogue is a validation tool. These are distinct clinical-workflow modes with different ergonomic requirements. Pathologists author in clinical mode (thinking about the specimen) and validate in clerical mode (thinking about completeness and cross-document consistency). Mixing the two creates alert-fatigue and trains reflex-dismissal.
+
+2. **Access to broader context.** Dialogue sees the full orchestrator-level context — requisition documents, operative notes, prior cases, cross-module state. WILLET does not and should not — that would couple it to every ancillary-document source.
+
+3. **Timing.** The pathologist's Finalize moment is a clinical decision point; interrupting it with validation questions is the wrong ergonomic. The work list is the right surface — the pathologist triages flags when they choose to, in clerical-review mode.
+
+**Runtime sequence.**
+
+```
+Pathologist clicks Finalize in WILLET
+    │
+    ▼ (WILLET runs only essential integrity checks — SRS-080)
+    │
+POST /api/report/{caseId}/finalize → LORIS API
+    │    (WILLET emits REPORT_FINALIZED audit event here)
+    │
+    ▼ (WILLET is done; responsibility transferred to orchestrator)
+    │
+Hermes forwards RTF via HL7 to LIS
+    │
+    ▼ (parallel branch)
+Dialogue runs validation asynchronously
+    │    (Dialogue emits its own audit events in orchestrator scope)
+    │
+    ├─ No flags → report proceeds to LIS sign-out unchanged
+    │
+    └─ Flags surfaced → work list indicator shown to pathologist
+            │
+            ▼
+        Pathologist triages in work list at their convenience
+            │
+            ├─ Dismiss as non-actionable → Dialogue records the decision
+            │
+            └─ Re-open case → edit → re-finalize → new idempotency key →
+                Hermes forwards amendment before LIS sign-out
+```
+
+**Pathologist's experience.** The pathologist finalizes when clinically ready. No in-module blocking dialog. They go do clinical work or move to the next case. Later, during a natural pause or as part of a clerical review cycle, they check the work list for any flagged items. Flagged items have enough context to triage quickly — no back-and-forth, no modal gates.
+
+**Audit trail.** WILLET emits `REPORT_FINALIZED` on finalize. Dialogue emits its own validation-activity audit events (e.g., `dialogue.flag_raised`, `dialogue.flag_resolved`). Both streams are preserved in the orchestrator audit log, queryable by case ID.
+
+**Amendment workflow.** Post-finalize edits produce a new RTF with a new idempotency key. Hermes forwards as an amendment-style update before LIS sign-out. Once the LIS signs out, the report is legally final and any further change requires the formal amendment workflow (out of scope for this SDS; see `01-URS.md §5.14`).
 
 ---
 

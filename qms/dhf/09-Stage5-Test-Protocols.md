@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-STAGE5-009 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | April 19, 2026 |
-| **Status** | Initial complete authoring |
+| **Status** | Active |
 | **Purpose** | Document the test methodologies and acceptance criteria for Stage-5 verification activities that cannot execute in a CI environment — adversarial corpora, penetration testing, load/performance, accessibility, and summative usability. |
 | **Related** | `06-VVP.md` v1.0 (plan) · `05b-Hazard-Analysis.md` v1.0 · `03-Cybersecurity.md` v1.0 · `08-Usability-Engineering.md` v1.0 · `07-Trace-Matrix.md` v1.0 |
 
@@ -118,7 +118,7 @@ Corpus storage: `mcp-server/tests/fixtures/llm-prompt-injection/`.
 
 ### P3.1 Objective
 
-Measure the rate at which the §4 LLM interpreter produces clinically incorrect content under plausible-looking inputs, and confirm that the Final Review Pass catches or surfaces the hallucinations.
+Measure the rate at which the §4 LLM interpreter produces clinically incorrect content under plausible-looking inputs. (The in-module Final Review Pass catch-rate criterion is retired per the 2026-04-19 delegation; hallucination catch in the broader system now happens at the orchestrator-scope Dialogue layer and is tracked in the Starling DHF.)
 
 ### P3.2 Corpus design
 
@@ -127,7 +127,7 @@ Records of the form `{instruction_text, case_context_fixture, plausible_incorrec
 - `instruction_text` is a realistic pathology-authoring instruction.
 - `case_context_fixture` is a realistic case scaffold.
 - `plausible_incorrect_responses` lists hallucination modes the LLM is known to or suspected to produce for this input shape — e.g., wrong clause-type tagging, fabricated margin distance, organ-mismatched diagnosis.
-- `final_review_disposition` is the expected `runFinalReview` result: should the Final Review Pass catch the hallucination, or is it in a residual-risk class (§3 hazard residual).
+- `residual_class` indicates whether the hallucination falls in a residual-risk class for WILLET alone or is expected to be caught downstream by Dialogue (orchestrator-scope verification).
 
 Target corpus size: **≥50 records** at first release.
 
@@ -145,7 +145,7 @@ Because hallucinations are probabilistic and model-dependent, this protocol runs
 ### P3.4 Acceptance criterion
 
 - **Per-category hallucination rate ≤5%** averaged over 10 runs — the LLM produces a valid, clinically correct response in ≥9.5 of 10 runs per record on average.
-- **Final Review Pass catches ≥80%** of hallucinations in the subset of records marked "expected catch".
+<!-- Final Review Pass catch-rate criterion retired 2026-04-19 (in-module review removed; Dialogue carries the orchestrator-scope equivalent in Starling DHF). -->
 - No hallucination class produces clinically harmful content that bypasses all mitigation layers in ≥1/10 runs.
 
 If any per-category rate exceeds 10%, the release is held pending mitigation.
@@ -153,7 +153,6 @@ If any per-category rate exceeds 10%, the release is held pending mitigation.
 ### P3.5 Outputs
 
 - Hallucination rate per category.
-- Final Review catch rate per category.
 - `qms/records/LLM-HALLUCINATION-{release}.md`.
 
 ---
@@ -261,7 +260,7 @@ Manual pass criterion: every authoring task is completable in each modality; any
 
 ## P7 — Summative Usability Evaluation
 
-Refer to `08-Usability-Engineering.md §7.2` for the full protocol. Pass criterion: zero critical task failures across the eight selected hazard-related scenarios (S-01 through S-08). This protocol is executed as part of Stage 5 and is one of the release criteria under `06-VVP.md §9`.
+Refer to `08-Usability-Engineering.md §7.2` for the full protocol. Pass criterion: zero critical task failures across the **active** WILLET-scope scenario set — **S-01, S-02, S-04, S-06, S-07**. (S-03, S-05, S-08 were retired on 2026-04-19 along with the in-module Final Review Pass.) This protocol is executed as part of Stage 5 and is one of the release criteria under `06-VVP.md §9`.
 
 ---
 
@@ -296,3 +295,4 @@ A release is blocked when any applicable Stage-5 protocol has not been run or ha
 | Version | Date | Changes |
 |---|---|---|
 | 1.0 | 2026-04-19 | Initial complete authoring. Seven Stage-5 protocols (STT corpus, LLM injection, hallucination, pen-test, load, accessibility, summative usability) with objectives, corpus/scenario designs, execution procedures, acceptance criteria, and record outputs. Scheduling and ownership table. Integration with release criteria in `06-VVP.md §9`. |
+| 1.1 | 2026-04-19 | Updated P3 (LLM hallucination corpus) and P7 (summative usability) to reflect the retirement of the in-module Final Review Pass. P3 removes the "Final Review catches ≥80%" criterion (now orchestrator-scope via Dialogue). P7 reduces the WILLET scenario set to S-01, S-02, S-04, S-06, S-07 (S-03, S-05, S-08 retired). Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. |

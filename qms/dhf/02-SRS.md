@@ -6,7 +6,7 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SRS-002 |
-| **Version** | 2.6 |
+| **Version** | 2.7 |
 | **Date** | April 19, 2026 |
 | **Derived From** | URS v2.4 (WILLET-DHF-URS-001), Design Dialogue v2.0, v2.3 architecture cascade |
 | **Software Safety Class** | IEC 62304 Class B (per `05a-Risk-Plan.md §3`) |
@@ -1547,39 +1547,34 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
-#### SRS-275 · Phase 1 (Added v2.3)
+#### SRS-275 · Phase 1 (Superseded v2.7 — Final Review Pass removed from WILLET; see SRS-282)
 
-**Before a report transitions to FINALIZED, the system shall execute a Final Review Pass that checks the full report for internal inconsistencies from a controlled set of discrepancy classes (specimen ↔ part-label organ mismatch, laterality inconsistency across parts, clause-type ↔ content mismatch, synoptic ↔ diagnosis disagreement, part label ↔ dictation content mismatch, required-laterality missing, unresolved staged items). If any discrepancy is found, Finalize shall be blocked and each discrepancy shall be presented for explicit resolution (Edit, Confirm as correct, or Acknowledge as intentional).**
+**Status: Superseded on 2026-04-19.** Cross-field clinical-consistency
+validation at sign-out is now handled by the orchestrator's Dialogue
+module (SDS 04-05 §6.5) asynchronously, post-finalize. WILLET's Finalize
+no longer blocks on discrepancy detection. Historical text retained for
+audit traceability below.
 
-| Field | Value |
-|---|---|
-| URS trace | UN-093 |
-| SDS trace | 04-03 §5.4 |
-| Verification | Integration test: finalize a report with a specimen-vs-part-label mismatch → Finalize is blocked, the discrepancy is surfaced, selecting Edit opens the affected field. Integration test: finalize a report with no discrepancies → proceeds without additional interaction. Unit test: the discrepancy class set is the controlled set (no ad-hoc critique). |
-
----
-
-#### SRS-276 · Phase 1 (Added v2.3)
-
-**When the pathologist selects "Acknowledge as intentional" for any flagged discrepancy during the Final Review Pass, the system shall require a free-text rationale of at least 10 characters before accepting the resolution. The audit record shall include the discrepancy class, the rationale, the user identity, the timestamp, and the case identifier.**
-
-| Field | Value |
-|---|---|
-| URS trace | UN-094 |
-| SDS trace | 04-03 §1.5.3, §5.4 |
-| Verification | Functional test: rationale under 10 characters rejects submission. Integration test: accepting with a valid rationale records the full audit envelope. Institutional-tuning test: configuring additional controlled-list constraints narrows the accepted rationales correctly. |
+> Before a report transitions to FINALIZED, the system shall execute a Final Review Pass that checks the full report for internal inconsistencies from a controlled set of discrepancy classes … If any discrepancy is found, Finalize shall be blocked …
 
 ---
 
-#### SRS-277 · Phase 1 (Added v2.3)
+#### SRS-276 · Phase 1 (Superseded v2.7 — acknowledge-as-intentional is Dialogue-scope)
 
-**When the AI service is unavailable, the Final Review Pass shall degrade to a manual self-review dialog listing items that would have been AI-reviewed (any `staged`-source items, any deterministic cross-check mismatches) and offering an explicit "Proceed without AI review" gesture. The default configuration shall permit this degraded sign-out path. Institutions may opt into a stricter configuration (`REQUIRE_AI_REVIEW_AT_SIGNOUT = true`) that hard-blocks Finalize when the review service is unavailable. All sign-outs completed without AI review shall be audited with `final_review: skipped_unavailable` and the service error code.**
+**Status: Superseded on 2026-04-19.** The rationale-logged escape was
+bound to the in-module Final Review Pass, which no longer exists in
+WILLET. The equivalent gesture, if needed, lives in Dialogue.
 
-| Field | Value |
-|---|---|
-| URS trace | UN-095 |
-| SDS trace | 04-03 §5.4, §8 |
-| Verification | Integration test: with review service mocked to 503, Finalize completes via manual self-review path. Audit log contains the skipped-unavailable marker. Toggling `REQUIRE_AI_REVIEW_AT_SIGNOUT` to `true` blocks Finalize under the same conditions. |
+> When the pathologist selects "Acknowledge as intentional" for any flagged discrepancy during the Final Review Pass, the system shall require a free-text rationale of at least 10 characters …
+
+---
+
+#### SRS-277 · Phase 1 (Superseded v2.7 — AI-unavailable concern is Dialogue-scope)
+
+**Status: Superseded on 2026-04-19.** WILLET's Finalize no longer
+depends on any AI service, so degraded-mode handling is out of scope.
+
+> When the AI service is unavailable, the Final Review Pass shall degrade to a manual self-review dialog …
 
 ---
 
@@ -1595,15 +1590,33 @@ Requirements are grouped by functional domain, mirroring the URS structure.
 
 ---
 
-#### SRS-279 · Phase 1 (Added v2.5)
+#### SRS-279 · Phase 1 (Superseded v2.7 — discrepancy-resolution audit is Dialogue-scope)
 
-**Every resolution of a Final Review Pass discrepancy shall be recorded in the audit trail as a `final_review.discrepancy_resolved` event. The event shall contain: the discrepancy class, the resolution type (`edit`, `confirm_as_correct`, or `acknowledge_as_intentional`), the rationale text (if `acknowledge_as_intentional`; may be empty for other resolution types), the user identity, the case identifier, the timestamp, and the pre-resolution and post-resolution content snapshots where applicable. The audit record shall be persisted before the Finalize action is allowed to proceed.**
+**Status: Superseded on 2026-04-19.** WILLET no longer generates
+discrepancy-resolution events; Dialogue emits its own audit trail for
+the validation activities it now owns. WILLET continues to emit
+`REPORT_FINALIZED` on finalize (pre-existing audit event).
+
+> Every resolution of a Final Review Pass discrepancy shall be recorded in the audit trail …
+
+---
+
+#### SRS-282 · Phase 1 (Added v2.7)
+
+**On Finalize, the system shall run essential integrity checks (SRS-080
+— every part has at least one DIAGNOSIS clause, required metadata
+present) and shall hand the finalized payload to the orchestrator via
+the LORIS API. The system shall not perform AI-driven cross-field
+consistency validation at or prior to Finalize. Cross-field
+validation is performed asynchronously by the orchestrator's Dialogue
+module and surfaced to the pathologist through the work list; WILLET
+receives state updates via its normal case-sync path (SDS 04-05 §6.4).**
 
 | Field | Value |
 |---|---|
-| URS trace | UN-093, UN-094 |
-| SDS trace | 04-03 §5.4, §9, §17.5 |
-| Verification | Integration test: resolve a discrepancy via each of the three gestures → audit trail contains exactly one `final_review.discrepancy_resolved` event per gesture with the correct resolution type. Audit record retrieval by case ID returns the full resolution history. Finalize fails closed (with a recoverable error state) if the audit persistence fails before the Finalize action. |
+| URS trace | UN-096 |
+| SDS trace | 04-05 §3, §6.4, §6.5 |
+| Verification | Integration test: finalize a report with a specimen-vs-part-label mismatch → Finalize completes without blocking (no review dialog appears). Unit test: no `final_review` service code path exists in the repository. Audit test: `REPORT_FINALIZED` is emitted; no `FINAL_REVIEW_*` events appear. |
 
 ---
 
@@ -1761,6 +1774,7 @@ Every URS user need traces to at least one SRS requirement:
 | 2.4 | 2026-04-09 | DRAFT | Added §3.27 Case-Level Comments (SRS-260–263). SRS-260: case-level comment UI input. SRS-261: persistence in cases.metadata.case_comment + autosave. SRS-262: finalization rendering as Comment section in RTF. SRS-263: audit trail for comment changes. Traceable to UN-089. Updated requirements summary table and traceability index. Total: 114 requirements (108 Phase 1, 6 Phase 2). |
 | 2.5 | 2026-04-18 | DRAFT | **Revised SRS-187** to reflect v2.3 architectural reconciliation: semantic normalization is an intrinsic operation of the §4 LLM interpreter in the conversational path, not a clause-direct pipeline stage. **Revised SRS-188** to correct undo-order specification: first Ctrl+Z reveals raw STT transcript (peeling back Layer 1 correction), second Ctrl+Z reverts entire dictation — aligned with SDS 04-03 §16.5 "peel back processing in reverse order of application." **Revised SRS-189** graceful-degradation behavior to reflect two-layer transcription pipeline and conversational-path disablement under LLM outage. **Added §3.28 Dual-System Architecture and Oversight** with ten new requirements: SRS-270 source-based automation policy, SRS-271 staging promotion ≥5 confirmations from ≥3 pathologists, SRS-272 12-month retirement, SRS-273 override quarantine at 3 overrides in 30 days, SRS-274 visual provenance display, SRS-275 Final Review Pass behavior, SRS-276 acknowledge-as-intentional audit requirement, SRS-277 graceful degradation of Final Review Pass, SRS-278 verbatim-contract enforcement on clause-direct path, SRS-279 audit logging of all three resolution gestures (edit/confirm/acknowledge). Traceable to UN-090–UN-095 (new URS entries). Header version bumped from 2.0 → 2.5 (document-control fix). Total: 124 requirements (118 Phase 1, 6 Phase 2). |
 | 2.6 | 2026-04-19 | Active | Added SRS-280 (autosave preference toggle) and SRS-281 (voice recording 5-minute maximum duration) per URS v2.5 §6 open-question resolutions (Q6 autosave, Q8 voice timeout). SRS-280 specifies the `autosave: boolean` preference with default `true`, co-existing with a manual Save button. SRS-281 specifies the 5-minute recording limit with a 30-second-remaining warning and auto-submit at cutoff. Revised SRS-187 trace-note (no content change) to acknowledge resolution Q6. Total: 126 requirements (120 Phase 1, 6 Phase 2). |
+| 2.7 | 2026-04-19 | Active | **Retired Final Review Pass in WILLET.** SRS-275, SRS-276, SRS-277, SRS-279 marked Superseded (historical text retained for audit). Added SRS-282 specifying WILLET's delegation of cross-field validation to the orchestrator's Dialogue module; Finalize runs only essential integrity checks (SRS-080) and hands off. SRS-278 (verbatim contract) retained — unrelated to Final Review. Traces to URS-096 (new). Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. Active-requirement count: 122 (4 superseded, 1 added). |
 
 ---
 

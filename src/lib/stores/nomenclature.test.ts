@@ -256,4 +256,74 @@ describe('nomenclatureStore', () => {
       expect(found).toBeUndefined();
     });
   });
+
+  describe('findProvenance — visual provenance lookup (SRS-274)', () => {
+    beforeEach(() => {
+      nomenclatureStore.staging = [
+        makeEntry({
+          id: 'st-1',
+          designator: 'Tumor',
+          standardized: 'Colon, right hemicolectomy, resection',
+          source: 'staged',
+          confirmations: [
+            { userId: 'alice', caseId: 'c1', timestamp: '2026-04-19T10:00:00Z' },
+            { userId: 'bob', caseId: 'c2', timestamp: '2026-04-19T11:00:00Z' },
+          ],
+        }),
+      ];
+      nomenclatureStore.institutional = [
+        makeEntry({
+          id: 'inst-1',
+          tier: 'institutional',
+          source: 'institutional',
+          designator: 'Specimen',
+          standardized: 'Colon, sigmoid, polypectomy',
+        }),
+      ];
+    });
+
+    it('findStagingByStandardized matches by output text (case-insensitive)', () => {
+      const found = nomenclatureStore.findStagingByStandardized(
+        'COLON, right hemicolectomy, resection',
+      );
+      expect(found?.id).toBe('st-1');
+    });
+
+    it('findInstitutionalByStandardized matches institutional tier by output', () => {
+      const found = nomenclatureStore.findInstitutionalByStandardized(
+        'Colon, sigmoid, polypectomy',
+      );
+      expect(found?.id).toBe('inst-1');
+    });
+
+    it('findProvenance prefers institutional over staging per SDS 04-04 §2.2', () => {
+      // Add a staging entry with the same standardized output as the institutional entry.
+      nomenclatureStore.staging = [
+        ...nomenclatureStore.staging,
+        makeEntry({
+          id: 'st-dup',
+          designator: 'dup-designator',
+          standardized: 'Colon, sigmoid, polypectomy',
+          source: 'staged',
+        }),
+      ];
+      const found = nomenclatureStore.findProvenance('Colon, sigmoid, polypectomy');
+      expect(found?.tier).toBe('institutional');
+      expect(found?.id).toBe('inst-1');
+    });
+
+    it('findProvenance returns the staging entry when only staging matches', () => {
+      const found = nomenclatureStore.findProvenance(
+        'Colon, right hemicolectomy, resection',
+      );
+      expect(found?.tier).toBe('staging');
+      expect(found?.source).toBe('staged');
+      expect(found?.confirmations).toHaveLength(2);
+    });
+
+    it('findProvenance returns undefined when the rendered label is LIS-native / user-authored', () => {
+      const found = nomenclatureStore.findProvenance('Some other value');
+      expect(found).toBeUndefined();
+    });
+  });
 });

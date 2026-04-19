@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-03 |
-| **Version** | 2.3.1 |
+| **Version** | 2.4 |
 | **Date** | April 19, 2026 |
 | **Stage** | 3A (Voice), 3C (LLM Assist) |
 | **Status** | Active |
@@ -418,38 +418,21 @@ Clarifications appear inline in the prompt area, below the instruction. The path
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 5.4 Final Review Pass (Added v2.3)
+### 5.4 Post-finalize validation — delegated to Dialogue (Revised v2.4)
 
-Before the report transitions to FINALIZED, the system runs an AI-driven consistency review of the entire report. This is the cross-validation role identified in §1.5.2 and the "System 2 reviews System 1's work" mechanism from the enforced-oversight model.
+Cross-field clinical-consistency validation at sign-out (specimen ↔ part-label mismatch, laterality consistency, clause-type ↔ content alignment, synoptic ↔ diagnosis agreement, required-field checks, clerical reconciliation against requisitions and operative notes) is **not** a WILLET concern. It is performed by the **Dialogue** module in the Starling orchestration platform, asynchronously after the pathologist finalizes. Dialogue surfaces any flags on the pathologist's work list; the pathologist triages there and re-opens the case to edit and re-finalize if needed.
 
-**Scope of the review.** The pass checks for internal inconsistencies that individual deterministic rules cannot detect because they operate at the clause or field level. Representative discrepancy classes:
+This is the separation-of-concerns that serves pathologists best:
 
-| Discrepancy class | Example |
-|---|---|
-| Specimen ↔ part-label organ mismatch | Case specimen is prostate; Part B's standardized label reads "Breast, left; biopsy" |
-| Laterality inconsistency across parts | Parts A and B both labeled left breast; Part C says right breast; case history mentions left mastectomy only |
-| Clause type ↔ content mismatch | Clause typed as DIAGNOSIS contains only margin language |
-| Synoptic ↔ diagnosis disagreement | Synoptic form says "Gleason 3+4=7"; diagnosis narrative says "Gleason 4+3=7" |
-| Part label ↔ dictation content mismatch | Part labeled "ascending colon, polypectomy"; DIAGNOSIS clause describes "adenocarcinoma of the sigmoid" |
-| Required-laterality missing | Part is a breast biopsy but standardized label has no laterality (required organ per SDS 04-04) |
-| Unresolved uncertain item | Any item in "staged" source category that has not been explicitly confirmed during authoring |
+- WILLET authors and finalizes when the pathologist judges the report clinically complete. No in-module AI review creates alert-fatigue, trains reflex-dismissal, or interrupts the clinical authoring flow.
+- Dialogue validates post-hoc, at orchestrator scope, with access to the broader case record (requisitions, operative notes, prior cases, cross-module context) that WILLET does not have anyway.
+- The pathologist triages flags in the dedicated work-list context — calm clerical-review mode rather than rushed clinical-sign-out mode.
 
-The set of discrepancy classes is a controlled artifact (changes require a design change record). The review LLM is prompted with a constrained schema that forces output into this set; open-ended critique is out of scope because it would undermine auditability.
+WILLET's Finalize retains only **essential integrity checks** (every part has at least one DIAGNOSIS clause, required metadata is populated) per SRS-080. Those are structural invariants of the report schema, not clinical-consistency judgments, and they remain in-module.
 
-**Execution and blocking behavior.** The review runs when the pathologist activates Finalize. If no discrepancies are found, Finalize proceeds. If discrepancies are found, the Finalize action is blocked and each discrepancy is surfaced in a review dialog. Each discrepancy must be resolved with one of three explicit gestures:
+**Handoff.** On Finalize, WILLET emits `REPORT_FINALIZED` and POSTs the finalized RTF to the orchestrator's LORIS API (see `04-05 §6.4`). From there, Hermes forwards to the LIS; Dialogue validates asynchronously; the work list signals the pathologist if follow-up is needed. WILLET's responsibility ends at the handoff.
 
-1. **Edit** — open the affected field for in-place correction. The review re-runs after edit.
-2. **Confirm as correct** — the deterministic check appears correct on this case; the pathologist affirms the current content; audit log records the resolution.
-3. **Acknowledge as intentional** — the pathologist affirms that the flagged inconsistency is a deliberate clinical choice (e.g., truly bilateral specimen with asymmetric laterality, non-standard part label for an unusual specimen). Requires a free-text rationale. Audit log records `decision: intentional_override` with the rationale, timestamp, user, and discrepancy class.
-
-No "dismiss without resolution" gesture is offered. This is the blocking-confirmation principle from §1.5.3 applied at the sign-out boundary.
-
-**Graceful degradation.** If the LLM service is unavailable, the review cannot run. Finalize is not blocked by service unavailability — a report is a legal document and cannot be held hostage to vendor uptime. Instead, the pathologist is presented with a manual self-review dialog listing items that would have been AI-reviewed (any `staged` source items, any detectable mismatches from deterministic cross-checks), and an explicit "Proceed without AI review" gesture. The audit log records `final_review: skipped_unavailable` with timestamp and service error code. Institutional policy may tighten this — a setting exists to disable Finalize entirely when the review service is down — but the permissive default is deliberate.
-
-**What the review is not.**
-- Not an endorsement of diagnostic content. The review checks internal consistency only; it does not opine on correctness of a diagnosis.
-- Not a replacement for pathologist judgment. Every discrepancy requires explicit human resolution; the review cannot dismiss itself.
-- Not a substitute for the SRS verification test suite. The review is runtime governance on a specific report; the test suite validates system behavior during development.
+**Historical context.** A prior v2.3 revision of this section specified an in-module AI-driven Final Review Pass that blocked Finalize on cross-field discrepancies. It was retired on 2026-04-19 based on pathologist-SME review of alert-fatigue risk. Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. URS UN-093/094/095 and SRS-275/276/277/279 are marked Superseded in their respective documents, with historical text retained for audit traceability. UN-096 and SRS-282 specify the current delegation.
 
 ---
 

@@ -177,3 +177,85 @@ describe('SaveStore state machine', () => {
     expect(saveStore.retryCount).toBe(0);
   });
 });
+
+describe('SaveStore — autosave preference (SRS-280)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('does not schedule auto-execute when preferencesStore.autosave is false', async () => {
+    const { saveStore } = await import('./save.svelte');
+    const { preferencesStore } = await import('./preferences.svelte');
+    saveStore.reset();
+    preferencesStore.update({ autosave: false });
+
+    const saveFn = vi.fn().mockResolvedValue(undefined);
+    saveStore.markDirty(saveFn);
+
+    // Entered DIRTY but nothing should execute even after the debounce window.
+    expect(saveStore.state).toBe('DIRTY');
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(saveFn).not.toHaveBeenCalled();
+    expect(saveStore.state).toBe('DIRTY');
+
+    // Explicit saveNow() flushes regardless of preference.
+    await saveStore.saveNow();
+    expect(saveFn).toHaveBeenCalledOnce();
+    expect(saveStore.state).toBe('SAVED');
+
+    // Restore default for subsequent tests.
+    preferencesStore.update({ autosave: true });
+    saveStore.reset();
+  });
+
+  it('schedules auto-execute when preferencesStore.autosave is true (default)', async () => {
+    const { saveStore } = await import('./save.svelte');
+    const { preferencesStore } = await import('./preferences.svelte');
+    saveStore.reset();
+    preferencesStore.update({ autosave: true });
+
+    const saveFn = vi.fn().mockResolvedValue(undefined);
+    saveStore.markDirty(saveFn);
+
+    await vi.advanceTimersByTimeAsync(350);
+    expect(saveFn).toHaveBeenCalledOnce();
+    expect(saveStore.state).toBe('SAVED');
+    saveStore.reset();
+  });
+
+  it('with autosave off, successive markDirty calls replace the pending save without scheduling', async () => {
+    const { saveStore } = await import('./save.svelte');
+    const { preferencesStore } = await import('./preferences.svelte');
+    saveStore.reset();
+    preferencesStore.update({ autosave: false });
+
+    const saveFn1 = vi.fn().mockResolvedValue(undefined);
+    const saveFn2 = vi.fn().mockResolvedValue(undefined);
+    saveStore.markDirty(saveFn1);
+    saveStore.markDirty(saveFn2);
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(saveFn1).not.toHaveBeenCalled();
+    expect(saveFn2).not.toHaveBeenCalled();
+
+    // saveNow() executes the most recent pending save (saveFn2).
+    await saveStore.saveNow();
+    expect(saveFn1).not.toHaveBeenCalled();
+    expect(saveFn2).toHaveBeenCalledOnce();
+
+    preferencesStore.update({ autosave: true });
+    saveStore.reset();
+  });
+
+  it('saveNow() is a no-op when there is nothing pending', async () => {
+    const { saveStore } = await import('./save.svelte');
+    saveStore.reset();
+
+    await expect(saveStore.saveNow()).resolves.toBeUndefined();
+    expect(saveStore.state).toBe('IDLE');
+  });
+});

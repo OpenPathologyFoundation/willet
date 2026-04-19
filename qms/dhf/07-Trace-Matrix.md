@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-TM-007 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | April 19, 2026 |
-| **Status** | Initial complete authoring |
+| **Status** | Active |
 | **IEC 62304 Reference** | §5.1.1 (Planning), §5.6.4 (Traceability), §7.1.2 (Risk control traceability) |
 | **ISO 14971 Reference** | §10 (Risk management file content) |
 | **Related** | `01-URS.md` v2.4 · `02-SRS.md` v2.5 · `03-Cybersecurity.md` v1.0 · `04-SDS/` · `05b-Hazard-Analysis.md` v1.0 · `06-VVP.md` |
@@ -88,12 +88,12 @@ The table below groups URS sections and their matching SRS sections with the imp
 | Concurrency & locking | 5.6 / UN-031–035 | 3.6 / SRS-050–055, 3.18 / SRS-170–174 | 04-01 §7 (lock service) | `src/lib/stores/save.test.ts` (optimistic locking), pending lock-specific integration tests |
 | Session persistence & recovery | 5.7 / UN-036–039 | 3.7 / SRS-060–065 | 04-01 §5.2 | `src/lib/stores/save.test.ts` |
 | Report state management | 5.8 / UN-040–043 | 3.8 / SRS-070–072 | 04-01 §4.2 | `src/lib/stores/report.test.ts`, `e2e/finalization-sync.test.ts` |
-| Finalization & transmission | 5.9 / UN-044–049, UN-093 | 3.9 / SRS-080–089, 3.28 / SRS-275–277, SRS-279 | 04-01 §6, 04-03 §5.4 | `src/lib/services/final-review.test.ts`, `e2e/final-review-pass.test.ts`, `e2e/finalization-sync.test.ts` |
+| Finalization & transmission | 5.9 / UN-044–049, UN-096 | 3.9 / SRS-080–089, 3.28 / SRS-282 | 04-01 §6, 04-03 §5.4, 04-05 §6.4, §6.5 | `e2e/finalization-sync.test.ts` — cross-field validation is orchestrator-scope (Dialogue) and tested in Starling DHF |
 | HL7/FHIR interface | 5.10 / UN-050–054 | 3.10 / SRS-100–103 | 04-01 §6.3 | Covered by integration tests in Starling orchestrator scope |
 | Role-based access control | 5.11 / UN-055–058 | 3.11 / SRS-110–112 | 04-00 §3 | Integration-level; auth-system tests |
 | Peripheral document access | 5.12 / UN-059–063 | 3.12 / SRS-120–124 | 04-01 §14 (Context Dock) | `e2e/synoptic-panel.test.ts` (context dock navigation) |
 | Multi-author workflow | 5.13 / UN-064–066 | 3.13 / SRS-130–132 | 04-01 §7.2 | Pending |
-| Audit & compliance | 5.14 / UN-067–070, UN-093, UN-094 | 3.14 / SRS-140–143, 3.28 / SRS-279 | 04-03 §9, §17.5, 04-06 Data Model | `e2e/final-review-pass.test.ts` (audit event tests), `e2e/finalization-sync.test.ts` |
+| Audit & compliance | 5.14 / UN-067–070 | 3.14 / SRS-140–143 | 04-03 §9, §17.5, 04-06 Data Model | `e2e/finalization-sync.test.ts` (REPORT_FINALIZED emission); discrepancy-resolution audit is Dialogue-scope (orchestrator DHF) |
 | Non-functional | 5.15 / UN-071–075 | 3.15 / SRS-150–154 | 04-00 §4 | Performance tests pending |
 | System integration | 5.16 / UN-076–079 | 3.16 / SRS-160–163 | STARLING-MIS-001 | Integration with orchestrator covered in Starling scope |
 | Undo / redo | — | 3.17 / SRS-175–176 | 04-03 §16.5 | `src/lib/stores/history.test.ts`, `e2e/v23-verbatim-contract.test.ts` (two-level undo) |
@@ -120,18 +120,18 @@ Each hazard in `05b-Hazard-Analysis.md` is listed with its risk controls, the SR
 
 | Hazard | Risk Controls | Implementing SRS | Verification |
 |---|---|---|---|
-| **HZ-001** — Context-mismatched deterministic rule | RC-001a (source-based policy), RC-001b (Final Review Pass), RC-001c (override quarantine) | SRS-270, 273, 275 | `src/lib/services/source-policy.test.ts`, `src/lib/services/final-review.test.ts`, `e2e/final-review-pass.test.ts`; quarantine test pending |
-| **HZ-002** — LLM hallucination accepted | RC-002a (ai_suggested never auto-applies), RC-002b (visual provenance), RC-002c (Final Review Pass cross-check), RC-002d (audit) | SRS-270, 274, 275, 279 | `src/lib/services/source-policy.test.ts`, `e2e/final-review-pass.test.ts`; visual-provenance automated a11y pending; hallucination fixture corpus pending |
+| **HZ-001** — Context-mismatched deterministic rule | RC-001a (source-based policy), RC-001b (**Dialogue post-finalize validation**), RC-001c (override quarantine) | SRS-270, 273, 282 | `src/lib/services/source-policy.test.ts`; Dialogue-side tests are orchestrator-scope; quarantine pipeline pending |
+| **HZ-002** — LLM hallucination accepted | RC-002a (ai_suggested never auto-applies), RC-002b (visual provenance), RC-002c (**Dialogue post-finalize validation**), RC-002d (audit) | SRS-270, 274, 282 | `src/lib/services/source-policy.test.ts`; visual-provenance automated a11y pending; hallucination-catch tests are orchestrator-scope |
 | **HZ-003** — PHI vendor boundary leakage | RC-003a–f (vendor contracts, minimum-necessary, region pinning, prompt audit) | SRS-270 (conceptual), Cybersecurity T-005 | Design-review gate, egress-filter unit test (pending), vendor BAA audit at onboarding |
 | **HZ-004** — Undetected rule drift | RC-004a (override counting), RC-004b (quarantine at threshold), RC-004c (admin unlock), RC-004d (QMS review) | SRS-273 | Override-quarantine integration test pending |
-| **HZ-005** — AI-unavailable finalize | RC-005a (manual self-review), RC-005b (institutional tightening), RC-005c (audit) | SRS-277 | Integration test with AI mocked to 503 pending; manual self-review UI exists (FinalReviewDialog) |
-| **HZ-006** — Forced-conformance trap | RC-006a (acknowledge-as-intentional), RC-006b (rationale ≥10 chars), RC-006c (audit) | SRS-276, 279 | `e2e/final-review-pass.test.ts` (rationale length, audit emission) |
-| **HZ-007** — Voice misinterpretation | RC-007a (Layer 1 correction), RC-007b (specimen-keyed context), RC-007c (verbatim contract), RC-007d (two-level undo), RC-007e (final review) | SRS-185, 187, 188, 275, 278 | `src/lib/services/transcription-correction.test.ts`, `e2e/v23-verbatim-contract.test.ts`; adversarial STT corpus pending |
-| **HZ-008** — Cross-part contamination | RC-008a (focus-based routing + debounce), RC-008b (dictation indicator), RC-008c (final review specimen-part detector), RC-008d (header-edit gesture) | SRS-185, 275 | `e2e/v23-verbatim-contract.test.ts` (indicator), `e2e/final-review-pass.test.ts` (mismatch detection) |
+| **HZ-005** — *Retired 2026-04-19* (AI-availability concern moved to Dialogue-scope) | — | — | — |
+| **HZ-006** — *Retired 2026-04-19* (forced-conformance trap eliminated by moving review off the Finalize path) | — | — | — |
+| **HZ-007** — Voice misinterpretation | RC-007a (Layer 1 correction), RC-007b (specimen-keyed context), RC-007c (verbatim contract), RC-007d (two-level undo), RC-007e (read-back + Dialogue post-finalize) | SRS-185, 187, 188, 278, 282 | `src/lib/services/transcription-correction.test.ts`, `e2e/v23-verbatim-contract.test.ts`; adversarial STT corpus pending |
+| **HZ-008** — Cross-part contamination | RC-008a (focus-based routing + debounce), RC-008b (dictation indicator), RC-008c (**Dialogue post-finalize specimen-part detector, orchestrator-scope**), RC-008d (header-edit gesture) | SRS-185, 282 | `e2e/v23-verbatim-contract.test.ts` (indicator); Dialogue-side specimen-part tests are orchestrator-scope |
 | **HZ-009** — LIS transmission failure / duplication | RC-009a (idempotency key), RC-009b (transmission status), RC-009c (retry), RC-009d (visible badge), RC-009e (audit) | SRS-081–089 | `e2e/finalization-sync.test.ts`; LIS integration tests in Starling scope |
 | **HZ-010** — Lock bypass / lost update | RC-010a (optimistic locking), RC-010b (conflict UI), RC-010c (finalization lock), RC-010d (save state machine) | SRS-050–055, 170–174 | `src/lib/stores/save.test.ts`; conflict UI integration test pending |
 | **HZ-011** — Nomenclature tier conflict | RC-011a (lookup priority), RC-011b (de-duplication), RC-011c (admin inspection), RC-011d (promotion retires staging), RC-011e (QMS review) | SRS-270, 271, 272, 273 | `src/lib/services/nomenclature.test.ts`, `src/lib/stores/nomenclature.test.ts` |
-| **HZ-012** — Incomplete finalization | RC-012a (pre-finalize validation), RC-012b (synoptic completeness), RC-012c (final review), RC-012d (finalize dialog summary) | SRS-080, 275 | `e2e/synoptic-panel.test.ts` (completeness), `e2e/final-review-pass.test.ts`, `src/lib/services/final-review.test.ts` |
+| **HZ-012** — Incomplete finalization | RC-012a (pre-finalize integrity validation, SRS-080), RC-012b (synoptic completeness), RC-012c (**Dialogue post-finalize validation**), RC-012d (finalize dialog summary) | SRS-080, 282 | `e2e/synoptic-panel.test.ts` (completeness); Dialogue-side cross-field tests are orchestrator-scope |
 
 Residual risks recorded in `05b-Hazard-Analysis.md` are all **Low** or **Low-to-Moderate**. Moderate residuals (HZ-001, HZ-002) are accepted subject to the ongoing adversarial corpus work planned for Stage 5.
 
@@ -165,9 +165,10 @@ The v2.3 cascade introduced 6 new user needs and 10 new system requirements. Bec
 | **UN-090** Deterministic-first precedence | SRS-270 (source-based policy), SRS-274 (visual provenance) | 04-03 §1.5, §5.1; 04-04 §2 | `src/lib/services/source-policy.ts` · `src/lib/components/PromptArea.svelte` (gates) | `src/lib/services/source-policy.test.ts` (34 tests) |
 | **UN-091** Self-maintaining dictionary lifecycle | SRS-271 (promotion), SRS-272 (retirement), SRS-273 (override quarantine) | 04-04 §3.1–§3.4 | `src/lib/services/nomenclature.ts` · `src/lib/stores/nomenclature.svelte.ts` · `src/mocks/handlers.ts` (nomenclature endpoints) | `src/lib/services/nomenclature.test.ts` (29 tests) · `src/lib/stores/nomenclature.test.ts` (12 tests) · `e2e/nomenclature-staging.test.ts` (2 tests); retirement batch job + override counter pending |
 | **UN-092** Verbatim direct dictation | SRS-187 revised (verbatim contract), SRS-188 revised (two-level undo), SRS-278 (no LLM semantic normalization) | 04-03 §2.2, §14.1, §16 | `src/lib/components/PromptArea.svelte` (handleDictation) · `src/lib/components/PartEditor.svelte` (two-level undo) | `e2e/v23-verbatim-contract.test.ts` (7 tests) · `src/lib/services/transcription-correction.test.ts` |
-| **UN-093** Final Review Pass at sign-out | SRS-275 (discrepancy classes + blocking), SRS-279 (audit event emission) | 04-03 §5.4 | `src/lib/services/final-review.ts` · `src/lib/components/FinalReviewDialog.svelte` · `src/lib/ReportModule.svelte` (finalize flow) | `src/lib/services/final-review.test.ts` (19 tests) · `e2e/final-review-pass.test.ts` (9 tests incl. audit-event assertions) |
-| **UN-094** Acknowledge-as-intentional escape | SRS-276 (rationale ≥10 chars), SRS-279 (audit of resolution) | 04-03 §1.5.3, §5.4 | `src/lib/components/FinalReviewDialog.svelte` (rationale gate + save gesture) | `e2e/final-review-pass.test.ts` (rationale-length test; audit-event test) |
-| **UN-095** Permissive degradation under AI unavailable | SRS-277 (manual self-review dialog + REQUIRE_AI_REVIEW_AT_SIGNOUT toggle) | 04-03 §5.4, §8 | `src/lib/services/final-review.ts` (`degraded` flag) · `src/lib/components/FinalReviewDialog.svelte` (manual self-review branch) | AI-unavailable integration test pending — LLM-backed detectors deferred to Stage 3C |
+| **UN-093** ~~Final Review Pass at sign-out~~ **Superseded 2026-04-19** | ~~SRS-275, SRS-279~~ — superseded by **UN-096 / SRS-282** (delegation to Dialogue) | — | — | — |
+| **UN-094** ~~Acknowledge-as-intentional escape~~ **Superseded 2026-04-19** | ~~SRS-276~~ — moot once the in-module review was retired | — | — | — |
+| **UN-095** ~~Permissive degradation under AI unavailable~~ **Superseded 2026-04-19** | ~~SRS-277~~ — moot once the in-module review was retired | — | — | — |
+| **UN-096** WILLET finalize delegates cross-field validation to Dialogue | SRS-282 (finalize hands off; no in-module AI review) | 04-03 §5.4 (delegation note), 04-05 §6.4 (orchestration pipeline), 04-05 §6.5 (Dialogue canonical description) | `src/lib/ReportModule.svelte` (simplified `handleFinalizeClick` — no review branch) | `e2e/finalization-sync.test.ts` (finalize flow end-to-end); absence test: no `FinalReviewDialog` component exists in the repo |
 
 ---
 
@@ -181,7 +182,6 @@ Unit and integration test files present in the repository, organized by what the
 |---|---|---|
 | `source-policy.test.ts` | SRS-270; HZ-001, HZ-002 | 34 |
 | `nomenclature.test.ts` | SRS-271, SRS-272 (design), SRS-273 (design); HZ-011 | 29 |
-| `final-review.test.ts` | SRS-275; HZ-001, HZ-002, HZ-006, HZ-008, HZ-012 | 19 |
 | `clause-classifier.test.ts` | SRS-030, SRS-032 | 8 |
 | `clause-operations.test.ts` | SRS-230–234 | 22 |
 | `clause-ordering.test.ts` | SRS-015 (clause ordering invariant) | 6 |
@@ -221,7 +221,6 @@ Unit and integration test files present in the repository, organized by what the
 | File | Coverage | Test count |
 |---|---|---|
 | `dictation-pipeline.test.ts` | SRS-180–189 end-to-end | — |
-| `final-review-pass.test.ts` | SRS-275, SRS-276, SRS-279; HZ-001, HZ-002, HZ-006, HZ-008, HZ-012 | 9 |
 | `finalization-sync.test.ts` | SRS-080–089, SRS-260; HZ-009, HZ-012 | — |
 | `nomenclature-staging.test.ts` | SRS-270, SRS-271; HZ-011, full loop | 2 |
 | `quick-entry.test.ts` | SRS-010–015 quick-entry mode | — |
@@ -242,7 +241,6 @@ All DHF documentation is complete at v1.0. The remaining verification items are 
 
 - **SRS-272 retirement batch job** — executes in auth-system; integration test at the auth-system layer. Scheduled: Stage 4 integration. Owner: V&V Engineer (WILLET side) + auth-system V&V (Starling side).
 - **SRS-273 override quarantine pipeline** — detection mechanism is unit-tested on `source-policy.shouldQuarantine`; runtime pipeline landing is code work scheduled for Phase 2E. Owner: Technical Lead.
-- **SRS-277 AI-unavailable Final Review branch** — UI exists; end-to-end exercise requires LLM-backed detectors (Stage 3C). Owner: V&V Engineer.
 - **SRS-274 visual provenance badges in production UI** — dev-harness rendering exists (`NomenclaturePanel.svelte`); production badges on part labels / clause outputs are Phase 2D+ code work. Owner: Technical Lead.
 - **SRS-110–112 / SRS-170–174 lock-service integration** — orchestrator integration testing. Scheduled: Stage 4. Owner: Starling integration.
 
@@ -302,3 +300,4 @@ The following internal consistency checks were performed while authoring this ma
 |---|---|---|
 | — | — | Stub describing intended structure; pointed at future CI-generated CSV. |
 | 1.0 | 2026-04-19 | Initial complete authoring. Functional-area forward trace for all 27 URS/SRS sections (§3). Full reverse trace for all 12 hazards (§4) and all 10 STRIDE threats (§5). v2.3 delta tracing with per-requirement design, implementation, and verification rows (§6). Test coverage summary listing all 32 test files mapped to SRS and hazards (§7). Known gaps catalog for functional, risk-control, security-control, and non-functional verification (§8). Cross-document consistency check log (§9). Future-work plan for CI-generated CSV export (§10). |
+| 1.1 | 2026-04-19 | Updated to reflect the retirement of the in-module Final Review Pass (URS v2.6, SRS v2.7, Hazard Analysis v1.1). Functional-area row for Finalization & transmission repointed to UN-096 / SRS-282 and the Dialogue delegation. Hazard reverse-trace §4 updated: HZ-005 and HZ-006 marked Retired; HZ-001/002/007/008/012 controls repointed from Final Review to Dialogue (orchestrator-scope). v2.3 delta §6 marks UN-093/094/095 superseded and adds UN-096 row. Test coverage summary (§7) removed entries for deleted `final-review.test.ts` and `e2e/final-review-pass.test.ts`. Gap list (§8) no longer mentions SRS-277. Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. |
