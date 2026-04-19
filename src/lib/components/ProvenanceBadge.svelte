@@ -18,11 +18,10 @@
   pathologist confirmations, not a probabilistic score.
 -->
 <script lang="ts">
-  import type { NomenclatureSource } from '$lib/services/nomenclature';
-  import { DEFAULT_POLICY } from '$lib/services/source-policy';
+  import { DEFAULT_POLICY, type ActionSource } from '$lib/services/source-policy';
 
   interface Props {
-    source: NomenclatureSource;
+    source: ActionSource;
     /** Number of confirmations so far (only meaningful for `staged`). */
     confirmationCount?: number;
     /** Confirmation threshold for promotion (defaults to policy default). */

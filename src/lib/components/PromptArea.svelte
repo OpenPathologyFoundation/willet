@@ -270,7 +270,11 @@
           applied: true,
         };
         promptStore.addEntry(entry);
-        onaction(response.actions);
+        const stampedActions = response.actions.map((a) => ({
+          ...a,
+          source: a.source ?? response.source ?? 'rule',
+        }));
+        onaction(stampedActions);
       } else {
         // `'confirm' | 'always_confirm' | 'clarify'` all require explicit confirmation.
         const entry: InstructionEntry = {
@@ -584,7 +588,13 @@
           });
       }
     }
-    onaction(response.actions);
+    // Stamp each action with the response source so the action applier can
+    // propagate it onto produced clauses for SDS 04-04 §4.1 visual provenance.
+    const stampedActions = response.actions.map((a) => ({
+      ...a,
+      source: a.source ?? response.source ?? 'rule',
+    }));
+    onaction(stampedActions);
     pendingConfirmation = null;
   }
 

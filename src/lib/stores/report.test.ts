@@ -129,6 +129,30 @@ describe('serializeClauses', () => {
       },
     });
     const parsed = parseClauses(part);
-    expect(parsed).toEqual(original);
+    expect(parsed.map((c) => ({ text: c.text, type: c.type, confidence: c.confidence })))
+      .toEqual(original);
+    expect(parsed.every((c) => c.source === undefined)).toBe(true);
+  });
+
+  it('round-trips per-clause source tags (SRS-274)', () => {
+    const original: Clause[] = [
+      { text: 'Adenocarcinoma, moderately differentiated', type: 'DIAGNOSIS', confidence: 0.92, source: 'ai_suggested' },
+      { text: 'Margins negative', type: 'MARGIN', confidence: 0.99, source: 'rule' },
+      { text: 'User-typed comment', type: 'COMMENT' /* no source */ },
+    ];
+    const serialized = serializeClauses(original);
+    expect(serialized.clause_sources).toEqual(['ai_suggested', 'rule', undefined]);
+    const part = makePart({
+      finalDiagnosis: serialized.finalDiagnosis,
+      metadata: {
+        clause_types: serialized.clause_types,
+        confidence: serialized.confidence as number[],
+        clause_sources: serialized.clause_sources,
+      },
+    });
+    const parsed = parseClauses(part);
+    expect(parsed[0].source).toBe('ai_suggested');
+    expect(parsed[1].source).toBe('rule');
+    expect(parsed[2].source).toBeUndefined();
   });
 });
