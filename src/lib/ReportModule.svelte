@@ -413,12 +413,22 @@
       switch (action.type) {
         case 'set_clauses': {
           const payload = action.payload as { clauses: Clause[] };
-          newClauses = payload.clauses;
+          // Propagate the action's source onto each produced clause so the
+          // editor can render source-based visual provenance (SDS 04-04 §4.1).
+          // Clauses that already carry an explicit source win over the action-
+          // level stamp (e.g., partial updates).
+          newClauses = payload.clauses.map((c) => ({
+            ...c,
+            source: c.source ?? action.source,
+          }));
           break;
         }
         case 'add_clause': {
           const payload = action.payload as { clause: Clause };
-          newClauses = [...currentClauses, payload.clause];
+          newClauses = [
+            ...currentClauses,
+            { ...payload.clause, source: payload.clause.source ?? action.source },
+          ];
           break;
         }
         case 'remove_clause': {
@@ -428,9 +438,15 @@
         }
         case 'update_clause': {
           const payload = action.payload as { index: number; clause: Partial<Clause> };
-          newClauses = currentClauses.map((c, i) =>
-            i === payload.index ? { ...c, ...payload.clause } : c,
-          );
+          newClauses = currentClauses.map((c, i) => {
+            if (i !== payload.index) return c;
+            return {
+              ...c,
+              ...payload.clause,
+              // A partial update that doesn't set source inherits the action's.
+              source: payload.clause.source ?? action.source ?? c.source,
+            };
+          });
           break;
         }
         case 'set_authored_label': {
@@ -452,8 +468,8 @@
       // Sort clauses by type order (Addendum §8.5.2)
       newClauses.sort((a, b) => CLAUSE_ORDER[a.type] - CLAUSE_ORDER[b.type]);
 
-      const { finalDiagnosis, clause_types, confidence } = serializeClauses(newClauses);
-      reportStore.updatePart(part.id, finalDiagnosis, { clause_types, confidence });
+      const { finalDiagnosis, clause_types, confidence, clause_sources } = serializeClauses(newClauses);
+      reportStore.updatePart(part.id, finalDiagnosis, { clause_types, confidence, clause_sources });
 
       saveStore.markDirty(async () => {
         await services.api.savePart(
@@ -461,7 +477,7 @@
           part.id,
           {
             finalDiagnosis,
-            metadata: { ...part.metadata, clause_types, confidence },
+            metadata: { ...part.metadata, clause_types, confidence, clause_sources },
           },
         );
       });

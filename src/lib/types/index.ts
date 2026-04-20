@@ -64,6 +64,19 @@ export interface Clause {
   text: string;
   type: ClauseType;
   confidence?: number;
+  /**
+   * Provenance of the clause (SDS 04-04 §4.1, SRS-274). Drives the
+   * `ProvenanceBadge` rendering next to clause text in the editor:
+   *   - `'rule'` / `'institutional'` / `'seed'` → no badge (deterministic)
+   *   - `'ai_suggested'` → "AI, verify" badge (LLM-derived, needs confirmation)
+   *   - `'staged'` → "staged (N/5)" badge (partially-confirmed AI output)
+   *   - `'ambiguous'` → "clarify" badge
+   *   - undefined → user-authored / LIS-native (no badge)
+   * Set by the action applier when clauses come from the §4 LLM interpreter
+   * (source='ai_suggested'); unset by direct pathologist typing (clauses
+   * typed in the editor remain unsourced, which renders as no badge).
+   */
+  source?: import('../services/source-policy').ActionSource;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,6 +121,12 @@ export interface PartMetadata {
   authored_label?: string;
   clause_types?: ClauseType[];
   confidence?: (number | undefined)[];
+  /**
+   * Per-clause provenance source tags, parallel to `clause_types` and
+   * `confidence`. `undefined` entries mean the clause is user-authored /
+   * LIS-native and renders without a provenance badge.
+   */
+  clause_sources?: (import('../services/source-policy').ActionSource | undefined)[];
   finalization?: FinalizationMetadata;
   [key: string]: unknown; // LIS-owned keys
 }
@@ -211,6 +230,14 @@ export interface LlmAction {
   partLabel: string;
   payload: Record<string, unknown>;
   confidence: number;
+  /**
+   * Provenance stamp from the producing response. Added v2.7 so downstream
+   * clause application can propagate source onto the produced clauses for
+   * SDS 04-04 §4.1 visual provenance. `'rule'` for rules-engine actions,
+   * `'ai_suggested'` for LLM-interpreter actions. Set by the consumer
+   * (PromptArea) at the point of dispatch, not by the producers.
+   */
+  source?: import('../services/source-policy').ActionSource;
 }
 
 export interface Clarification {

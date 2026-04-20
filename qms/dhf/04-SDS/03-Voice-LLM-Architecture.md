@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | **Document ID** | WILLET-DHF-SDS-004-03 |
-| **Version** | 2.4 |
+| **Version** | 2.5 |
 | **Date** | April 19, 2026 |
 | **Stage** | 3A (Voice), 3C (LLM Assist) |
 | **Status** | Active |
@@ -433,6 +433,53 @@ WILLET's Finalize retains only **essential integrity checks** (every part has at
 **Handoff.** On Finalize, WILLET emits `REPORT_FINALIZED` and POSTs the finalized RTF to the orchestrator's LORIS API (see `04-05 §6.4`). From there, Hermes forwards to the LIS; Dialogue validates asynchronously; the work list signals the pathologist if follow-up is needed. WILLET's responsibility ends at the handoff.
 
 **Historical context.** A prior v2.3 revision of this section specified an in-module AI-driven Final Review Pass that blocked Finalize on cross-field discrepancies. It was retired on 2026-04-19 based on pathologist-SME review of alert-fatigue risk. Decision record: `.dev-notes/2026-04-19-final-review-delegated-to-dialogue.md`. URS UN-093/094/095 and SRS-275/276/277/279 are marked Superseded in their respective documents, with historical text retained for audit traceability. UN-096 and SRS-282 specify the current delegation.
+
+### 5.5 Expert System + Explicit LLM Invocation (Added v2.5)
+
+The conversational authoring pipeline is **dual-track**: a deterministic expert system runs first as the fast default, and the probabilistic LLM is explicitly invoked by the pathologist when the expert system is not enough. This is the operational realization of the §1.5 "System 1 / System 2" design principle applied at the instruction-dispatch boundary.
+
+#### 5.5.1 Expert system (default, fast path)
+
+The rules-engine classifier (`instruction-classifier.ts`) and its executors (`src/mocks/llm-mock.ts` in dev, a production equivalent at integration time) handle the recognized shapes of pathologist instruction with **institutional and specimen-aware expansion**:
+
+- Bare findings map to institutional preferred forms via specimen-keyed tables.
+  Example: *"all parts are benign"* on a prostate needle biopsy expands to
+  `Benign prostatic tissue`; on a breast lumpectomy it expands to
+  `Benign breast tissue`. The table is data — not code logic — and extensible
+  per-institution with a one-line addition.
+- Actions produced by the rules engine are tagged `source: 'rule'` and
+  auto-apply under the §5.1 source-based policy. No confirmation required.
+- The expansion tables live near the rules engine today; a future iteration
+  migrates them into the SDS 04-04 personal / institutional dictionary tiers
+  so pathologists can add their own entries without a code change.
+
+#### 5.5.2 Explicit LLM invocation (pathologist-initiated)
+
+The pathologist can bypass the rules engine and route an instruction directly to the §4 LLM interpreter through either of two gestures:
+
+- **Dedicated "Ask AI" button** next to Send in the PromptArea. Clicking it submits the current draft to `/api/interpret`, skipping the rules engine entirely. The LLM response is tagged `source: 'ai_suggested'` and — per §5.1 — never auto-applies. Pathologist must confirm before the action is applied. Intended for instructions the rules engine would not recognize (complex ranges, mixed per-part findings, paraphrased requests).
+- **Keyword prefix** in the instruction text: `ai:`, `ask ai`, `use ai`, `use llm`, or `@ai` at the start of the instruction. The prefix is stripped; the rest of the instruction routes directly to LLM. Same `ai_suggested` tagging and same confirmation requirement. Lightweight affordance for users who prefer typing to clicking.
+
+In both cases the result enters the same confirmation path as rules-engine auto-escalation: actions surface as `pendingConfirmation` and the pathologist clicks Apply (or Dismiss).
+
+#### 5.5.3 Auto-escalation (fallback)
+
+The pre-existing behavior remains: when the rules engine returns zero actions, the pipeline auto-escalates to the LLM. This catches cases where the pathologist didn't use the keyword prefix or the button but dispatched something the rules engine doesn't recognize. The LLM response is tagged `ai_suggested` and surfaces for confirmation — same as explicit invocation.
+
+#### 5.5.4 Production upgrade: cheap-classifier-first routing
+
+The dev-harness routes by keyword prefix; production upgrades this to a cheap-model intent classifier (e.g., Haiku-class) that reads the instruction and decides rules-vs-LLM routing. The more capable model (Sonnet/Opus class) is invoked only for the LLM branch, keeping token cost proportional to actual need. Pathologist-initiated overrides (button, keyword prefix) bypass the classifier — explicit trumps inferred.
+
+#### 5.5.5 Source-tagging summary
+
+| Invocation path | Source tag | Decision (§5.1) |
+|---|---|---|
+| Rules engine recognized the instruction | `rule` | `auto_apply` |
+| Rules engine returned zero → auto-escalated to LLM | `ai_suggested` | `always_confirm` |
+| Pathologist clicked Ask AI | `ai_suggested` | `always_confirm` |
+| Pathologist used `ai:` / `@ai` / `use ai` prefix | `ai_suggested` | `always_confirm` |
+
+Explicit LLM invocation does not bypass the v2.3 "probabilistic sources never act without judgment" principle — the explicit gesture replaces the rules-engine *routing* decision, not the confirmation *gating* decision.
 
 ---
 

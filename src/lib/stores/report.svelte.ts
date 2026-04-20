@@ -31,10 +31,12 @@ export function parseClauses(part: PartData): Clause[] {
     ? lines.slice(0, Math.max(lines.length, types.length))
     : lines.filter((l) => l.length > 0);
 
+  const sources = part.metadata.clause_sources ?? [];
   return effectiveLines.map((text, i) => ({
     text,
     type: types[i] ?? ('ANCILLARY' as ClauseType),
     confidence: part.metadata.confidence?.[i],
+    source: sources[i],
   }));
 }
 
@@ -42,11 +44,13 @@ export function serializeClauses(clauses: Clause[]): {
   finalDiagnosis: string;
   clause_types: ClauseType[];
   confidence: (number | undefined)[];
+  clause_sources: (import('$lib/services/source-policy').ActionSource | undefined)[];
 } {
   return {
     finalDiagnosis: clauses.map((c) => c.text).join('\n'),
     clause_types: clauses.map((c) => c.type),
     confidence: clauses.map((c) => c.confidence),
+    clause_sources: clauses.map((c) => c.source),
   };
 }
 

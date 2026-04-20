@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Clause, ClauseType } from '$lib/types';
+  import ProvenanceBadge from './ProvenanceBadge.svelte';
 
   interface Props {
     clause: Clause;
@@ -209,19 +210,31 @@
   </select>
 
   <!-- Clause text -->
-  <textarea
-    bind:this={textareaEl}
-    value={clause.text}
-    oninput={handleInput}
-    onkeydown={handleKeydown}
-    onfocus={handleFocus}
-    onblur={handleBlur}
-    disabled={readOnly}
-    rows={1}
-    class="w-full resize-none overflow-hidden bg-transparent text-sm outline-none disabled:text-clinical-muted disabled:cursor-not-allowed
-      {isPlaceholder ? 'text-clinical-muted italic' : 'text-clinical-text'} placeholder-clinical-muted"
-    placeholder={index === 0 ? 'Enter diagnosis...' : 'Enter finding...'}
-  ></textarea>
+  <div class="flex-1 min-w-0">
+    <textarea
+      bind:this={textareaEl}
+      value={clause.text}
+      oninput={handleInput}
+      onkeydown={handleKeydown}
+      onfocus={handleFocus}
+      onblur={handleBlur}
+      disabled={readOnly}
+      rows={1}
+      class="w-full resize-none overflow-hidden bg-transparent text-sm outline-none disabled:text-clinical-muted disabled:cursor-not-allowed
+        {isPlaceholder ? 'text-clinical-muted italic' : 'text-clinical-text'} placeholder-clinical-muted"
+      placeholder={index === 0 ? 'Enter diagnosis...' : 'Enter finding...'}
+    ></textarea>
+    {#if clause.source}
+      <!--
+        Source-based provenance badge on the clause (SRS-274, SDS 04-04 §4.1).
+        `undefined` source (user-typed / LIS-native) renders nothing, so the
+        normal authoring experience is unchanged for direct-dictation clauses.
+      -->
+      <div class="-mt-1">
+        <ProvenanceBadge source={clause.source} class="ml-0" />
+      </div>
+    {/if}
+  </div>
 
   <!-- Delete button (visible on hover) -->
   {#if !readOnly}

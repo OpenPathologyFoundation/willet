@@ -187,15 +187,88 @@
     requestAnimationFrame(() => clauseRefs[atIndex]?.focus());
   }
 
+  let headerInputEl = $state<HTMLInputElement | null>(null);
+
   function startHeaderEdit() {
     if (readOnly) return;
     headerDraft = authoredLabel ?? part.partDesignator ?? '';
     editingHeader = true;
   }
 
+  // Click-outside: when the header is being edited, a click anywhere outside
+  // the input should commit (not just tab / blur, which were unreliable when
+  // the click target itself was non-focusable). Attach a document listener
+  // only while editing and remove it when edit mode exits.
+  $effect(() => {
+    if (!editingHeader) return;
+    function onDocumentPointerDown(e: PointerEvent) {
+      if (!headerInputEl) return;
+      const target = e.target as Node | null;
+      if (target && headerInputEl.contains(target)) return;
+      commitHeaderEdit();
+    }
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+  });
+
+  /**
+   * Confirm the current authored_label as correct (SDS 04-04 §4.2). Appends
+   * a confirmation to the matching staging entry; accumulating confirmations
+   * across pathologists drives the §3.2 promotion-to-institutional pipeline.
+   * Only meaningful for staging-tier entries; institutional/seed are already
+   * promoted and don't need confirmation.
+   */
+  let confirmFlash = $state(false);
+  let confirmFlashTimer: ReturnType<typeof setTimeout> | null = null;
+
+  async function confirmLabelProvenance() {
+    if (readOnly) return;
+    const prov = labelProvenance;
+    if (!prov || prov.tier !== 'staging') return;
+    try {
+      await nomenclatureStore.confirmExisting(services.api, prov.id, {
+        userId: 'standalone-user',
+        caseId: reportStore.caseData!.caseId,
+        timestamp: new Date().toISOString(),
+      });
+      confirmFlash = true;
+      if (confirmFlashTimer) clearTimeout(confirmFlashTimer);
+      confirmFlashTimer = setTimeout(() => {
+        confirmFlash = false;
+        confirmFlashTimer = null;
+      }, 1500);
+    } catch (err) {
+      console.warn('[WILLET] Confirm staging entry failed:', err);
+    }
+  }
+
+  /**
+   * Keyboard affordances on the focused authored_label (SDS 04-04 §4.2):
+   *   - E or F2  → enter inline edit mode
+   *   - Enter    → confirm the current value as correct (staging tier only)
+   */
+  function handleLabelKeydown(e: KeyboardEvent) {
+    if (readOnly || editingHeader) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Only act if there's something confirmable; silent no-op otherwise.
+      if (labelProvenance?.tier === 'staging') {
+        confirmLabelProvenance();
+      }
+    } else if (e.key === 'e' || e.key === 'E' || e.key === 'F2') {
+      e.preventDefault();
+      startHeaderEdit();
+    }
+  }
+
   async function commitHeaderEdit() {
     editingHeader = false;
-    if (headerDraft === (authoredLabel ?? part.partDesignator ?? '')) return;
+    const previousValue = authoredLabel ?? part.partDesignator ?? '';
+    if (headerDraft === previousValue) return;
+
+    // Capture provenance BEFORE we mutate the reportStore — labelProvenance
+    // is derived from the current displayLabel, which changes with the edit.
+    const overridenEntry = labelProvenance;
 
     try {
       await services.api.updateAuthoredLabel(
@@ -206,6 +279,23 @@
       reportStore.updatePart(part.id, part.finalDiagnosis ?? '', {
         authored_label: headerDraft,
       });
+
+      // If the edit overrode a deterministic output (staging or institutional),
+      // record an override per SDS 04-04 §3.4. The service side filters
+      // trivial edits, so we forward unconditionally; it's cheap.
+      if (overridenEntry && (overridenEntry.tier === 'staging' || overridenEntry.tier === 'institutional')) {
+        nomenclatureStore
+          .recordOverride(services.api, overridenEntry.id, {
+            userId: 'standalone-user',
+            caseId: reportStore.caseData!.caseId,
+            timestamp: new Date().toISOString(),
+            before: overridenEntry.standardized,
+            after: headerDraft,
+          })
+          .catch((err) => {
+            console.warn('[WILLET] Override record failed:', err);
+          });
+      }
     } catch {
       // Revert on failure — header stays unchanged
     }
@@ -361,6 +451,7 @@
 
       {#if editingHeader}
         <input
+          bind:this={headerInputEl}
           type="text"
           bind:value={headerDraft}
           class="flex-1 rounded bg-clinical-input-bg px-2 py-0.5 text-sm text-clinical-text outline-none ring-1 ring-clinical-primary/50 border border-clinical-input-border"
@@ -371,24 +462,63 @@
           onblur={commitHeaderEdit}
         />
       {:else}
-        <span class="text-sm text-clinical-text-secondary">{displayLabel}</span>
+        <!--
+          Authored-label rendering with SDS 04-04 §4.2/§4.3 affordances:
+          - double-click anywhere on the label to enter edit mode
+          - keyboard: focus + Enter = confirm (if staging); E or F2 = edit
+          - hover: reveal Edit (always, when editable) and Confirm (staging only)
+        -->
+        <span
+          role="button"
+          tabindex={readOnly ? -1 : 0}
+          class="text-sm text-clinical-text-secondary rounded px-0.5 outline-none
+                 focus-visible:ring-2 focus-visible:ring-clinical-primary/40
+                 {readOnly ? '' : 'cursor-pointer hover:bg-clinical-hover/50'}
+                 {confirmFlash ? 'bg-badge-green-bg/40 transition-colors' : ''}"
+          ondblclick={() => { if (!readOnly) startHeaderEdit(); }}
+          onkeydown={handleLabelKeydown}
+          aria-label={labelProvenance
+            ? `Part ${part.partLabel} label: ${displayLabel}. Source: ${labelProvenance.source}. Press Enter to confirm, E to edit, or double-click to edit.`
+            : `Part ${part.partLabel} label: ${displayLabel}. Press E or double-click to edit.`}
+        >{displayLabel}</span>
         {#if labelProvenance}
           <ProvenanceBadge
             source={labelProvenance.source}
             confirmationCount={labelProvenance.confirmations?.length}
           />
         {/if}
+        {#if confirmFlash}
+          <span class="text-[10px] font-medium text-badge-green-text animate-pulse">
+            Confirmed ✓
+          </span>
+        {/if}
         {#if !readOnly}
-          <button
-            type="button"
-            class="opacity-0 group-hover:opacity-100 text-clinical-muted hover:text-clinical-text transition-opacity"
-            onclick={startHeaderEdit}
-            title="Edit part header"
-          >
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
+          <span class="inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+            {#if labelProvenance?.tier === 'staging'}
+              <button
+                type="button"
+                class="text-clinical-muted hover:text-clinical-primary transition-colors p-0.5 rounded focus-visible:ring-2 focus-visible:ring-clinical-primary/40 outline-none"
+                onclick={confirmLabelProvenance}
+                title="Confirm this standardization as correct (+1 toward institutional promotion)"
+                aria-label="Confirm part label as correct"
+              >
+                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+            {/if}
+            <button
+              type="button"
+              class="text-clinical-muted hover:text-clinical-text transition-colors p-0.5 rounded focus-visible:ring-2 focus-visible:ring-clinical-primary/40 outline-none"
+              onclick={startHeaderEdit}
+              title="Edit part header (or press E, or double-click the label)"
+              aria-label="Edit part label"
+            >
+              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+          </span>
         {/if}
       {/if}
     </div>

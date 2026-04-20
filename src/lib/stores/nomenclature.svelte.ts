@@ -22,6 +22,10 @@ import type {
   CreateStagingInput,
   Confirmation,
   PromotionResult,
+  CreatePersonalInput,
+  PersonalResult,
+  OverrideRecord,
+  OverrideResult,
 } from '$lib/services/nomenclature';
 
 /** Case- and whitespace-insensitive normalization (mirrors the server-side rule). */
@@ -34,6 +38,8 @@ class NomenclatureSvelteStore {
   staging = $state<NomenclatureEntry[]>([]);
   /** All non-retired institutional entries as last known from the server. */
   institutional = $state<NomenclatureEntry[]>([]);
+  /** Personal dictionary entries for the active user as last known from the server. */
+  personal = $state<NomenclatureEntry[]>([]);
   /** True once an initial `loadAll()` has completed. */
   loaded = $state(false);
 
@@ -42,13 +48,15 @@ class NomenclatureSvelteStore {
    * populate the reactive state. Safe to call repeatedly; each call overwrites
    * the previous state with the authoritative server view.
    */
-  async loadAll(api: ApiClient): Promise<void> {
-    const [staging, institutional] = await Promise.all([
+  async loadAll(api: ApiClient, userId?: string): Promise<void> {
+    const [staging, institutional, personal] = await Promise.all([
       api.listNomenclatureStaging(),
       api.listNomenclatureInstitutional(),
+      api.listNomenclaturePersonal(userId),
     ]);
     this.staging = staging;
     this.institutional = institutional;
+    this.personal = personal;
     this.loaded = true;
   }
 
@@ -137,17 +145,88 @@ class NomenclatureSvelteStore {
   }
 
   /**
-   * Composite provenance lookup. Returns the entry whose standardized
-   * output matches `text`, walking the tiers in priority order per SDS
-   * 04-04 §2.2 (institutional before staging). Returns undefined when no
-   * entry matches — callers treat absence as "user-authored / LIS-native /
-   * no provenance to show."
+   * Look up a personal entry whose `standardized` output matches `text`.
+   * Same reverse-lookup semantics as the other tiers.
+   */
+  findPersonalByStandardized(text: string): NomenclatureEntry | undefined {
+    const normalized = normalize(text);
+    return this.personal.find((e) => normalize(e.standardized) === normalized);
+  }
+
+  /**
+   * Composite provenance lookup. Walks the tiers in SDS 04-04 §2.2 priority
+   * order — **personal** → institutional → staging — and returns the first
+   * match. Personal wins because a pathologist's explicit preference is
+   * higher-priority than the institutional standard for their own reports.
+   * Returns `undefined` when no entry matches — callers treat absence as
+   * "user-authored / LIS-native / no provenance to show."
    */
   findProvenance(text: string): NomenclatureEntry | undefined {
     return (
-      this.findInstitutionalByStandardized(text)
+      this.findPersonalByStandardized(text)
+      ?? this.findInstitutionalByStandardized(text)
       ?? this.findStagingByStandardized(text)
     );
+  }
+
+  /**
+   * Create or update the current pathologist's personal dictionary entry
+   * for the given designator→standardized pair. Returns the server's
+   * `{entry, replaced}` result. Upsert semantics: two calls with the same
+   * userId + designator modify in place rather than creating a duplicate.
+   */
+  async submitPersonal(api: ApiClient, input: CreatePersonalInput): Promise<PersonalResult> {
+    const result = await api.createNomenclaturePersonal(input);
+    this.upsertPersonal(result.entry);
+    return result;
+  }
+
+  /**
+   * Delete a personal entry by id. Removes from the reactive state on success.
+   */
+  async removePersonal(api: ApiClient, entryId: string): Promise<void> {
+    await api.deleteNomenclaturePersonal(entryId);
+    this.personal = this.personal.filter((e) => e.id !== entryId);
+  }
+
+  /**
+   * Submit a substantive pathologist override of a dictionary entry's
+   * deterministic output (SDS 04-04 §3.4). Trivial edits (whitespace / case /
+   * punctuation only) are dropped server-side. When the override count
+   * reaches the threshold, the entry transitions to `quarantined: true`
+   * and `decidePolicy` in `source-policy` demotes it to `always_confirm`.
+   * The reactive `staging` and `institutional` arrays are updated in place
+   * so provenance badges reflect the new quarantine state immediately.
+   */
+  async recordOverride(
+    api: ApiClient,
+    entryId: string,
+    record: OverrideRecord,
+  ): Promise<OverrideResult> {
+    const result = await api.recordNomenclatureOverride(entryId, record);
+    // Mirror the updated entry into whichever tier array it lives in.
+    const replaceIn = (list: NomenclatureEntry[]) => {
+      const idx = list.findIndex((e) => e.id === entryId);
+      if (idx === -1) return list;
+      return [...list.slice(0, idx), result.entry, ...list.slice(idx + 1)];
+    };
+    this.staging = replaceIn(this.staging);
+    this.institutional = replaceIn(this.institutional);
+    this.personal = replaceIn(this.personal);
+    return result;
+  }
+
+  private upsertPersonal(entry: NomenclatureEntry): void {
+    const idx = this.personal.findIndex((e) => e.id === entry.id);
+    if (idx === -1) {
+      this.personal = [...this.personal, entry];
+    } else {
+      this.personal = [
+        ...this.personal.slice(0, idx),
+        entry,
+        ...this.personal.slice(idx + 1),
+      ];
+    }
   }
 
   /** Merge an updated entry into the staging array (by id). */
@@ -164,6 +243,7 @@ class NomenclatureSvelteStore {
   reset(): void {
     this.staging = [];
     this.institutional = [];
+    this.personal = [];
     this.loaded = false;
   }
 }

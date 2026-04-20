@@ -51,9 +51,12 @@ function makeApi(overrides: Partial<ApiClient> = {}): ApiClient {
   return {
     listNomenclatureStaging: vi.fn().mockResolvedValue([]),
     listNomenclatureInstitutional: vi.fn().mockResolvedValue([]),
+    listNomenclaturePersonal: vi.fn().mockResolvedValue([]),
     createNomenclatureStaging: vi.fn(),
     confirmNomenclatureStaging: vi.fn(),
     promoteNomenclatureStaging: vi.fn(),
+    createNomenclaturePersonal: vi.fn(),
+    deleteNomenclaturePersonal: vi.fn(),
     ...overrides,
   } as unknown as ApiClient;
 }
@@ -324,6 +327,100 @@ describe('nomenclatureStore', () => {
     it('findProvenance returns undefined when the rendered label is LIS-native / user-authored', () => {
       const found = nomenclatureStore.findProvenance('Some other value');
       expect(found).toBeUndefined();
+    });
+  });
+
+  describe('personal tier (SDS 04-04 §2.1)', () => {
+    beforeEach(() => {
+      nomenclatureStore.personal = [
+        makeEntry({
+          id: 'personal-1',
+          tier: 'personal',
+          source: 'institutional',
+          designator: 'left breast biopsy',
+          standardized: 'Breast, left, needle core biopsy',
+          createdBy: 'dr-smith',
+        }),
+      ];
+      nomenclatureStore.institutional = [
+        makeEntry({
+          id: 'inst-shared',
+          tier: 'institutional',
+          source: 'institutional',
+          designator: 'left breast biopsy',
+          standardized: 'Breast, left, needle core biopsy',
+        }),
+      ];
+    });
+
+    it('findPersonalByStandardized matches by output text (case-insensitive)', () => {
+      const found = nomenclatureStore.findPersonalByStandardized(
+        'BREAST, left, needle core biopsy',
+      );
+      expect(found?.id).toBe('personal-1');
+    });
+
+    it('findProvenance prefers personal over institutional per SDS 04-04 §2.2', () => {
+      const found = nomenclatureStore.findProvenance(
+        'Breast, left, needle core biopsy',
+      );
+      expect(found?.tier).toBe('personal');
+      expect(found?.id).toBe('personal-1');
+    });
+
+    it('submitPersonal upserts the returned entry into the reactive state', async () => {
+      nomenclatureStore.personal = [];
+      const newEntry = makeEntry({
+        id: 'personal-new',
+        tier: 'personal',
+        source: 'institutional',
+        designator: 'x',
+        standardized: 'X',
+        createdBy: 'dr-smith',
+      });
+      const api = makeApi({
+        createNomenclaturePersonal: vi.fn().mockResolvedValue({
+          entry: newEntry,
+          replaced: false,
+        }),
+      });
+      const result = await nomenclatureStore.submitPersonal(api, {
+        designator: 'x',
+        standardized: 'X',
+        userId: 'dr-smith',
+      });
+      expect(result.replaced).toBe(false);
+      expect(nomenclatureStore.personal).toHaveLength(1);
+      expect(nomenclatureStore.personal[0].id).toBe('personal-new');
+    });
+
+    it('submitPersonal replaces an existing entry in place when server reports replaced', async () => {
+      const existing = nomenclatureStore.personal[0];
+      const updated = makeEntry({
+        ...existing,
+        standardized: 'Breast, left, core needle biopsy (updated)',
+      });
+      const api = makeApi({
+        createNomenclaturePersonal: vi.fn().mockResolvedValue({
+          entry: updated,
+          replaced: true,
+        }),
+      });
+      await nomenclatureStore.submitPersonal(api, {
+        designator: 'left breast biopsy',
+        standardized: 'Breast, left, core needle biopsy (updated)',
+        userId: 'dr-smith',
+      });
+      expect(nomenclatureStore.personal).toHaveLength(1);
+      expect(nomenclatureStore.personal[0].standardized).toContain('updated');
+    });
+
+    it('removePersonal removes the entry from state on success', async () => {
+      const api = makeApi({
+        deleteNomenclaturePersonal: vi.fn().mockResolvedValue(undefined),
+      });
+      await nomenclatureStore.removePersonal(api, 'personal-1');
+      expect(nomenclatureStore.personal).toHaveLength(0);
     });
   });
 });

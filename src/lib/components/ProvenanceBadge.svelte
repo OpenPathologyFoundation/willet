@@ -7,7 +7,8 @@
   - seed          → small serif-italic "seed" hint
   - rule          → small "auto" hint
   - staged        → amber badge "staged (N/5)"
-  - ai_suggested  → saturated blue badge "AI, verify"
+  - ai_suggested  → saturated blue badge "AI, verify" — sustained-hover
+                    acknowledges (badge fades). Keyboard: focus + Enter.
   - ambiguous     → amber badge "clarify"
 
   Visual states are distinguishable without color alone (per SDS 04-04 §4.1);
@@ -16,13 +17,21 @@
   No numeric confidence is displayed (SDS 04-03 §1.5.3, §5.1). Staging
   progress is shown as "N/5" because that is a human-interpretable count of
   pathologist confirmations, not a probabilistic score.
+
+  Hover-to-acknowledge (ai_suggested only): resting the cursor on the badge
+  for HOVER_ACK_MS flips the badge into an acknowledged state and fades it
+  out. An attention-based confirmation gesture — the deliberate rest is
+  what signals "I read this, I've attended to it." Mouse-passing-by cancels.
+  Keyboard-only users focus the badge and press Enter. Acknowledgement is
+  per-component-instance and in-memory — a hard refresh or re-render with a
+  new source key restores the badge. Audit data is untouched.
 -->
 <script lang="ts">
-  import type { NomenclatureSource } from '$lib/services/nomenclature';
-  import { DEFAULT_POLICY } from '$lib/services/source-policy';
+  import { fade } from 'svelte/transition';
+  import { DEFAULT_POLICY, type ActionSource } from '$lib/services/source-policy';
 
   interface Props {
-    source: NomenclatureSource;
+    source: ActionSource;
     /** Number of confirmations so far (only meaningful for `staged`). */
     confirmationCount?: number;
     /** Confirmation threshold for promotion (defaults to policy default). */
@@ -37,6 +46,45 @@
     confirmationTarget = DEFAULT_POLICY.stagingPromotionConfirmations,
     class: extraClass = '',
   }: Props = $props();
+
+  /**
+   * Sustained-hover dwell time before the ai_suggested badge self-acknowledges.
+   * 800 ms is long enough to defeat mouse pass-through but short enough that
+   * a deliberate hover feels responsive. Keyboard-focus uses the same dwell.
+   */
+  const HOVER_ACK_MS = 800;
+
+  let acknowledged = $state(false);
+  let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+  let hoverActive = $state(false);
+
+  function startAckTimer() {
+    if (source !== 'ai_suggested' || acknowledged) return;
+    hoverActive = true;
+    if (hoverTimer) clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => {
+      acknowledged = true;
+      hoverTimer = null;
+      hoverActive = false;
+    }, HOVER_ACK_MS);
+  }
+
+  function cancelAckTimer() {
+    hoverActive = false;
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+      hoverTimer = null;
+    }
+  }
+
+  function handleKey(e: KeyboardEvent) {
+    if (source !== 'ai_suggested' || acknowledged) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      acknowledged = true;
+      cancelAckTimer();
+    }
+  }
 </script>
 
 {#if source === 'institutional'}
@@ -61,12 +109,26 @@
     title={`Staged — confirmed by ${confirmationCount ?? 1} of ${confirmationTarget} pathologists. Will be promoted to institutional when the threshold is met.`}
   >staged ({confirmationCount ?? 1}/{confirmationTarget})</span>
 {:else if source === 'ai_suggested'}
-  <span
-    class="inline-block align-middle ml-1 rounded px-1.5 py-0 text-[10px] font-semibold
-           bg-badge-blue-bg text-badge-blue-text border border-badge-blue-text/20 {extraClass}"
-    aria-label="Source: AI-suggested, verify before sign-out"
-    title="AI-suggested — verify before sign-out. Never auto-applied."
-  >AI, verify</span>
+  {#if !acknowledged}
+    <span
+      role="button"
+      tabindex="0"
+      class="inline-block align-middle ml-1 rounded px-1.5 py-0 text-[10px] font-semibold
+             bg-badge-blue-bg text-badge-blue-text border border-badge-blue-text/20
+             cursor-default outline-none
+             focus-visible:ring-2 focus-visible:ring-clinical-primary/40
+             {hoverActive ? 'opacity-70 scale-95' : 'opacity-100 scale-100'}
+             transition-all duration-200 {extraClass}"
+      onmouseenter={startAckTimer}
+      onmouseleave={cancelAckTimer}
+      onfocus={startAckTimer}
+      onblur={cancelAckTimer}
+      onkeydown={handleKey}
+      aria-label="AI-suggested — rest pointer (or press Enter) to acknowledge"
+      title="AI-suggested — hold pointer here to confirm attention (Enter to acknowledge via keyboard)"
+      transition:fade={{ duration: 300 }}
+    >AI, verify</span>
+  {/if}
 {:else if source === 'ambiguous'}
   <span
     class="inline-block align-middle ml-1 rounded px-1.5 py-0 text-[10px] font-medium

@@ -195,13 +195,15 @@ function executeIntent(intent: InstructionIntent, req: LlmInstructionRequest): I
     case 'remove_clause':
       return executeRemoveClause(intent, parts);
     case 'populate_benign':
-      return executeBenign(intent, parts);
+      return executeBenign(intent, parts, req.caseContext.specimenType);
     case 'add_margin':
       return executeMargin(intent, parts);
     case 'add_finding_to_part':
       return executePartFinding(intent, parts);
     case 'populate_counted':
-      return executeCounted(intent, parts);
+      return executeCounted(intent, parts, req.caseContext.specimenType);
+    case 'populate_range':
+      return executeRange(intent, parts, req.caseContext.specimenType);
     case 'reorder_parts':
       return executeReorderParts(intent, parts);
     case 'populate_fallback':
@@ -680,9 +682,10 @@ function executeRemoveClause(
 function executeBenign(
   intent: InstructionIntent,
   parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
 ): IntentResult {
   const rawText = intent.params.rawText as string;
-  const diagnosis = extractBenignDiagnosis(rawText);
+  const diagnosis = extractBenignDiagnosis(rawText, specimenType);
   return populateAllPartsWithDiagnosis(parts, diagnosis);
 }
 
@@ -707,9 +710,73 @@ function executePartFinding(
 function executeCounted(
   intent: InstructionIntent,
   parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
 ): IntentResult {
-  const findings = intent.params.findings as CountedFinding[];
+  const rawFindings = intent.params.findings as CountedFinding[];
+  // Expand bare "benign" findings to the institutional specimen-aware form
+  // (same expert-system logic as extractBenignDiagnosis). Anything already
+  // qualified ("Benign polyp", "Hyperplastic polyp") passes through.
+  const findings = rawFindings.map((f) => ({
+    ...f,
+    text: expandIfBareBenign(f.text, specimenType),
+  }));
   return handleCountBasedPopulation(findings, parts);
+}
+
+function executeRange(
+  intent: InstructionIntent,
+  parts: LlmInstructionRequest['caseContext']['parts'],
+  specimenType: string | null,
+): IntentResult {
+  const startPart = intent.params.startPart as number;
+  const endPart = intent.params.endPart as number;
+  const rawText = intent.params.text as string;
+  const finalText = expandIfBareBenign(rawText, specimenType);
+
+  const actions: LlmAction[] = [];
+  const clarifications: Clarification[] = [];
+
+  // Range is 1-based inclusive; the pathologist said "parts 1 through 6".
+  for (let i = startPart - 1; i <= endPart - 1; i++) {
+    if (i < 0 || i >= parts.length) continue;
+    const part = parts[i];
+    actions.push({
+      type: 'set_clauses',
+      partLabel: part.partLabel,
+      payload: {
+        clauses: [{ text: finalText, type: 'DIAGNOSIS' as ClauseType }],
+      },
+      confidence: 0.9,
+    });
+  }
+
+  if (actions.length === 0) {
+    clarifications.push({
+      question:
+        `Part range ${startPart}–${endPart} is out of bounds for this case (${parts.length} parts).`,
+      context: 'Range out of bounds',
+    });
+  }
+
+  return {
+    actions,
+    clarifications,
+    confidence: actions.length > 0 ? 0.9 : 0.3,
+  };
+}
+
+/**
+ * Expand a bare "Benign" (or "benign") finding to the institutional
+ * specimen-aware form via the same table used by `extractBenignDiagnosis`.
+ * Anything that's already qualified passes through unchanged. Shared by the
+ * count and range handlers so range-based "parts 1 through 6 benign" and
+ * count-based "six benign" both get the right institutional phrasing.
+ */
+function expandIfBareBenign(text: string, specimenType: string | null): string {
+  if (text.trim().toLowerCase() !== 'benign') return text;
+  const organ = extractOrganSystem(specimenType);
+  if (organ && BENIGN_BY_ORGAN[organ]) return BENIGN_BY_ORGAN[organ];
+  return 'Benign';
 }
 
 function executeFallback(
@@ -908,12 +975,72 @@ function handleMarginInstruction(
   };
 }
 
-function extractBenignDiagnosis(instruction: string): string {
+/**
+ * Organ keywords used to extract a clinical organ system from a free-text
+ * specimen type. Deliberately conservative — we only recognize common
+ * pathology organ systems, not every specimen variety. Used by the
+ * specimen-aware "benign" expansion and extendable to other bare-finding
+ * expansions (negative, reactive, etc.) as the rules engine grows.
+ */
+const ORGAN_KEYWORDS: Record<string, string[]> = {
+  prostate: ['prostate'],
+  breast: ['breast'],
+  colon: ['colon', 'cecum', 'cecal', 'rectum', 'rectal', 'sigmoid', 'hemicolectomy', 'colectomy'],
+  lung: ['lung', 'pulmonary', 'lobectomy'],
+  thyroid: ['thyroid'],
+  kidney: ['kidney', 'renal', 'nephrectomy'],
+  skin: ['skin', 'cutaneous', 'shave', 'punch'],
+  liver: ['liver', 'hepatic', 'hepatectomy'],
+  bladder: ['bladder', 'cystoscopy'],
+};
+
+/**
+ * Institutional/specimen-aware canonical form for a bare "benign" finding,
+ * keyed by organ system. Entries are deliberately concise and should be
+ * reviewed and adjusted per institution — pathologist/institution phrasing
+ * varies. A future iteration will move this into the personal/institutional
+ * nomenclature dictionary so it's editable without a code change (SDS 04-04
+ * §2.1). Until then, extending this table is a one-line PR.
+ */
+const BENIGN_BY_ORGAN: Record<string, string> = {
+  prostate: 'Benign prostatic tissue',
+  breast: 'Benign breast tissue',
+  colon: 'Colonic mucosa, benign',
+  lung: 'Benign pulmonary parenchyma',
+  thyroid: 'Benign thyroid parenchyma',
+  kidney: 'Benign renal parenchyma',
+  skin: 'Skin, benign',
+  liver: 'Benign hepatic tissue',
+  bladder: 'Bladder mucosa, benign',
+};
+
+function extractOrganSystem(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  for (const [system, keywords] of Object.entries(ORGAN_KEYWORDS)) {
+    for (const kw of keywords) {
+      if (lower.includes(kw)) return system;
+    }
+  }
+  return null;
+}
+
+function extractBenignDiagnosis(instruction: string, specimenType: string | null): string {
+  // "benign <entity>" — pathologist explicitly named the tissue/finding.
+  // Respect their wording (capitalize the first letter, append ", benign").
   const match = instruction.match(/\bbenign\s+(\w[\w\s]*?)(?:\.|,|$)/i);
   if (match) {
     const entity = match[1].trim();
     return entity.charAt(0).toUpperCase() + entity.slice(1) + ', benign';
   }
+
+  // Bare "benign" — consult the specimen-aware expert-system table.
+  // Institutional preferred form wins over the generic "Benign" fallback.
+  const organ = extractOrganSystem(specimenType);
+  if (organ && BENIGN_BY_ORGAN[organ]) {
+    return BENIGN_BY_ORGAN[organ];
+  }
+
   return 'Benign';
 }
 
