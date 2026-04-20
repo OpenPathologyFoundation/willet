@@ -2,11 +2,24 @@
 // Whisper transcription service — calls OpenAI Whisper API
 // SDS 04-03 §6 Voice Transcription Pipeline
 
+import { buildWhisperPrompt, type PersonalVocabEntry } from './whisper-prompt';
+
 const WHISPER_URL = 'https://api.openai.com/v1/audio/transcriptions';
 
 export interface WhisperResult {
   text: string;
   error?: string;
+}
+
+export interface TranscribeOptions {
+  /** Specimen description used to bias Whisper toward subspecialty terms. */
+  specimenType?: string | null;
+  /**
+   * Optional user-curated terms (personal dictionary) added to the prompt.
+   * Accepts structured {term, organKey} entries for per-organ filtering, or
+   * plain strings (coerced to cross-organ entries).
+   */
+  personalTerms?: ReadonlyArray<PersonalVocabEntry | string>;
 }
 
 /**
@@ -21,7 +34,10 @@ export function isWhisperAvailable(): boolean {
  * Transcribe an audio blob using OpenAI Whisper.
  * Falls back to a simulated response if no API key is configured.
  */
-export async function transcribe(audioBlob: Blob): Promise<WhisperResult> {
+export async function transcribe(
+  audioBlob: Blob,
+  options: TranscribeOptions = {},
+): Promise<WhisperResult> {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
   if (!apiKey || apiKey === 'sk-your-key-here' || apiKey.startsWith('sk-placeholder')) {
@@ -38,6 +54,13 @@ export async function transcribe(audioBlob: Blob): Promise<WhisperResult> {
   const formData = new FormData();
   formData.append('file', audioBlob, 'speech.webm');
   formData.append('model', 'whisper-1');
+
+  // Soft-bias Whisper toward pathology vocabulary. The prompt is memoized
+  // by (organKey, personalFingerprint) so it's built once per case context.
+  const prompt = buildWhisperPrompt(options.specimenType ?? null, options.personalTerms);
+  if (prompt) {
+    formData.append('prompt', prompt);
+  }
 
   try {
     const response = await fetch(WHISPER_URL, {

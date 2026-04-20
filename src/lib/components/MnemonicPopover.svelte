@@ -5,6 +5,9 @@
   import type { MnemonicHit } from '$lib/types';
   import { getServices } from '$lib/services/context';
   import { texttypeLabel, texttypeBadgeColor } from '$lib/constants/texttype';
+  import { preferencesStore } from '$lib/stores/preferences.svelte';
+
+  type TierFilter = 'mine' | 'mine+inst' | 'all';
 
   interface Props {
     /** Screen coordinates to anchor the popover near */
@@ -27,6 +30,24 @@
   let inputEl = $state<HTMLInputElement | null>(null);
   let popoverEl = $state<HTMLDivElement | null>(null);
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Persistent tier filter (UN-097). Reads from user preferences so the last
+  // choice carries across sessions.
+  let tierFilter = $state<TierFilter>(preferencesStore.mnemonicFilter);
+
+  function tiersFor(filter: TierFilter): Array<'personal' | 'institutional' | 'seed'> {
+    if (filter === 'mine') return ['personal'];
+    if (filter === 'mine+inst') return ['personal', 'institutional'];
+    return ['personal', 'institutional', 'seed'];
+  }
+
+  function updateFilter(next: TierFilter) {
+    tierFilter = next;
+    preferencesStore.update({ mnemonicFilter: next });
+    // Persist to server in the background; failures are non-fatal.
+    services.api.savePreferences({ mnemonicFilter: next }).catch(() => {});
+    if (query.trim()) handleInput();
+  }
 
   // Position: ensure popover doesn't overflow viewport
   const popoverWidth = 360;
@@ -56,7 +77,11 @@
     debounceTimer = setTimeout(async () => {
       searching = true;
       try {
-        const response = await services.api.searchMnemonics(query, undefined, 8);
+        const response = await services.api.searchMnemonics(query, {
+          limit: 8,
+          userId: services.userId,
+          tiers: tiersFor(tierFilter),
+        });
         results = response.hits;
       } catch {
         results = [];
@@ -153,6 +178,14 @@
           >
             <span class="shrink-0 font-mono text-xs font-bold">{hit.abbr}</span>
             <span
+              class="shrink-0 rounded px-1 py-0.5 text-[8px] font-medium text-white
+                {hit.tier === 'personal' ? 'bg-emerald-600' :
+                 hit.tier === 'institutional' ? 'bg-indigo-600' : 'bg-slate-500'}"
+            >
+              {hit.tier === 'personal' ? 'Mine' :
+               hit.tier === 'institutional' ? 'Inst' : 'Seed'}
+            </span>
+            <span
               class="shrink-0 rounded px-1 py-0.5 text-[8px] font-medium text-white"
               style="background-color: {texttypeBadgeColor(hit.texttypeId)}"
             >
@@ -176,6 +209,27 @@
         Start typing to search mnemonics
       </div>
     {/if}
+
+    <!-- Filter chips (persistent per user, UN-097) -->
+    <div class="flex items-center gap-1 border-t border-clinical-border px-3 py-1.5 text-[10px]">
+      <span class="text-clinical-muted shrink-0">Show:</span>
+      {#each [
+        { id: 'mine', label: 'Mine' },
+        { id: 'mine+inst', label: 'Mine + Inst' },
+        { id: 'all', label: 'All' },
+      ] as preset (preset.id)}
+        <button
+          type="button"
+          class="rounded-full border px-1.5 py-0.5 transition-colors
+            {tierFilter === preset.id
+              ? 'border-clinical-primary bg-clinical-primary/10 text-clinical-text'
+              : 'border-clinical-border text-clinical-muted hover:text-clinical-text'}"
+          onclick={() => updateFilter(preset.id as TierFilter)}
+        >
+          {preset.label}
+        </button>
+      {/each}
+    </div>
 
     <!-- Footer hint -->
     <div class="border-t border-clinical-border px-3 py-1.5 text-[10px] text-clinical-muted flex items-center gap-3">

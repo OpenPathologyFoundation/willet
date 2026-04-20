@@ -19,6 +19,8 @@ export interface UserPreferences {
    * The Save button remains visible in both modes.
    */
   autosave: boolean;
+  /** Mnemonic popover filter preference (UN-097 §5.28). */
+  mnemonicFilter: 'mine' | 'mine+inst' | 'all';
 }
 
 const DEFAULTS: UserPreferences = {
@@ -31,6 +33,7 @@ const DEFAULTS: UserPreferences = {
   clauseTypeSuggestion: true,
   editMode: 'structured',
   autosave: true,
+  mnemonicFilter: 'mine+inst',
 };
 
 const STORAGE_KEY = 'willet-preferences';
@@ -49,6 +52,7 @@ class PreferencesStore {
   get clauseTypeSuggestion() { return this.preferences.clauseTypeSuggestion; }
   get editMode() { return this.preferences.editMode; }
   get autosave() { return this.preferences.autosave; }
+  get mnemonicFilter() { return this.preferences.mnemonicFilter; }
 
   /**
    * Load preferences from API (with localStorage fallback).

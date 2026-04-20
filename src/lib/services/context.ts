@@ -11,6 +11,8 @@ export interface WilletServices {
   api: ApiClient;
   jwt: () => string;
   role: UserRole;
+  /** Authenticated user identifier (JWT sub claim in integrated mode). */
+  userId: string;
   emitEvent: (event: ModuleEvent) => void;
 }
 
@@ -18,6 +20,8 @@ export interface ServiceConfig {
   apiBase: string;
   jwt: string;
   role: UserRole;
+  /** Optional userId; defaults to 'demo-user' for standalone harnesses. */
+  userId?: string;
   caseId: string;
   onEvent: (event: ModuleEvent) => void;
 }
@@ -29,6 +33,7 @@ export function createServices(config: ServiceConfig): WilletServices {
     api: createApiClient(config.apiBase, () => currentJwt),
     jwt: () => currentJwt,
     role: config.role,
+    userId: config.userId ?? 'demo-user',
     emitEvent(event) {
       config.onEvent(event);
     },

@@ -3,7 +3,6 @@
   import ReportModule from '$lib/ReportModule.svelte';
   import { themeStore } from '$lib/stores/theme.svelte';
   import type { ModuleEvent } from '$lib/types';
-  import NomenclaturePanel from './NomenclaturePanel.svelte';
 
   // Case selector for standalone development
   const FIXTURE_CASES = [
@@ -58,18 +57,14 @@
     <span class="text-[10px] text-clinical-muted">MSW mocks active</span>
   </div>
 
-  <!-- Dev observability: nomenclature dictionaries (staging/institutional).
-       Demo-harness only; integrated mode has no equivalent surface (admin UI
-       handles the same data per SDS 04-04 §5). -->
-  <NomenclaturePanel />
-
   <!-- Module mount -->
   {#key selectedCase}
     <div class="flex-1 overflow-hidden">
       <ReportModule
         caseId={selectedCase}
         jwt="dev-standalone-jwt"
-        role="ATTENDING"
+        role="DIRECTOR"
+        userId="gershkovich"
         apiBase=""
         onEvent={handleEvent}
       />

@@ -1,4 +1,4 @@
-import { http, HttpResponse, delay } from 'msw';
+import { http, HttpResponse, delay, passthrough } from 'msw';
 import { fixtureIndex } from './fixtures/cases';
 import { clinicalFixtureIndex } from './fixtures/clinical-context';
 import { findTemplate } from './fixtures/templates';
@@ -7,6 +7,30 @@ import type { UserPreferences } from '$lib/stores/preferences.svelte';
 import { mockInterpretInstruction } from './llm-mock';
 import { normalizeDictation, type NormalizationRequest } from '$lib/services/dictation-normalizer';
 import { correctTranscription as localCorrect } from '$lib/services/transcription-correction';
+import personalVocabGershkovich from '../../mcp-server/data/personal-vocab-gershkovich.json';
+import { MnemonicStore, MnemonicStoreError, type MnemonicTier } from '$lib/services/mnemonic-store';
+
+/**
+ * Turn any error into a JSON response with an appropriate status. We match on
+ * a `code` string rather than `instanceof MnemonicStoreError` because Vite HMR
+ * can reload the store module independently from handlers.ts, which gives the
+ * two files different class references — `instanceof` then returns false for
+ * errors thrown by the store, falling through to a confusing 500.
+ */
+function mnemonicErrorResponse(e: unknown): Response {
+  const code = (e as { code?: string } | undefined)?.code;
+  const message = e instanceof Error ? e.message : String(e);
+  const KNOWN_CODES = ['not_found', 'forbidden', 'immutable', 'invalid_abbr', 'abbr_exists', 'wrong_tier'] as const;
+  if (code && (KNOWN_CODES as readonly string[]).includes(code)) {
+    const status = code === 'not_found' ? 404
+      : code === 'forbidden' || code === 'immutable' ? 403
+      : code === 'abbr_exists' ? 409
+      : 400;
+    return HttpResponse.json({ error: message, code }, { status });
+  }
+  console.error('[mnemonic handler] unexpected error:', e);
+  return HttpResponse.json({ error: message, code: 'internal' }, { status: 500 });
+}
 import {
   NomenclatureStore,
   type CreateStagingInput,
@@ -271,6 +295,15 @@ export const handlers = [
     return HttpResponse.json(result);
   }),
 
+  // GET /api/vocabulary/personal — Per-pathologist Whisper vocabulary file.
+  // In standalone mode the same example fixture is returned for every userId
+  // so the demo works without a real data store. In integrated mode a real
+  // endpoint looks up the file by userId.
+  http.get('/api/vocabulary/personal', async () => {
+    await delay(30);
+    return HttpResponse.json(personalVocabGershkovich);
+  }),
+
   // POST /api/transcription/correct — Vocabulary correction (SRS-185, SDS 04-03 §16.3)
   // In standalone mode, runs the same deterministic correction as the local function.
   // In integrated mode, this would proxy to the MCP server at POST /correct.
@@ -290,19 +323,12 @@ export const handlers = [
     });
   }),
 
-  // NOTE: /api/interpret is normally passed through to the MCP server. The handler
-  // below handles the dev-harness standardize pattern with a set_authored_label
-  // action, AND — for any other instruction — delegates to the rules-engine
-  // mock (mockInterpretInstruction). This keeps the "Ask AI" button and the
-  // `ai:` / `@ai` / `use ai` keyword prefixes functional in standalone mode
-  // without a running MCP. In production, both paths hit the real LLM; the
-  // dev-harness returns rules-engine-equivalent results tagged `ai_suggested`
-  // at the caller, which demonstrates the SDS §5.5 confirmation flow honestly.
-  //
-  // Real MCP is still reachable when running alongside the dev server — this
-  // handler returns a concrete response rather than passthrough so the LLM
-  // UI paths always produce visible results. A production deployment replaces
-  // the entire handler with a real-LLM endpoint.
+  // /api/interpret — routes to the real MCP server (:8001/interpret) via the
+  // Vite proxy in vite.config.ts, where interpret_with_anthropic/openai make
+  // a real LLM call. The only exception is the dev-harness standardize pattern,
+  // which returns a `set_authored_label` action shape directly so the label
+  // standardization demo remains deterministic without depending on the LLM
+  // inferring that exact action shape. Every other instruction passes through.
   http.post('/api/interpret', async ({ request }) => {
     const body = (await request.clone().json()) as LlmInstructionRequest;
     const match = body.instruction.match(DEV_HARNESS_STANDARDIZE_PATTERN);
@@ -330,53 +356,151 @@ export const handlers = [
       }
     }
 
-    // Fallback: delegate to the rules-engine mock so Ask-AI and keyword-prefix
-    // routes produce meaningful responses in the dev harness. PromptArea tags
-    // this response as `source: 'ai_suggested'`, which drives the v2.3
-    // confirmation flow regardless of the dev-harness source of the actions.
-    await delay(150);
-    const response = mockInterpretInstruction(body);
-    return HttpResponse.json({
-      ...response,
-      summary: `${response.summary} (dev-harness LLM)`,
-      provider: 'mock-dev-harness-fallback',
-    });
+    return passthrough();
   }),
 
-  // GET /api/mnemonics/search — Mnemonic search (standalone mock)
+  // GET /api/mnemonics/search — Mnemonic search backed by MnemonicStore (UN-097).
   http.get('/api/mnemonics/search', async ({ request }) => {
     await delay(80);
     const url = new URL(request.url);
-    const q = (url.searchParams.get('q') ?? '').toLowerCase().trim();
-    if (!q) {
-      return HttpResponse.json({ hits: [], totalHits: 0, processingTimeMs: 1 });
-    }
+    const q = url.searchParams.get('q') ?? '';
+    const texttype = url.searchParams.get('texttype') ?? undefined;
+    const userId = url.searchParams.get('userId') ?? undefined;
+    const tiersParam = url.searchParams.get('tiers');
+    const tiers = tiersParam
+      ? (tiersParam.split(',').filter((t) => t === 'personal' || t === 'institutional' || t === 'seed') as MnemonicTier[])
+      : undefined;
+    const includeRetired = url.searchParams.get('includeRetired') === '1';
+    const limit = Number.parseInt(url.searchParams.get('limit') ?? '20', 10);
 
-    // Simple prefix/substring match against mock mnemonics
-    const hits = MOCK_MNEMONICS.filter(m =>
-      m.abbr.toLowerCase().includes(q) ||
-      (m.description ?? '').toLowerCase().includes(q) ||
-      m.mnemonic.toLowerCase().includes(q) ||
-      (m.lookupDisplay ?? '').toLowerCase().includes(q),
-    );
-
+    const hits = mockMnemonicStore.search(q, { tiers, userId, texttype, includeRetired, limit });
     return HttpResponse.json({
-      hits: hits.slice(0, 20),
+      hits,
       totalHits: hits.length,
       processingTimeMs: 5,
     });
   }),
 
-  // POST /api/mnemonics/:mnemonicId/use — Record usage (no-op in standalone)
-  http.post('/api/mnemonics/:mnemonicId/use', async () => {
-    await delay(50);
+  // POST /api/mnemonics — Create a personal mnemonic (UN-097).
+  http.post('/api/mnemonics', async ({ request }) => {
+    await delay(60);
+    const body = (await request.json()) as {
+      abbr: string;
+      mnemonic?: string;
+      description?: string | null;
+      lookupDisplay?: string | null;
+      commentText: string;
+      texttypeId: string;
+      userId: string;
+    };
+    try {
+      const entry = mockMnemonicStore.createPersonal(body);
+      return HttpResponse.json(toMnemonicHit(entry));
+    } catch (e) {
+      return mnemonicErrorResponse(e);
+    }
+  }),
+
+  // PUT /api/mnemonics/:id — Update editable fields (UN-097).
+  http.put('/api/mnemonics/:id', async ({ params, request }) => {
+    const id = params.id as string;
+    console.log('[mnemonic PUT] entered', id);
+    await delay(60);
+    try {
+      // Body parsing lives inside try so malformed JSON returns 400, not 500.
+      const body = (await request.json()) as {
+        userId: string;
+        isAdmin: boolean;
+        description?: string | null;
+        lookupDisplay?: string | null;
+        commentText?: string;
+        texttypeId?: string;
+      };
+      const entry = mockMnemonicStore.update({
+        mnemonicId: id,
+        userId: body.userId,
+        isAdmin: body.isAdmin,
+        description: body.description,
+        lookupDisplay: body.lookupDisplay,
+        commentText: body.commentText,
+        texttypeId: body.texttypeId,
+      });
+      return HttpResponse.json(toMnemonicHit(entry));
+    } catch (e) {
+      return mnemonicErrorResponse(e);
+    }
+  }),
+
+  // POST /api/mnemonics/:id/promote — Promote personal → institutional (UN-097).
+  http.post('/api/mnemonics/:id/promote', async ({ params, request }) => {
+    await delay(60);
+    const id = params.id as string;
+    const body = (await request.json()) as { promotedBy: string };
+    try {
+      const { institutional, personal } = mockMnemonicStore.promoteToInstitutional({
+        mnemonicId: id,
+        promotedBy: body.promotedBy,
+      });
+      return HttpResponse.json({
+        institutional: toMnemonicHit(institutional),
+        personal: toMnemonicHit(personal),
+      });
+    } catch (e) {
+      return mnemonicErrorResponse(e);
+    }
+  }),
+
+  // POST /api/mnemonics/:id/retire — Retire (governance + seed immutability enforced server-side).
+  http.post('/api/mnemonics/:id/retire', async ({ params, request }) => {
+    await delay(60);
+    const id = params.id as string;
+    const body = (await request.json()) as { userId: string; isAdmin: boolean };
+    try {
+      const entry = mockMnemonicStore.retire({
+        mnemonicId: id,
+        userId: body.userId,
+        isAdmin: body.isAdmin,
+      });
+      return HttpResponse.json(toMnemonicHit(entry));
+    } catch (e) {
+      return mnemonicErrorResponse(e);
+    }
+  }),
+
+  // POST /api/mnemonics/:id/unretire — Reverse retirement.
+  http.post('/api/mnemonics/:id/unretire', async ({ params, request }) => {
+    await delay(60);
+    const id = params.id as string;
+    const body = (await request.json()) as { userId: string; isAdmin: boolean };
+    try {
+      const entry = mockMnemonicStore.unretire({
+        mnemonicId: id,
+        userId: body.userId,
+        isAdmin: body.isAdmin,
+      });
+      return HttpResponse.json(toMnemonicHit(entry));
+    } catch (e) {
+      return mnemonicErrorResponse(e);
+    }
+  }),
+
+  // POST /api/mnemonics/:mnemonicId/use — Record usage and update rank.
+  http.post('/api/mnemonics/:mnemonicId/use', async ({ params }) => {
+    await delay(40);
+    mockMnemonicStore.recordUsage(params.mnemonicId as string);
     return new HttpResponse(null, { status: 200 });
   }),
 
-  // GET /api/mnemonics/top — Top mnemonics (empty in standalone)
+  // GET /api/mnemonics/top — Top mnemonics for the current user (standalone stub).
   http.get('/api/mnemonics/top', async () => {
     await delay(50);
     return HttpResponse.json([]);
+  }),
+
+  // POST /api/mnemonics/_reset — Dev-only isolation; resets and re-seeds.
+  http.post('/api/mnemonics/_reset', async () => {
+    seedMnemonicStore();
+    return HttpResponse.json({ ok: true });
   }),
 
   // POST /api/audit/events — Audit event sink (no-op in standalone)
@@ -489,88 +613,112 @@ export const handlers = [
 ];
 
 // ---------------------------------------------------------------------------
-// Mock mnemonic data for standalone mode
+// Mnemonic store singleton + seed data (UN-097, §5.28)
 // ---------------------------------------------------------------------------
 
-const MOCK_MNEMONICS = [
-  {
-    mnemonicId: 'mn-001',
-    abbr: 'HR2',
-    mnemonic: 'HR2',
-    description: 'High risk genotypes',
-    lookupDisplay: 'HPV-Hi',
-    commentText: 'High Risk Type HPV-DNA was performed by PCR amplification. High-risk HPV genotypes DETECTED.',
-    texttypeId: '$procint',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-002',
-    abbr: 'QC',
-    mnemonic: 'QC',
-    description: 'GI',
-    lookupDisplay: 'Chronic gastritis',
-    commentText: 'Gastric antral-type mucosa with chronic inactive gastritis.\nNo intestinal metaplasia identified.\nNo Helicobacter organisms identified on H&E.',
-    texttypeId: '$final',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-003',
-    abbr: 'ADEN',
-    mnemonic: 'ADEN',
-    description: 'Colon',
-    lookupDisplay: 'Tubular adenoma',
-    commentText: 'Tubular adenoma with low-grade dysplasia.\nNo high-grade dysplasia or invasive carcinoma identified.',
-    texttypeId: '$final',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-004',
-    abbr: 'NMLB',
-    mnemonic: 'NMLB',
-    description: 'Breast',
-    lookupDisplay: 'Benign breast',
-    commentText: 'Breast tissue with fibrocystic changes.\nNo atypia or malignancy identified.',
-    texttypeId: '$final',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-005',
-    abbr: 'MSI',
-    mnemonic: 'MSI',
-    description: 'Molecular',
-    lookupDisplay: 'MSI stable',
-    commentText: 'Microsatellite instability (MSI) testing was performed by immunohistochemistry for MLH1, MSH2, MSH6, and PMS2.\nAll four mismatch repair proteins show intact nuclear expression.\nInterpretation: Microsatellite stable (MSS).',
-    texttypeId: '$procint',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-006',
-    abbr: 'HPNEG',
-    mnemonic: 'HPNEG',
-    description: 'GI',
-    lookupDisplay: 'H. pylori negative',
-    commentText: 'Giemsa stain is negative for Helicobacter pylori organisms.',
-    texttypeId: '$procres',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-007',
-    abbr: 'PROS',
-    mnemonic: 'PROS',
-    description: 'Prostate',
-    lookupDisplay: 'Benign prostate',
-    commentText: 'Benign prostatic tissue with nodular hyperplasia.\nNo adenocarcinoma identified.',
-    texttypeId: '$final',
-    userUseCount: 0,
-  },
-  {
-    mnemonicId: 'mn-008',
-    abbr: 'IHC4',
-    mnemonic: 'IHC4',
-    description: 'Breast IHC panel',
-    lookupDisplay: 'ER/PR/HER2/Ki67',
-    commentText: 'Estrogen receptor (ER): Positive, >95% of tumor nuclei, strong intensity.\nProgesterone receptor (PR): Positive, 80% of tumor nuclei, moderate intensity.\nHER2: Negative (score 1+) by immunohistochemistry.\nKi-67 proliferation index: 15%.',
-    texttypeId: '$procint',
-    userUseCount: 0,
-  },
-];
+export const mockMnemonicStore = new MnemonicStore();
+
+function toMnemonicHit(entry: {
+  mnemonicId: string; abbr: string; mnemonic: string;
+  description: string | null; lookupDisplay: string | null;
+  commentText: string; texttypeId: string; userUseCount: number;
+  tier: MnemonicTier; retired: boolean; createdBy: string | null;
+}) {
+  return {
+    mnemonicId: entry.mnemonicId,
+    abbr: entry.abbr,
+    mnemonic: entry.mnemonic,
+    description: entry.description,
+    lookupDisplay: entry.lookupDisplay,
+    commentText: entry.commentText,
+    texttypeId: entry.texttypeId,
+    userUseCount: entry.userUseCount,
+    tier: entry.tier,
+    retired: entry.retired,
+    createdBy: entry.createdBy,
+  };
+}
+
+/** (Re-)seed the in-memory mnemonic store. Invoked at module load and /_reset. */
+function seedMnemonicStore(): void {
+  mockMnemonicStore.reset();
+  const now = '2026-01-01T00:00:00Z';
+
+  // Seed tier — the baseline shipped with the product.
+  mockMnemonicStore.loadSeed([
+    {
+      mnemonicId: 'seed-hr2', abbr: 'HR2', mnemonic: 'HR2',
+      description: 'High risk genotypes', lookupDisplay: 'HPV-Hi',
+      commentText: 'High Risk Type HPV-DNA was performed by PCR amplification. High-risk HPV genotypes DETECTED.',
+      texttypeId: '$procint',
+      tier: 'seed', createdBy: null, createdAt: now, lastUsedAt: null, userUseCount: 0,
+    },
+    {
+      mnemonicId: 'seed-qc', abbr: 'QC', mnemonic: 'QC',
+      description: 'GI', lookupDisplay: 'Chronic gastritis',
+      commentText: 'Gastric antral-type mucosa with chronic inactive gastritis.\nNo intestinal metaplasia identified.\nNo Helicobacter organisms identified on H&E.',
+      texttypeId: '$final',
+      tier: 'seed', createdBy: null, createdAt: now, lastUsedAt: null, userUseCount: 0,
+    },
+    {
+      mnemonicId: 'seed-msi', abbr: 'MSI', mnemonic: 'MSI',
+      description: 'Molecular', lookupDisplay: 'MSI stable',
+      commentText: 'Microsatellite instability (MSI) testing was performed by immunohistochemistry for MLH1, MSH2, MSH6, and PMS2.\nAll four mismatch repair proteins show intact nuclear expression.\nInterpretation: Microsatellite stable (MSS).',
+      texttypeId: '$procint',
+      tier: 'seed', createdBy: null, createdAt: now, lastUsedAt: null, userUseCount: 0,
+    },
+    {
+      mnemonicId: 'seed-hpneg', abbr: 'HPNEG', mnemonic: 'HPNEG',
+      description: 'GI', lookupDisplay: 'H. pylori negative',
+      commentText: 'Giemsa stain is negative for Helicobacter pylori organisms.',
+      texttypeId: '$procres',
+      tier: 'seed', createdBy: null, createdAt: now, lastUsedAt: null, userUseCount: 0,
+    },
+    {
+      mnemonicId: 'seed-ihc4', abbr: 'IHC4', mnemonic: 'IHC4',
+      description: 'Breast IHC panel', lookupDisplay: 'ER/PR/HER2/Ki67',
+      commentText: 'Estrogen receptor (ER): Positive, >95% of tumor nuclei, strong intensity.\nProgesterone receptor (PR): Positive, 80% of tumor nuclei, moderate intensity.\nHER2: Negative (score 1+) by immunohistochemistry.\nKi-67 proliferation index: 15%.',
+      texttypeId: '$procint',
+      tier: 'seed', createdBy: null, createdAt: now, lastUsedAt: null, userUseCount: 0,
+    },
+  ]);
+
+  // Institutional tier — promoted & maintained by the organization.
+  mockMnemonicStore.loadSeed([
+    {
+      mnemonicId: 'inst-aden', abbr: 'ADEN', mnemonic: 'ADEN',
+      description: 'Colon', lookupDisplay: 'Tubular adenoma (institutional)',
+      commentText: 'Tubular adenoma with low-grade dysplasia.\nNo high-grade dysplasia or invasive carcinoma identified.\nMargins: not applicable.',
+      texttypeId: '$final',
+      tier: 'institutional', createdBy: 'admin-user', createdAt: now, lastUsedAt: null, userUseCount: 3,
+    },
+    {
+      mnemonicId: 'inst-nmlb', abbr: 'NMLB', mnemonic: 'NMLB',
+      description: 'Breast', lookupDisplay: 'Benign breast (institutional)',
+      commentText: 'Breast tissue with fibrocystic changes.\nNo atypia, in-situ disease, or malignancy identified.',
+      texttypeId: '$final',
+      tier: 'institutional', createdBy: 'admin-user', createdAt: now, lastUsedAt: null, userUseCount: 7,
+    },
+  ]);
+
+  // Personal tier — two examples for the demo user so the governance badges
+  // and filters are meaningful out of the box.
+  mockMnemonicStore.loadSeed([
+    {
+      mnemonicId: 'pers-pros', abbr: 'PROS', mnemonic: 'PROS',
+      description: 'Prostate (mine)', lookupDisplay: 'Benign prostate — my phrasing',
+      commentText: 'Benign prostatic tissue with nodular hyperplasia.\nNo adenocarcinoma, HGPIN, or atypical small acinar proliferation identified.',
+      texttypeId: '$final',
+      tier: 'personal', createdBy: 'gershkovich', createdAt: now, lastUsedAt: null, userUseCount: 12,
+    },
+    {
+      mnemonicId: 'pers-nmlb', abbr: 'NMLB', mnemonic: 'NMLB',
+      description: 'Breast (my version)', lookupDisplay: 'Benign breast — my phrasing',
+      commentText: 'Fragments of benign breast tissue with fibrocystic changes, usual ductal hyperplasia, and apocrine metaplasia.\nNo atypia or malignancy identified.',
+      texttypeId: '$final',
+      tier: 'personal', createdBy: 'gershkovich', createdAt: now, lastUsedAt: null, userUseCount: 5,
+    },
+  ]);
+}
+
+seedMnemonicStore();
