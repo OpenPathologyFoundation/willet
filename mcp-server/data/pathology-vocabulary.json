@@ -123,5 +123,78 @@
     "papillary", "follicular", "Bethesda", "Hurthle cell",
     "squamous cell", "mesothelioma", "lepidic",
     "hematoxylin", "eosin", "Napsin A", "synaptophysin"
-  ]
+  ],
+
+  "organHints": {
+    "colon": [
+      "tubular adenoma with low-grade dysplasia",
+      "tubulovillous adenoma",
+      "sessile serrated lesion",
+      "hyperplastic polyp",
+      "inflammatory bowel disease",
+      "signet ring cell carcinoma",
+      "muscularis propria invasion",
+      "lymphovascular invasion identified",
+      "perineural invasion identified",
+      "surgical margins uninvolved",
+      "negative for dysplasia"
+    ],
+    "breast": [
+      "invasive ductal carcinoma",
+      "invasive lobular carcinoma",
+      "ductal carcinoma in situ",
+      "Nottingham grade 1",
+      "Nottingham grade 2",
+      "Nottingham grade 3",
+      "HER2 negative",
+      "HER2 equivocal",
+      "estrogen receptor positive",
+      "progesterone receptor positive",
+      "sentinel lymph node negative",
+      "micrometastasis",
+      "no atypia identified"
+    ],
+    "prostate": [
+      "Gleason 3+3=6",
+      "Gleason 3+4=7",
+      "Gleason 4+3=7",
+      "Gleason 4+4=8",
+      "ISUP grade group 1",
+      "ISUP grade group 2",
+      "ISUP grade group 3",
+      "percent Gleason pattern 4",
+      "perineural invasion identified",
+      "extraprostatic extension",
+      "seminal vesicle invasion",
+      "HGPIN",
+      "atypical small acinar proliferation",
+      "PI-RADS"
+    ],
+    "thyroid": [
+      "Bethesda category II",
+      "Bethesda category III",
+      "Bethesda category IV",
+      "Bethesda category V",
+      "Bethesda category VI",
+      "papillary thyroid carcinoma",
+      "follicular variant of papillary carcinoma",
+      "Hurthle cell neoplasm",
+      "colloid nodule",
+      "lymphocytic thyroiditis"
+    ],
+    "lung": [
+      "adenocarcinoma lepidic predominant",
+      "adenocarcinoma acinar predominant",
+      "adenocarcinoma papillary predominant",
+      "adenocarcinoma micropapillary predominant",
+      "squamous cell carcinoma",
+      "small cell carcinoma",
+      "non-small cell carcinoma",
+      "Napsin A positive",
+      "TTF-1 positive",
+      "p40 positive",
+      "pleural invasion",
+      "visceral pleural invasion"
+    ]
+  }
 }

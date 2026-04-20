@@ -45,6 +45,8 @@ export interface ReportModuleProps {
   caseId: string;
   jwt: string;
   role: UserRole;
+  /** Authenticated user identifier; defaults to a demo-user placeholder when omitted. */
+  userId?: string;
   apiBase: string;
   onEvent: (event: ModuleEvent) => void;
 }
@@ -368,6 +370,10 @@ export interface MnemonicHit {
   commentText: string;            // RTF content
   texttypeId: string;
   userUseCount?: number;
+  // Governance (UN-097)
+  tier?: 'personal' | 'institutional' | 'seed';
+  retired?: boolean;
+  createdBy?: string | null;
 }
 
 export interface MnemonicSearchResponse {

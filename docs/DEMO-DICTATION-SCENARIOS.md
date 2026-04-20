@@ -412,13 +412,13 @@ Populate Part A with "Adenocarcinoma" (via Scenario 6, typing, or any prior inst
 
 1. With Part A showing "Adenocarcinoma", submit:
 
-   > "Change the diagnosis to acinar adenocarcinoma, Gleason score 4 plus 3 equals 7, ISUP grade group 3"
+   > "Change the diagnosis to acinar adenocarcinoma, Gleason score 4 3 7, (Grade Group 2)"
 
 2. Submit.
 
 ### Expected Result
 
-- Part A's DIAGNOSIS clause is **updated** (not a second clause added) to: "Acinar adenocarcinoma, Gleason score 4 plus 3 equals 7, ISUP grade group 3"
+- Part A's DIAGNOSIS clause is **updated** (not a second clause added) to: "Acinar adenocarcinoma, Gleason score 4+3=7, (Grade Group 3)"
 - The action type should be `update_clause` (if the clause exists) or `set_clauses` (if replacing).
 - Part B remains unchanged.
 

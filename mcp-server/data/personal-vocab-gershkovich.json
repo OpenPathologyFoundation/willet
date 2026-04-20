@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "userId": "gershkovich",
+  "description": "Per-pathologist Whisper vocabulary hints. The `_all` bucket applies to every specimen; organ keys apply only when the specimen resolves to that organ. Ordering matters: later items have stronger Whisper bias and survive truncation.",
+
+  "organHints": {
+    "_all": [
+      "Dr. Gershkovich",
+      "seen in consultation",
+      "reviewed with the attending",
+      "reviewed with Dr.",
+      "electronically signed",
+      "no tumor is identified in the specimen",
+      "findings discussed with the surgeon",
+      "specimen received in formalin",
+      "representative sections submitted",
+      "immunohistochemistry confirms the diagnosis"
+    ],
+    "prostate": [
+      "no tumor identified in the core",
+      "benign prostatic tissue with nodular hyperplasia",
+      "focal HGPIN identified",
+      "atypical small acinar proliferation, suspicious for carcinoma",
+      "Gleason pattern 4 less than 5 percent",
+      "cribriform pattern identified",
+      "intraductal carcinoma identified",
+      "no perineural invasion",
+      "no extraprostatic extension",
+      "percent core involvement"
+    ],
+    "breast": [
+      "no invasive carcinoma identified",
+      "fibrocystic changes",
+      "usual ductal hyperplasia",
+      "atypical ductal hyperplasia",
+      "columnar cell change with flat epithelial atypia",
+      "comedo necrosis present",
+      "lobular carcinoma in situ, classical type",
+      "no lymphovascular invasion",
+      "margins negative for invasive carcinoma",
+      "margins negative for DCIS",
+      "closest margin two millimeters"
+    ],
+    "thyroid": [
+      "follicular architecture predominant",
+      "nuclear features of papillary carcinoma",
+      "psammoma bodies identified",
+      "capsular invasion identified",
+      "vascular invasion identified",
+      "noninvasive follicular thyroid neoplasm with papillary-like nuclear features",
+      "NIFTP",
+      "oncocytic change"
+    ],
+    "colon": [
+      "no dysplasia identified",
+      "fragments of benign colonic mucosa",
+      "active chronic colitis",
+      "cryptitis and crypt abscesses",
+      "basal lymphoplasmacytosis",
+      "no granulomas identified",
+      "no evidence of malignancy",
+      "pseudomembranes present",
+      "melanosis coli"
+    ],
+    "lung": [
+      "acinar pattern predominant",
+      "lepidic pattern predominant",
+      "solid pattern predominant",
+      "micropapillary pattern present",
+      "spread through air spaces identified",
+      "STAS present",
+      "visceral pleura involved",
+      "visceral pleura not involved",
+      "bronchial margin negative",
+      "lobectomy specimen"
+    ],
+    "skin": [
+      "Breslow thickness",
+      "Clark level",
+      "ulceration absent",
+      "ulceration present",
+      "mitotic figures per square millimeter",
+      "regression identified",
+      "satellitosis identified",
+      "in situ component present",
+      "peripheral margins negative",
+      "deep margin negative"
+    ],
+    "gyn": [
+      "no squamous intraepithelial lesion",
+      "low-grade squamous intraepithelial lesion",
+      "high-grade squamous intraepithelial lesion",
+      "LSIL",
+      "HSIL",
+      "atypical squamous cells of undetermined significance",
+      "ASCUS",
+      "endometrial intraepithelial neoplasia",
+      "chronic endometritis",
+      "decidualized stroma"
+    ]
+  }
+}

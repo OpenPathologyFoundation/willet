@@ -44,9 +44,16 @@ export interface ApiClient {
   fetchTemplate(specimenType: string): Promise<ReportTemplate>;
   fetchPreferences(): Promise<Partial<UserPreferences>>;
   savePreferences(prefs: Partial<UserPreferences>): Promise<void>;
-  searchMnemonics(query: string, texttype?: string, limit?: number): Promise<MnemonicSearchResponse>;
+  searchMnemonics(query: string, options?: MnemonicSearchOptions): Promise<MnemonicSearchResponse>;
   recordMnemonicUsage(mnemonicId: string): Promise<void>;
   getTopMnemonics(limit?: number): Promise<MnemonicHit[]>;
+
+  // Mnemonic governance (UN-097, proposed — §5.28)
+  createMnemonic(input: CreateMnemonicInput): Promise<MnemonicHit>;
+  updateMnemonic(mnemonicId: string, input: UpdateMnemonicInput): Promise<MnemonicHit>;
+  promoteMnemonic(mnemonicId: string, promotedBy: string): Promise<PromoteMnemonicResult>;
+  retireMnemonic(mnemonicId: string, userId: string, isAdmin: boolean): Promise<MnemonicHit>;
+  unretireMnemonic(mnemonicId: string, userId: string, isAdmin: boolean): Promise<MnemonicHit>;
   normalizeDictation(text: string, clauseType: ClauseType, specimenType: string | null): Promise<{ text: string; normalized: boolean }>;
   correctTranscription(text: string, specimenType: string | null): Promise<{ corrected: string; changes: Array<{ original: string; corrected: string; type: string; position: number }>; raw: string }>;
   interpretInstruction(instruction: string, caseContext: LlmInstructionRequest['caseContext'], conversationHistory?: LlmInstructionRequest['conversationHistory']): Promise<LlmInstructionResponse & { provider?: string }>;
@@ -65,6 +72,45 @@ export interface ApiClient {
 
   // Override-quarantine (SDS 04-04 §3.4)
   recordNomenclatureOverride(entryId: string, record: OverrideRecord): Promise<OverrideResult>;
+}
+
+/** Options for the mnemonic search endpoint (UN-097). */
+export interface MnemonicSearchOptions {
+  texttype?: string;
+  limit?: number;
+  tiers?: ReadonlyArray<'personal' | 'institutional' | 'seed'>;
+  userId?: string;
+  includeRetired?: boolean;
+}
+
+/** Request body for the mnemonic create endpoint (UN-097). */
+export interface CreateMnemonicInput {
+  abbr: string;
+  mnemonic?: string;
+  description?: string | null;
+  lookupDisplay?: string | null;
+  commentText: string;
+  texttypeId: string;
+  userId: string;
+}
+
+/**
+ * Request body for the mnemonic update endpoint (UN-097). Only editable
+ * fields are sent; undefined fields are preserved server-side.
+ */
+export interface UpdateMnemonicInput {
+  userId: string;
+  isAdmin: boolean;
+  description?: string | null;
+  lookupDisplay?: string | null;
+  commentText?: string;
+  texttypeId?: string;
+}
+
+/** Result of promoting a personal mnemonic to institutional (UN-097). */
+export interface PromoteMnemonicResult {
+  institutional: MnemonicHit;
+  personal: MnemonicHit;
 }
 
 /** Typed API error with HTTP status and optional response body. */
@@ -139,9 +185,17 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     async savePreferences(prefs) {
       await request<unknown>('PUT', '/api/user/preferences', prefs);
     },
-    searchMnemonics(query, texttype, limit = 20) {
-      const params = new URLSearchParams({ q: query, limit: String(limit) });
-      if (texttype) params.set('texttype', texttype);
+    searchMnemonics(query, options = {}) {
+      const params = new URLSearchParams({
+        q: query,
+        limit: String(options.limit ?? 20),
+      });
+      if (options.texttype) params.set('texttype', options.texttype);
+      if (options.tiers && options.tiers.length > 0) {
+        params.set('tiers', options.tiers.join(','));
+      }
+      if (options.userId) params.set('userId', options.userId);
+      if (options.includeRetired) params.set('includeRetired', '1');
       return request<MnemonicSearchResponse>('GET', `/api/mnemonics/search?${params}`);
     },
     async recordMnemonicUsage(mnemonicId) {
@@ -149,6 +203,37 @@ export function createApiClient(apiBase: string, getJwt: () => string): ApiClien
     },
     getTopMnemonics(limit = 10) {
       return request<MnemonicHit[]>('GET', `/api/mnemonics/top?limit=${limit}`);
+    },
+    createMnemonic(input) {
+      return request<MnemonicHit>('POST', '/api/mnemonics', input);
+    },
+    updateMnemonic(mnemonicId, input) {
+      return request<MnemonicHit>(
+        'PUT',
+        `/api/mnemonics/${encodeURIComponent(mnemonicId)}`,
+        input,
+      );
+    },
+    promoteMnemonic(mnemonicId, promotedBy) {
+      return request<PromoteMnemonicResult>(
+        'POST',
+        `/api/mnemonics/${encodeURIComponent(mnemonicId)}/promote`,
+        { promotedBy },
+      );
+    },
+    retireMnemonic(mnemonicId, userId, isAdmin) {
+      return request<MnemonicHit>(
+        'POST',
+        `/api/mnemonics/${encodeURIComponent(mnemonicId)}/retire`,
+        { userId, isAdmin },
+      );
+    },
+    unretireMnemonic(mnemonicId, userId, isAdmin) {
+      return request<MnemonicHit>(
+        'POST',
+        `/api/mnemonics/${encodeURIComponent(mnemonicId)}/unretire`,
+        { userId, isAdmin },
+      );
     },
     normalizeDictation(text, clauseType, specimenType) {
       return request<{ text: string; normalized: boolean }>('POST', '/api/dictation/normalize', {

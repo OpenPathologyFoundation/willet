@@ -20,6 +20,8 @@
   } from '$lib/stores/voice.svelte';
   import { getServices } from '$lib/services/context';
   import { transcribe } from '$lib/services/whisper';
+  import { loadPersonalVocab } from '$lib/services/personal-vocab';
+  import type { PersonalVocabEntry } from '$lib/services/whisper-prompt';
   import { correctTranscription, type CorrectionResult } from '$lib/services/transcription-correction';
   import { normalizeFindingSingular } from '$lib/services/instruction-classifier';
   import { decidePolicy } from '$lib/services/source-policy';
@@ -44,6 +46,14 @@
   let textareaEl = $state<HTMLTextAreaElement | null>(null);
   let logExpanded = $state(false);
   let expandedEntryId = $state<string | null>(null);
+
+  // Personal vocabulary loaded once per session. Empty list is a safe default:
+  // Whisper still gets the shared vocabulary and transcription still succeeds.
+  // TODO: replace hardcoded demo userId with the authenticated user when auth lands.
+  let personalVocab = $state<PersonalVocabEntry[]>([]);
+  loadPersonalVocab('gershkovich').then((entries) => {
+    personalVocab = entries;
+  });
 
   // --- Context menu for instruction re-application ---
   const CLAUSE_TYPE_LABELS: { type: ClauseType; label: string }[] = [
@@ -495,9 +505,14 @@
           { id: 'route', label: 'Inserting', icon: 'arrow', status: 'pending' },
         ]);
 
+        // Passing the specimen type to Whisper biases transcription toward the
+        // correct subspecialty vocabulary (Gleason, perineural, HGPIN, Hurthle, ...)
+        // via the same term corpus used downstream for correction.
+        const specimenType = reportStore.caseData?.specimenType ?? null;
+
         isTranscribing = true;
         voiceStore.setTranscribing(true);
-        const result = await transcribe(blob);
+        const result = await transcribe(blob, { specimenType, personalTerms: personalVocab });
         isTranscribing = false;
         voiceStore.setTranscribing(false);
 
@@ -510,7 +525,6 @@
 
           // Apply transcription correction (SRS-185) — both paths get corrected text
           // Try MCP server API first, fall back to local deterministic table (SDS §8 graceful degradation)
-          const specimenType = reportStore.caseData?.specimenType ?? null;
           let correction: CorrectionResult;
           try {
             const apiResult = await services.api.correctTranscription(result.text, specimenType);

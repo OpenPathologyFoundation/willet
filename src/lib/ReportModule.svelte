@@ -26,11 +26,25 @@
   import type { MnemonicHit } from '$lib/types';
   import { rtfToHtml } from 'svelte-rtf-editor';
 
-  let { caseId, jwt, role, apiBase, onEvent }: ReportModuleProps = $props();
+  let { caseId, jwt, role, userId, apiBase, onEvent }: ReportModuleProps = $props();
 
   // Step 1: Create services (SDS 04-01 §2.1)
-  const services = untrack(() => createServices({ apiBase, jwt, role, caseId, onEvent }));
+  const services = untrack(() => createServices({ apiBase, jwt, role, userId, caseId, onEvent }));
   setServiceContext(services);
+
+  /**
+   * Convert plain-text mnemonic commentText (newline-separated) to HTML that
+   * preserves the author's paragraph and line-break structure. Used when the
+   * stored commentText is plain text rather than real RTF.
+   */
+  function plainTextMnemonicToHtml(text: string): string {
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text
+      .split(/\n{2,}/)
+      .map((para) => `<p>${esc(para).replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
 
   const isReadOnly = $derived(reportStore.isReadOnly);
 
@@ -127,18 +141,26 @@
   function handleMnemonicSelect(hit: MnemonicHit) {
     showMnemonicPopover = false;
 
-    // Parse RTF to plain text for textarea, or HTML for contentEditable
+    // mnemonic.commentText is either RTF (begins with `{\rtf`) or plain text
+    // with `\n` line breaks. For plain text, splitting on blank lines into
+    // paragraphs preserves the author's structure — the prior fallback
+    // collapsed newlines, producing run-on text like "...metaplasia.No atypia...".
+    const isRtf = hit.commentText.trimStart().startsWith('{\\rtf');
     let plainText: string;
     let html: string;
-    try {
-      html = rtfToHtml(hit.commentText);
-      // Strip HTML tags for plain text insertion into textareas
-      const temp = document.createElement('div');
-      temp.innerHTML = html;
-      plainText = temp.textContent ?? hit.commentText;
-    } catch {
+    if (isRtf) {
+      try {
+        html = rtfToHtml(hit.commentText);
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        plainText = temp.textContent ?? hit.commentText;
+      } catch {
+        plainText = hit.commentText;
+        html = plainTextMnemonicToHtml(hit.commentText);
+      }
+    } else {
       plainText = hit.commentText;
-      html = `<p>${plainText}</p>`;
+      html = plainTextMnemonicToHtml(hit.commentText);
     }
 
     const target = mnemonicInsertTarget;
